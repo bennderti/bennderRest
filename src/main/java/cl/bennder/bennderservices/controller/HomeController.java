@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
     
     private static final Logger log = LoggerFactory.getLogger(HomeController.class);
-    
+    //.- login
     @RequestMapping(value = "login",method = RequestMethod.POST)
     public @ResponseBody LoginResponse login(@RequestBody LoginRequest request){
         log.info("[login] - inicio ");        
