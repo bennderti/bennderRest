@@ -24,18 +24,18 @@ public class UsuarioServicesImpl implements UsuarioServices{
     
     private static final Logger log = LoggerFactory.getLogger(UsuarioServicesImpl.class);
     
-//    @Autowired
-//    private UsuarioMapper usuarioMapper;
+    @Autowired
+    private UsuarioMapper usuarioMapper;
 
     @Override
     public void listarUsuarios() {
         log.info("INICIO");
-//        List<Integer> users = usuarioMapper.getUsers();
-//        if(users!= null){
-//            for(Integer user:users){
-//                log.info("usuario ->{}",user);
-//            }
-//        }
+        List<Integer> users = usuarioMapper.getUsers();
+        if(users!= null){
+            for(Integer user:users){
+                log.info("usuario ->{}",user);
+            }
+        }
         log.info("FIN");
     }
     

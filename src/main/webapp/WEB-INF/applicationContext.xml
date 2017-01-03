@@ -20,59 +20,38 @@
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:task="http://www.springframework.org/schema/task"
        xmlns:jee="http://www.springframework.org/schema/jee"
        xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">       
     
     <mvc:annotation-driven/>
     <context:component-scan base-package="cl.bennder.bennderservices"/>
   
     <!-- Data Source Bennder -->
-<!--    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/bennderDS"/>
-    -->
-<!--    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-       <property name="jndiName" value="java:comp/env/jdbc/bennderDS"/>
-    </bean>-->
-
-<!--    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiName" value="java:/jdbc/bennderDS"/>
-    </bean>  -->
+    <!-- tutorial:
+    Instalación de jdbc postgresql
+    http://jan.zawodny.pl/blog/2011/07/jboss-7-postgresql-9 -->
+    <jee:jndi-lookup id="dataSource" jndi-name="jboss/datasources/bennderDS"/>
     
-<!--    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.postgresql.Driver"/>
-        <property name="url" value="jdbc:postgresql://localhost:5432/bennder"/>
-        <property name="username" value="postgres"/>
-        <property name="password" value="admin"/>
-    </bean>-->
     
-<!--    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-		p:driverClassName="org.postgresql.ds.PGConnectionPoolDataSource" p:url="jdbc:postgresql://localhost:5432/bennder"
-		p:username="postgres" p:password="admin"/>-->
-    
-<!--    org.postgresql.ds.PGConnectionPoolDataSource-->
-    
-<!--    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
   
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
-    </bean>  
-  
+    </bean>    
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-    </bean>  
-  
+    </bean> 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="cl.bennder.bennderservices.mapper"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
-  
-    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
-        <constructor-arg index="0" ref="sqlSessionFactory"/>
-    </bean>-->
 
 
 </beans>
