@@ -5,7 +5,11 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
+import cl.bennder.bennderservices.model.Validacion;
+import cl.bennder.bennderservices.request.LoginRequest;
+import cl.bennder.bennderservices.response.LoginResponse;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -37,6 +41,40 @@ public class UsuarioServicesImpl implements UsuarioServices{
             }
         }
         log.info("FIN");
+    }
+
+    @Override
+    public LoginResponse validacionUsuario(LoginRequest request) {
+        LoginResponse response = new LoginResponse();
+        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "Problema en validación de usuario"));
+        log.info("INICIO");
+        Integer validacion = 0;
+        try {
+            if(request.getUser()!=null && request.getPassword()!=null){
+                log.info("Validando usuario ->{}",request.getUser());
+                validacion = usuarioMapper.validaUsuario(request.getUser(), request.getPassword());
+                if(validacion!=null && validacion > 0){
+                    response.getValidacion().setCodigo(CodigoValidacion.OK);
+                    response.getValidacion().setMensaje("Validación OK");
+                    log.info("Validación OK");
+                }
+                else{
+                    response.getValidacion().setMensaje("Usuario y contraseña incorrectos");
+                    log.info("Usuario y contraseña incorrectos");
+                }
+            }
+            else{
+                log.info("Favor completar datos para validación de usuario");
+                response.getValidacion().setMensaje("Favor completar datos para validación de usuario");
+            }
+
+        } catch (Exception e) {
+            log.error("Error en Exception:",e);
+            response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "Error en validación de usuario"));
+            
+        }
+        log.info("FIN");
+        return response;
     }
     
 }

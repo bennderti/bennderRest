@@ -34,8 +34,7 @@ public class HomeController {
     @RequestMapping(value = "login",method = RequestMethod.POST)
     public @ResponseBody LoginResponse login(@RequestBody LoginRequest request){
         log.info("[login] - inicio ");        
-        LoginResponse response = new LoginResponse(new Validacion("0", "Welcome "+request.getUser()+" to Bennder!"));
-        usuarioServices.listarUsuarios();
+        LoginResponse response = usuarioServices.validacionUsuario(request);
         log.info("response ->{}",response.toString());
         log.info("[login] - fin ");
         return response;

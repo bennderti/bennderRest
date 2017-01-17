@@ -5,10 +5,14 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.request.LoginRequest;
+import cl.bennder.bennderservices.response.LoginResponse;
+
 /**
  *
  * @author dyanez
  */
 public interface UsuarioServices {
     public void listarUsuarios();
+    public LoginResponse validacionUsuario(LoginRequest request);
 }
