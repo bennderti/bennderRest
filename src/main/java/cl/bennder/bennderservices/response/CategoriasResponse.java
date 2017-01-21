@@ -28,6 +28,9 @@ public class CategoriasResponse implements Serializable{
     }
 
     public Validacion getValidacion() {
+        if(validacion == null){
+            validacion = new Validacion();
+        }
         return validacion;
     }
 

@@ -11,16 +11,17 @@ import java.io.Serializable;
  *
  * @author dyanez
  */
+
 public class Categoria implements Serializable{
     private Integer idCategoria;
-    private String nomnbre;
+    private String nombre;
 
     public Categoria() {
     }
 
-    public Categoria(Integer idCategoria, String nomnbre) {
+    public Categoria(Integer idCategoria, String nombre) {
         this.idCategoria = idCategoria;
-        this.nomnbre = nomnbre;
+        this.nombre = nombre;
     }
 
     public Integer getIdCategoria() {
@@ -31,17 +32,17 @@ public class Categoria implements Serializable{
         this.idCategoria = idCategoria;
     }
 
-    public String getNomnbre() {
-        return nomnbre;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNomnbre(String nomnbre) {
-        this.nomnbre = nomnbre;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     @Override
     public String toString() {
-        return "Categoria{" + "idCategoria=" + idCategoria + ", nomnbre=" + nomnbre + '}';
+        return "Categoria{" + "idCategoria=" + idCategoria + ", nombre=" + nombre + '}';
     }
     
 }

@@ -24,7 +24,7 @@ public interface UsuarioMapper {
    * @param password Contraseña del usuaio
    * @return Retorna 0 si usuario no existe, caso contrario existe
    */
-   @Select("SELECT COUNT(1) FROM B_USUARIO WHERE USUARIO = #{u} AND PASSWORD =#{p}")
-   public Integer validaUsuario(@Param("u") String usuario,@Param("p") String password);
+   @Select("SELECT COUNT(1) FROM USUARIO WHERE ID_USUARIO = #{u} AND PASSWORD =#{p}")
+   public Integer validaUsuario(@Param("u") Integer usuario,@Param("p") String password);
     
 }

@@ -7,6 +7,8 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
+import cl.bennder.bennderservices.model.Validacion;
+import cl.bennder.bennderservices.request.CategoriasRequest;
 import cl.bennder.bennderservices.response.CategoriasResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +30,11 @@ public class CategoriaServicesImpl implements CategoriaServices{
     private CategoriaMapper categoriaMapper;
     
     @Override
-    public CategoriasResponse getCategorias() {
+    public CategoriasResponse getCategorias(CategoriasRequest request) {
         CategoriasResponse response = new CategoriasResponse();
         try {
             response.setCategorias(categoriaMapper.getCategorias());
+            response.setValidacion(new Validacion("0", "Categorías OK"));
             log.info("Obtención de categorías->{}",response.getCategorias().size());
         } catch (Exception e) {
             log.error("Exception getCategorias,",e);

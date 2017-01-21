@@ -5,22 +5,29 @@
  */
 package cl.bennder.bennderservices.request;
 
+import java.io.Serializable;
+
 /**
  *
  * @author dyanez
  */
-public class LoginRequest {
-    private String user;
+public class LoginRequest implements Serializable{
+    private Integer user;
     private String password;
 
     public LoginRequest() {
     }
+     public LoginRequest(Integer user, String password) {
+        this.user = user;
+        this.password = password;
+    }
     
-    public String getUser() {
+    
+    public Integer getUser() {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(Integer user) {
         this.user = user;
     }
 

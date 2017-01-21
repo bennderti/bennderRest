@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.request.CategoriasRequest;
 import cl.bennder.bennderservices.response.CategoriasResponse;
 
 /**
@@ -12,5 +13,5 @@ import cl.bennder.bennderservices.response.CategoriasResponse;
  * @author dyanez
  */
 public interface CategoriaServices {
-    public CategoriasResponse getCategorias();
+    public CategoriasResponse getCategorias(CategoriasRequest request);
 }
