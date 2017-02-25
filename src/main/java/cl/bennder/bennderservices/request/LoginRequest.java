@@ -12,22 +12,22 @@ import java.io.Serializable;
  * @author dyanez
  */
 public class LoginRequest implements Serializable{
-    private Integer user;
+    private String user;
     private String password;
 
     public LoginRequest() {
     }
-     public LoginRequest(Integer user, String password) {
+     public LoginRequest(String user, String password) {
         this.user = user;
         this.password = password;
     }
     
     
-    public Integer getUser() {
+    public String getUser() {
         return user;
     }
 
-    public void setUser(Integer user) {
+    public void setUser(String user) {
         this.user = user;
     }
 
