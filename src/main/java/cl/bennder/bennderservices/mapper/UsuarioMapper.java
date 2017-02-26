@@ -26,5 +26,14 @@ public interface UsuarioMapper {
    */
    @Select("SELECT COUNT(1) FROM USUARIO WHERE USUARIO = #{u} AND PASSWORD =#{p}")
    public Integer validaUsuario(@Param("u") String usuario,@Param("p") String password);
+   
+    
+    /**
+   * Obtiene el id del cliente que es RUT sin DV
+   * @param usuario Indica el usuario ingresado
+   * @return Retorna el idUsuario que es rut sin DV, utilizado como el identificador de sesion para cliente
+   */
+   @Select("SELECT ID_USUARIO FROM USUARIO WHERE USUARIO = #{u}")
+   public Integer getIdUsuario(@Param("u") String usuario);
     
 }

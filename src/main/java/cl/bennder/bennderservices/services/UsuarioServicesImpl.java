@@ -52,8 +52,11 @@ public class UsuarioServicesImpl implements UsuarioServices{
         try {
             if(request.getUser()!=null && request.getPassword()!=null){
                 log.info("Validando usuario ->{}",request.getUser());
+                //usuario existe?
                 validacion = usuarioMapper.validaUsuario(request.getUser(), request.getPassword());
-                if(validacion!=null && validacion > 0){
+                if(validacion!=null && validacion.compareTo(1) == 0){
+                    //.- obtener idUSuario(rut usuario sin dv) por usuario
+                    response.setIdUsuario(usuarioMapper.getIdUsuario(request.getUser()));                    
                     response.getValidacion().setCodigo(CodigoValidacion.OK);
                     response.getValidacion().setMensaje("Validación OK");
                     log.info("Validación OK");
