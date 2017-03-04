@@ -12,28 +12,32 @@ import java.io.Serializable;
  *
  * @author dyanez
  */
-public class LoginResponse implements Serializable{
-    private Validacion validacion;
+public class LoginResponse extends ValidacionResponse implements Serializable{
     private Integer idUsuario;//rut sin dv
 
-    public LoginResponse(Validacion validacion) {
-        this.validacion = validacion;
+    public LoginResponse(Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
-    
+
+    public LoginResponse(Integer idUsuario, Validacion validacion) {
+        super(validacion);
+        this.idUsuario = idUsuario;
+    }
+
     public LoginResponse() {
     }
     
     //se dejó de esta manera, como una de las mejores prácticas y así instanciar sólo cuando se utilice
-    public Validacion getValidacion() {
-        if(validacion == null){
-            validacion = new Validacion();
-        }
-        return validacion;
-    }
-
-    public void setValidacion(Validacion validacion) {
-        this.validacion = validacion;
-    }
+//    public Validacion getValidacion() {
+//        if(validacion == null){
+//            validacion = new Validacion();
+//        }
+//        return validacion;
+//    }
+//
+//    public void setValidacion(Validacion validacion) {
+//        this.validacion = validacion;
+//    }
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -45,7 +49,9 @@ public class LoginResponse implements Serializable{
 
     @Override
     public String toString() {
-        return "LoginResponse{" + "validacion=" + validacion + ", idUsuario=" + idUsuario + '}';
+        return "LoginResponse{" + "idUsuario=" + idUsuario + '}';
     }
+
+    
     
 }

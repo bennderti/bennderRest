@@ -46,7 +46,7 @@ public class UsuarioServicesImpl implements UsuarioServices{
     @Override
     public LoginResponse validacionUsuario(LoginRequest request) {
         LoginResponse response = new LoginResponse();
-        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "Problema en validación de usuario"));
+        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
         log.info("INICIO");
         Integer validacion = 0;
         try {
@@ -73,7 +73,7 @@ public class UsuarioServicesImpl implements UsuarioServices{
 
         } catch (Exception e) {
             log.error("Error en Exception:",e);
-            response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "Error en validación de usuario"));
+            response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "1","Error en validación de usuario"));
             
         }
         log.info("FIN");

@@ -34,7 +34,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         CategoriasResponse response = new CategoriasResponse();
         try {
             response.setCategorias(categoriaMapper.getCategorias());
-            response.setValidacion(new Validacion("0", "Categorías OK"));
+            response.setValidacion(new Validacion("0","0","Categorías OK"));
             log.info("Obtención de categorías->{}",response.getCategorias().size());
         } catch (Exception e) {
             log.error("Exception getCategorias,",e);
