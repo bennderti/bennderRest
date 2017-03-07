@@ -6,6 +6,7 @@
 package cl.bennder.bennderservices.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -15,13 +16,17 @@ import java.io.Serializable;
 public class Categoria implements Serializable{
     private Integer idCategoria;
     private String nombre;
+    private Integer idCategoriaPadre;
+    private List<Categoria> subCategorias;
 
     public Categoria() {
     }
 
-    public Categoria(Integer idCategoria, String nombre) {
+    public Categoria(Integer idCategoria, String nombre, Integer idCategoriaPadre, List<Categoria> subCategorias) {
         this.idCategoria = idCategoria;
         this.nombre = nombre;
+        this.subCategorias = subCategorias;
+        this.idCategoriaPadre = idCategoriaPadre;
     }
 
     public Integer getIdCategoria() {
@@ -38,6 +43,22 @@ public class Categoria implements Serializable{
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public List<Categoria> getSubCategorias() {
+        return subCategorias;
+    }
+
+    public void setSubCategorias(List<Categoria> subCategorias) {
+        this.subCategorias = subCategorias;
+    }
+
+    public Integer getIdCategoriaPadre() {
+        return idCategoriaPadre;
+    }
+
+    public void setIdCategoriaPadre(Integer idCategoriaPadre) {
+        this.idCategoriaPadre = idCategoriaPadre;
     }
 
     @Override

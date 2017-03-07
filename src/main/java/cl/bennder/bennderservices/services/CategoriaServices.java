@@ -13,5 +13,6 @@ import cl.bennder.bennderservices.response.CategoriasResponse;
  * @author dyanez
  */
 public interface CategoriaServices {
-    public CategoriasResponse getCategorias(CategoriasRequest request);
+    CategoriasResponse getCategorias(CategoriasRequest request);
+    CategoriasResponse obtenerCategoriasRelacionadas(CategoriasRequest request);
 }

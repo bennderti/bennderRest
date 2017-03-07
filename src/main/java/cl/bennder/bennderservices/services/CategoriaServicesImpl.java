@@ -5,8 +5,10 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
+import cl.bennder.bennderservices.model.Categoria;
 import cl.bennder.bennderservices.model.Validacion;
 import cl.bennder.bennderservices.request.CategoriasRequest;
 import cl.bennder.bennderservices.response.CategoriasResponse;
@@ -15,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.BadRequestException;
 
 /**
  *
@@ -42,5 +46,44 @@ public class CategoriaServicesImpl implements CategoriaServices{
         
         return response;
     }
- 
+
+    @Override
+    public CategoriasResponse obtenerCategoriasRelacionadas(CategoriasRequest request) {
+        CategoriasResponse response = new CategoriasResponse();
+
+        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
+        try {
+
+            String nombreCategoria = request.getNombreCategoria();
+
+
+            if (nombreCategoria == null || nombreCategoria.isEmpty()){
+                log.error("Campo nombreCategoria esta vacio");
+                response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Campo nombreCategoria esta vacio"));
+            }
+            else {
+                Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(nombreCategoria.trim());
+                if (categoria == null) {
+                    log.error("Objeto categoria esta vacio");
+                    response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Objeto categoria esta vacio"));
+                }
+                else{
+                    switch (categoria.getIdCategoriaPadre()) {
+                        case -1:
+                            response.setCategorias(categoriaMapper.obtenerSubCategorias(categoria.getIdCategoria()));
+                            break;
+                        default:
+                            response.setCategorias(categoriaMapper.obtenerSubCategorias(categoria.getIdCategoriaPadre()));
+                            break;
+                    }
+                    response.setValidacion(new Validacion("0", "0", "Categorías OK"));
+                    log.info("Obtención de categorías->{}", response.getCategorias().size());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Exception obtenerCategoriasRelacionadas,",e);
+        }
+        return response;
+    }
+
 }
