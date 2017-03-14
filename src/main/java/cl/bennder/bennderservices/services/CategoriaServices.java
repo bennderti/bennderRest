@@ -6,6 +6,7 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.request.CategoriasRequest;
+import cl.bennder.bennderservices.response.CategoriaResponse;
 import cl.bennder.bennderservices.response.CategoriasResponse;
 
 /**
@@ -15,4 +16,5 @@ import cl.bennder.bennderservices.response.CategoriasResponse;
 public interface CategoriaServices {
     CategoriasResponse getCategorias(CategoriasRequest request);
     CategoriasResponse obtenerCategoriasRelacionadas(CategoriasRequest request);
+    CategoriaResponse cargarCategoria(CategoriasRequest request);
 }
