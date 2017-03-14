@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.mapper;
 
+import cl.bennder.bennderservices.model.Usuario;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -35,5 +36,29 @@ public interface UsuarioMapper {
    */
    @Select("SELECT ID_USUARIO FROM USUARIO WHERE USUARIO = #{u}")
    public Integer getIdUsuario(@Param("u") String usuario);
+   
+   
+   /**
+    * Obtiene el estado del usuario el cual puede ser 1:Nuevo, 2:Activo, 3:Inactivo
+    * @param idUsuario
+    * @return idEstadoUsuario
+    * @author mgutierrez
+    */
+   @Select("SELECT ID_ESTADO_USUARIO FROM USUARIO WHERE ID_USUARIO = #{idUsuario}")
+   public Integer getEstadoUasuario(@Param("idUsuario") Integer idUsuario);
+   
+   
+   /**
+    * Obtiene los siguiente datos del usuario: nombres, apellidos, direccion y datos de contacto
+    * @param idUsuario
+    * @return Usuario 
+    * @author mgutierrez
+    */
+   @Select("SELECT U.NOMBRES, U.APELLIDO_P, U.APELLIDO_M, D.ID_COMUNA, D.CALLE, D.NUMERO, D.DEPARTAMENTO, D.VILLA, C.CELULAR, C.TELEFONO_FIJO, C.CORREO "
+           + "FROM USUARIO U "
+           + "INNER JOIN DIRECCION D ON U.ID_DIRECCION = D.ID_DIRECCION "
+           + "INNER JOIN CONTACTO C ON U.ID_CONTACTO = C.ID_CONTACTO "
+           + "WHERE U.ID_USUARIO = #{idUsuario}")
+   public Usuario getDatosUsuario(@Param("idUsuario") Integer idUsuario);
     
 }
