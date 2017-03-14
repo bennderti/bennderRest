@@ -19,14 +19,14 @@ public class Beneficio implements Serializable{
     private Integer stock;
     private Integer idProveedor;
     private Integer idCategoria;
-    private Integer idTipoBeneficio;
+    private TipoBeneficio tipoBeneficio;
     private Integer limiteStock;
     private Integer visitasGeneral;
 
     public Beneficio() {
     }
 
-    public Beneficio(Integer idBeneficio, String titulo, String descripcion, Date fechaCreacion, Date fechaExpiracion, String condicion, Boolean habilitado, Integer calificacion, Integer stock, Integer idProveedor, Integer idCategoria, Integer idTipoBeneficio, Integer limiteStock, Integer visitasGeneral) {
+    public Beneficio(Integer idBeneficio, String titulo, String descripcion, Date fechaCreacion, Date fechaExpiracion, String condicion, Boolean habilitado, Integer calificacion, Integer stock, Integer idProveedor, Integer idCategoria, TipoBeneficio tipoBeneficio, Integer limiteStock, Integer visitasGeneral) {
         this.idBeneficio = idBeneficio;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -38,7 +38,7 @@ public class Beneficio implements Serializable{
         this.stock = stock;
         this.idProveedor = idProveedor;
         this.idCategoria = idCategoria;
-        this.idTipoBeneficio = idTipoBeneficio;
+        this.tipoBeneficio = tipoBeneficio;
         this.limiteStock = limiteStock;
         this.visitasGeneral = visitasGeneral;
     }
@@ -131,12 +131,12 @@ public class Beneficio implements Serializable{
         this.idCategoria = idCategoria;
     }
 
-    public Integer getIdTipoBeneficio() {
-        return idTipoBeneficio;
+    public TipoBeneficio getTipoBeneficio() {
+        return tipoBeneficio;
     }
 
-    public void setIdTipoBeneficio(Integer idTipoBeneficio) {
-        this.idTipoBeneficio = idTipoBeneficio;
+    public void setTipoBeneficio(TipoBeneficio tipoBeneficio) {
+        this.tipoBeneficio = tipoBeneficio;
     }
 
     public Integer getLimiteStock() {
