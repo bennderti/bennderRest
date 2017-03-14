@@ -85,7 +85,7 @@ create table ACCESO_USUARIO (
 /*==============================================================*/
 create table ACCION_USUARIO_BENEFICIO (
    ID_ACCION_BENEFICIO  INT4                 not null,
-   NOMBRE               CHAR(15)             null,
+   NOMBRE               VARCHAR(15)             null,
    constraint PK_ACCION_USUARIO_BENEFICIO primary key (ID_ACCION_BENEFICIO)
 );
 
@@ -94,11 +94,11 @@ create table ACCION_USUARIO_BENEFICIO (
 /*==============================================================*/
 create table BENEFICIO (
    ID_BENEFICIO         SERIAL               not null,
-   TITULO               CHAR(50)             not null,
-   DESCRIPCION          CHAR(1000)           not null,
+   TITULO               VARCHAR(50)             not null,
+   DESCRIPCION          VARCHAR(1000)           not null,
    FECHA_CREACION       date                 not null,
    FECHA_EXPIRACION     date                 not null,
-   CONDICION            CHAR(50)             null,
+   CONDICION            VARCHAR(50)             null,
    HABILITADO           BOOL                 not null,
    CALIFICACION         INT4                 not null,
    STOCK                INT4                 not null,
@@ -144,7 +144,7 @@ create table BENEFICIO_PRODUCTO (
 /*==============================================================*/
 create table CARGO (
    ID_CARGO             SERIAL               not null,
-   NOMBRE               CHAR(20)             not null,
+   NOMBRE               VARCHAR(20)             not null,
    constraint PK_CARGO primary key (ID_CARGO)
 );
 
@@ -165,7 +165,7 @@ create table CATEGORIA (
 create table COMUNA (
    ID_COMUNA            INT4                 not null,
    ID_REGION            INT4                 null,
-   NOMBRE               CHAR(20)             not null,
+   NOMBRE               VARCHAR(20)             not null,
    constraint PK_COMUNA primary key (ID_COMUNA)
 );
 
@@ -176,7 +176,7 @@ create table CONTACTO (
    ID_CONTACTO          SERIAL               not null,
    CELULAR              INT4                 null,
    TELEFONO_FIJO        INT4                 null,
-   CORREO               CHAR(20)             null,
+   CORREO               VARCHAR(20)             null,
    constraint PK_CONTACTO primary key (ID_CONTACTO)
 );
 
@@ -186,10 +186,10 @@ create table CONTACTO (
 create table DIRECCION (
    ID_DIRECCION         SERIAL               not null,
    ID_COMUNA            INT4                 null,
-   CALLE                CHAR(20)             not null,
-   NUMERO               CHAR(10)             not null,
-   DEPARTAMENTO         CHAR(10)             null,
-   VILLA                CHAR(20)             null,
+   CALLE                VARCHAR(20)             not null,
+   NUMERO               VARCHAR(10)             not null,
+   DEPARTAMENTO         VARCHAR(10)             null,
+   VILLA                VARCHAR(20)             null,
    constraint PK_DIRECCION primary key (ID_DIRECCION)
 );
 
@@ -199,7 +199,7 @@ create table DIRECCION (
 create table EMPRESA (
    ID_EMPRESA           SERIAL               not null,
    ID_DIRECCION         INT4                 null,
-   NOMBRE               CHAR(50)             not null,
+   NOMBRE               VARCHAR(50)             not null,
    constraint PK_EMPRESA primary key (ID_EMPRESA)
 );
 
@@ -208,7 +208,7 @@ create table EMPRESA (
 /*==============================================================*/
 create table ESTADO_USUARIO (
    ID_ESTADO_USUARIO    INT4                 not null,
-   NOMBRE               CHAR(15)             not null,
+   NOMBRE               VARCHAR(15)             not null,
    constraint PK_ESTADO_USUARIO primary key (ID_ESTADO_USUARIO)
 );
 
@@ -236,7 +236,7 @@ create table INTERES_USUARIO (
 /* Table: KEY_WORDS                                             */
 /*==============================================================*/
 create table KEY_WORDS (
-   ID_KEY_WORD          CHAR(20)             not null,
+   ID_KEY_WORD          VARCHAR(20)             not null,
    constraint PK_KEY_WORDS primary key (ID_KEY_WORD)
 );
 
@@ -245,7 +245,7 @@ create table KEY_WORDS (
 /*==============================================================*/
 create table KEY_WORD_BENEFICIO (
    ID_BENEFICIO         INT4                 not null,
-   ID_KEY_WORD          CHAR(20)             not null,
+   ID_KEY_WORD          VARCHAR(20)             not null,
    constraint PK_KEY_WORD_BENEFICIO primary key (ID_BENEFICIO, ID_KEY_WORD)
 );
 
@@ -254,7 +254,7 @@ create table KEY_WORD_BENEFICIO (
 /*==============================================================*/
 create table PAIS (
    ID_PAIS              INT4                 not null,
-   NOMBRE               CHAR(20)             not null,
+   NOMBRE               VARCHAR(20)             not null,
    constraint PK_PAIS primary key (ID_PAIS)
 );
 
@@ -263,7 +263,7 @@ create table PAIS (
 /*==============================================================*/
 create table PERFIL (
    ID_PERFIL            INT4                 not null,
-   NOMBRE               CHAR(20)             not null,
+   NOMBRE               VARCHAR(20)             not null,
    HABILITADO           BOOL                 not null,
    constraint PK_PERFIL primary key (ID_PERFIL)
 );
@@ -282,7 +282,7 @@ create table PERFIL_USUARIO (
 /*==============================================================*/
 create table PERMISO (
    ID_PERMISO           INT4                 not null,
-   NOMBRE               CHAR(20)             not null,
+   NOMBRE               VARCHAR(20)             not null,
    HABILITADO           BOOL                 not null,
    constraint PK_PERMISO primary key (ID_PERMISO)
 );
@@ -301,7 +301,7 @@ create table PERMISO_PERFIL (
 /*==============================================================*/
 create table PROVEEDOR (
    ID_PROVEEDOR         INT4                 not null,
-   NOMBRE               CHAR(50)             not null,
+   NOMBRE               VARCHAR(50)             not null,
    RUT                  INT4                 not null,
    FECHA_INGRESO        DATE                 not null,
    FECHA_SALIDA         DATE                 null,
@@ -315,7 +315,7 @@ create table PROVEEDOR (
 create table RATING_REVIEW (
    ID_BENEFICIO         INT4                 not null,
    ID_USUARIO           INT4                 not null,
-   COMENTARIO           CHAR(50)             null,
+   COMENTARIO           VARCHAR(50)             null,
    CALIFICACION         INT2                 not null,
    constraint PK_RATING_REVIEW primary key (ID_BENEFICIO, ID_USUARIO)
 );
@@ -326,7 +326,7 @@ create table RATING_REVIEW (
 create table REGION (
    ID_REGION            INT4                 not null,
    ID_PAIS              INT4                 null,
-   NOMBRE               CHAR(20)             not null,
+   NOMBRE               VARCHAR(20)             not null,
    constraint PK_REGION primary key (ID_REGION)
 );
 
@@ -334,7 +334,7 @@ create table REGION (
 /* Table: STOP_WORD                                             */
 /*==============================================================*/
 create table STOP_WORD (
-   ID_STOP_WORD         CHAR(20)             not null,
+   ID_STOP_WORD         VARCHAR(20)             not null,
    constraint PK_STOP_WORD primary key (ID_STOP_WORD)
 );
 
@@ -351,8 +351,8 @@ create table SUCURSAL_PROVEEDOR (
 /* Table: TESAURUS                                              */
 /*==============================================================*/
 create table TESAURUS (
-   KEY_WORD             CHAR(20)             not null,
-   KEY_WORD_REL         CHAR(20)             not null,
+   KEY_WORD             VARCHAR(20)             not null,
+   KEY_WORD_REL         VARCHAR(20)             not null,
    constraint PK_TESAURUS primary key (KEY_WORD, KEY_WORD_REL)
 );
 
@@ -361,7 +361,7 @@ create table TESAURUS (
 /*==============================================================*/
 create table TIPO_BENEFICIO (
    ID_TIPO_BENEFICIO    INT4                 not null,
-   NOMBRE               CHAR(15)             null,
+   NOMBRE               VARCHAR(15)             null,
    constraint PK_TIPO_BENEFICIO primary key (ID_TIPO_BENEFICIO)
 );
 
@@ -370,7 +370,7 @@ create table TIPO_BENEFICIO (
 /*==============================================================*/
 create table TIPO_USUARIO_EMPRESA (
    ID_TIPO              INT4                 not null,
-   NOMBRE               CHAR(15)             null,
+   NOMBRE               VARCHAR(15)             null,
    constraint PK_TIPO_USUARIO_EMPRESA primary key (ID_TIPO)
 );
 
@@ -382,7 +382,7 @@ create table USUARIO (
    ID_CONTACTO          INT4                 not null,
    ID_DIRECCION         INT4                 null,
    ID_ESTADO_USUARIO    INT4                 null,
-   PASSWORD             CHAR(15)             not null,
+   PASSWORD             VARCHAR(15)             not null,
    USUARIO              VARCHAR(50)          not null,
    constraint PK_USUARIO primary key (ID_USUARIO)
 );
@@ -395,7 +395,7 @@ create table USUARIO_BENEFICIO (
    ID_USUARIO           INT4                 not null,
    ID_ACCION_BENEFICIO  INT4                 null,
    CANTIDAD             INT4                 not null,
-   CODIGO_BENEFICIO     CHAR(15)             null,
+   CODIGO_BENEFICIO     VARCHAR(15)             null,
    constraint PK_USUARIO_BENEFICIO primary key (ID_BENEFICIO, ID_USUARIO)
 );
 
@@ -407,7 +407,7 @@ create table USUARIO_EMPRESA (
    ID_TIPO              INT4                 null,
    ID_CARGO             INT4                 not null,
    ID_USUARIO           INT4                 not null,
-   CORREO               CHAR(20)             null,
+   CORREO               VARCHAR(20)             null,
    constraint PK_USUARIO_EMPRESA primary key (ID_CARGO, ID_USUARIO)
 );
 
@@ -418,7 +418,7 @@ create table USUARIO_PROVEEDOR (
    ID_PROVEEDOR         INT4                 not null,
    ID_USUARIO           INT4                 not null,
    ID_TIPO              INT4                 not null,
-   CORREO               CHAR(20)             not null,
+   CORREO               VARCHAR(20)             not null,
    constraint PK_USUARIO_PROVEEDOR primary key (ID_PROVEEDOR, ID_USUARIO)
 );
 
