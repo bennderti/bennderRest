@@ -1,11 +1,20 @@
 package cl.bennder.bennderservices.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Diego on 03-03-2017.
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Descuento.class, name = "Descuento")
+})
 public class Beneficio implements Serializable{
 
     private Integer idBeneficio;
