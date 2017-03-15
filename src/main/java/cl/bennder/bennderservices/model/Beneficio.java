@@ -13,7 +13,8 @@ import java.util.Date;
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Descuento.class, name = "Descuento")
+        @JsonSubTypes.Type(value = Descuento.class, name = "Descuento"),
+        @JsonSubTypes.Type(value = Producto.class, name = "Producto")
 })
 public class Beneficio implements Serializable{
 

@@ -2,6 +2,7 @@ package cl.bennder.bennderservices.mapper;
 
 import cl.bennder.bennderservices.model.Beneficio;
 import cl.bennder.bennderservices.model.Descuento;
+import cl.bennder.bennderservices.model.Producto;
 import cl.bennder.bennderservices.model.TipoBeneficio;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.IntegerTypeHandler;
@@ -19,14 +20,18 @@ public interface BeneficioMapper {
             " b.descripcion," +
             " tb.id_tipo_beneficio," +
             " tb.nombre," +
-            " bd.porcentaje_descuento as porcentajeDescuento" +
+            " bd.porcentaje_descuento as porcentajeDescuento," +
+            " bp.precio_normal as precioNormal," +
+            " bp.precio_oferta as precioOferta" +
             " FROM beneficio b" +
             " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
             " WHERE b.id_categoria = #{idCategoria}")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
-            @Case(value = "1", type = Descuento.class)
+            @Case(value = "1", type = Descuento.class),
+            @Case(value = "2", type = Producto.class)
 
     })
     @Results({
