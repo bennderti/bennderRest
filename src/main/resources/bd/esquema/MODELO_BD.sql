@@ -72,6 +72,10 @@ drop table if exists USUARIO_EMPRESA;
 
 drop table if exists USUARIO_PROVEEDOR;
 
+drop table if exists plantilla_correo;
+
+drop table if exists parametro_sistema;
+
 /*==============================================================*/
 /* Table: ACCESO_USUARIO                                        */
 /*==============================================================*/
@@ -420,6 +424,33 @@ create table USUARIO_PROVEEDOR (
    ID_TIPO              INT4                 not null,
    CORREO               VARCHAR(20)             not null,
    constraint PK_USUARIO_PROVEEDOR primary key (ID_PROVEEDOR, ID_USUARIO)
+);
+
+
+/*==============================================================*/
+/* Table: PLANTILLA_CORREO, PARA DEFINIR PLANTILLAS DE CORREO                                     */
+/*==============================================================*/
+CREATE TABLE plantilla_correo
+(
+  id_plantilla integer NOT NULL,
+  nombre character varying(100) NOT NULL,
+  asunto character varying(100) NOT NULL,
+  descripcion character varying(100) NOT NULL,
+  constraint pk_plantilla_correo primary key (id_plantilla)
+);
+
+
+/*==============================================================*/
+/* TABLAS parametro_sistema UTILIZADAS PARA GUARDAR DATOS DE PARAMETROS DE SISTEMA
+/*==============================================================*/
+
+CREATE TABLE parametro_sistema
+(
+  id_parametro_sistema serial NOT NULL,
+  tipo_parametro varchar(30) NOT NULL,
+  clave varchar(30) NOT NULL,
+  valor_a varchar(100) NOT NULL,
+  valor_b varchar(100) NOT NULL
 );
 
 alter table ACCESO_USUARIO
