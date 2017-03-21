@@ -181,18 +181,26 @@ public class EmailServicesImpl implements EmailServices{
                     datosEmailTemplate.setMailTo(usuario);
                     
                     ParametroSistema paramUrlBennder = this.parametroSistemaServices.getDatosParametroSistema(TP_BENNDER_USUARIO, C_URL_PLATAFORMA);
-                    log.info("Url acceso plataforma bennder ->{}, para  usuario->{}",paramUrlBennder.getValorA(),usuario);
-                   //Completando datos de contexto
-                    VelocityContext velocityContext = new VelocityContext();
-                    velocityContext.put("user", usuario);
-                    velocityContext.put("password", password);
-                    velocityContext.put("urlBennderUsuario", paramUrlBennder.getValorA());
-                    
-                    datosEmailTemplate.setContext(velocityContext);
-                    log.info("obteniendo beans de email...");
-                    ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
-                    Mailer mailer = (Mailer) context.getBean("mailer");
-                    response = mailer.enviarCorreoPassword(datosEmailTemplate, passMailFrom);                    
+                    if(paramUrlBennder != null){
+                        log.info("Url acceso plataforma bennder ->{}, para  usuario->{}",paramUrlBennder.getValorA(),usuario);
+                       //Completando datos de contexto
+                        VelocityContext velocityContext = new VelocityContext();
+                        velocityContext.put("user", usuario);
+                        velocityContext.put("password", password);
+                        velocityContext.put("urlBennderUsuario", paramUrlBennder.getValorA());
+
+                        datosEmailTemplate.setContext(velocityContext);
+                        log.info("obteniendo beans de email...");
+                        ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
+                        Mailer mailer = (Mailer) context.getBean("mailer");
+                        response = mailer.enviarCorreoPassword(datosEmailTemplate, passMailFrom); 
+                    }
+                    else{  
+                        response.setCodigoNegocio("3");
+                        response.setMensaje("Sin plataforma configurada para usuario, favor contactar a soporte.");
+                        log.info("Sin plataforma configurada para usuario->{}",usuario);
+                    }
+                  
                 }
                 else{
                     response.setCodigoNegocio("2");
