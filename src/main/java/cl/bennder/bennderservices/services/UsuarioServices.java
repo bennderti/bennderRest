@@ -5,8 +5,9 @@
  */
 package cl.bennder.bennderservices.services;
 
-import cl.bennder.bennderservices.request.LoginRequest;
-import cl.bennder.bennderservices.response.LoginResponse;
+import cl.bennder.entitybennderwebrest.request.LoginRequest;
+import cl.bennder.entitybennderwebrest.response.LoginResponse;
+
 
 /**
  *

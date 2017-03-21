@@ -5,7 +5,8 @@
  */
 package cl.bennder.bennderservices.mapper;
 
-import cl.bennder.bennderservices.model.Categoria;
+
+import cl.bennder.entitybennderwebrest.model.Categoria;
 import java.util.List;
 
 import org.apache.ibatis.annotations.*;

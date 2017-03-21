@@ -6,14 +6,12 @@
 package cl.bennder.bennderservices.controller;
 
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
-import cl.bennder.bennderservices.model.Categoria;
-import cl.bennder.bennderservices.model.Validacion;
-import cl.bennder.bennderservices.request.BeneficiosRequest;
-import cl.bennder.bennderservices.request.CategoriasRequest;
-import cl.bennder.bennderservices.response.BeneficiosResponse;
-import cl.bennder.bennderservices.response.CategoriaResponse;
-import cl.bennder.bennderservices.response.CategoriasResponse;
 import cl.bennder.bennderservices.services.CategoriaServices;
+import cl.bennder.entitybennderwebrest.request.BeneficiosRequest;
+import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
+import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
+import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

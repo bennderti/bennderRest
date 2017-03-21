@@ -1,9 +1,9 @@
 package cl.bennder.bennderservices.mapper;
 
-import cl.bennder.bennderservices.model.Beneficio;
-import cl.bennder.bennderservices.model.Descuento;
-import cl.bennder.bennderservices.model.Producto;
-import cl.bennder.bennderservices.model.TipoBeneficio;
+import cl.bennder.entitybennderwebrest.model.Beneficio;
+import cl.bennder.entitybennderwebrest.model.Descuento;
+import cl.bennder.entitybennderwebrest.model.Producto;
+import cl.bennder.entitybennderwebrest.model.TipoBeneficio;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.IntegerTypeHandler;
 import org.apache.ibatis.type.StringTypeHandler;

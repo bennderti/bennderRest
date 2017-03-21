@@ -170,12 +170,13 @@
         </dependency>
         <!--Fin - Adicionales para velocity-->   
         
-         <!--Librerias--> 
-<!--        <dependency>
+         <!--Libreria entidades compartidas web/rest - inicio--> 
+        <dependency>
             <groupId>cl.bennder</groupId>
-            <artifactId>Libreria</artifactId>
+            <artifactId>EntityBennderWebRest</artifactId>
             <version>1.0</version>
-        </dependency>-->
+        </dependency>
+        <!--Libreria entidades compartidas web/rest - fin--> 
          
     </dependencies>
 

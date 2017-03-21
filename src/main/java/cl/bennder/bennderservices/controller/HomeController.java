@@ -5,10 +5,6 @@
  */
 package cl.bennder.bennderservices.controller;
 
-import cl.bennder.bennderservices.request.LoginRequest;
-import cl.bennder.bennderservices.request.RecuperacionPasswordRequest;
-import cl.bennder.bennderservices.response.LoginResponse;
-import cl.bennder.bennderservices.response.ValidacionResponse;
 import cl.bennder.bennderservices.services.UsuarioServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import cl.bennder.bennderservices.services.EmailServices;
+import cl.bennder.entitybennderwebrest.request.LoginRequest;
+import cl.bennder.entitybennderwebrest.request.RecuperacionPasswordRequest;
+import cl.bennder.entitybennderwebrest.response.LoginResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 
 /**
  *

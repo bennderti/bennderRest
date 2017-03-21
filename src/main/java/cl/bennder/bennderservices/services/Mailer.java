@@ -11,7 +11,7 @@ package cl.bennder.bennderservices.services;
  */
 import cl.bennder.bennderservices.model.EmailTemplate;
 import cl.bennder.bennderservices.model.SimpleMail;
-import cl.bennder.bennderservices.model.Validacion;
+import cl.bennder.entitybennderwebrest.model.Validacion;
 import java.io.StringWriter;
 import java.util.Properties;
 import javax.mail.internet.MimeMessage;
@@ -76,7 +76,7 @@ public class Mailer {
 
  }
  public Validacion enviarCorreoPassword(EmailTemplate emailTemplate, String passMailFrom){
-    Validacion response = new Validacion("0", "1", "Problemas al enviar correo");
+     Validacion response = new Validacion("0", "1", "Problemas al enviar correo");
     log.info("inicio");
     try {
         log.info("completando correo salida->{}/destinatario->{}/asunto...",emailTemplate.getMailFrom(),emailTemplate.getMailTo()); 

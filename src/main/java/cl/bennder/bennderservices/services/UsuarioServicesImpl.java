@@ -7,9 +7,9 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
-import cl.bennder.bennderservices.model.Validacion;
-import cl.bennder.bennderservices.request.LoginRequest;
-import cl.bennder.bennderservices.response.LoginResponse;
+import cl.bennder.entitybennderwebrest.model.Validacion;
+import cl.bennder.entitybennderwebrest.request.LoginRequest;
+import cl.bennder.entitybennderwebrest.response.LoginResponse;
 import java.util.List;
 
 import org.slf4j.Logger;
