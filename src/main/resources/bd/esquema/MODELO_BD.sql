@@ -169,7 +169,7 @@ create table CATEGORIA (
 create table COMUNA (
    ID_COMUNA            INT4                 not null,
    ID_REGION            INT4                 null,
-   NOMBRE               VARCHAR(20)             not null,
+   NOMBRE               VARCHAR(50)             not null,
    constraint PK_COMUNA primary key (ID_COMUNA)
 );
 
