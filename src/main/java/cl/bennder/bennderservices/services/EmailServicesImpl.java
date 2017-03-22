@@ -136,7 +136,7 @@ public class EmailServicesImpl implements EmailServices{
                 }
                 else{
                     response.getValidacion().setCodigoNegocio("2");
-                    response.getValidacion().setMensaje("Datos de entrada no válidos");
+                    response.getValidacion().setMensaje("No existe usuario registrado");
                     log.info("{} No existe usuario registrado",mensajeLog);
                 }
             }
