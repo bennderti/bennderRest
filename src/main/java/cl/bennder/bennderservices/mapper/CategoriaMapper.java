@@ -30,6 +30,15 @@ public interface CategoriaMapper {
 
    @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM categoria WHERE nombre = #{nombreCategoria}")
    Categoria obtenerCategoriaPorNombre(String nombreCategoria);
+   
+   /***
+    * Obtiene las categorias asociada a una categoria en especial
+    * @param idCategoria
+    * @return 
+    */
+   
+   @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria_padre = #{idCategoria}")
+    public List<Categoria> obtenerCategoriasById(Integer idCategoria);
 
 
 }

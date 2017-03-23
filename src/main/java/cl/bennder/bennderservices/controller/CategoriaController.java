@@ -5,9 +5,9 @@
  */
 package cl.bennder.bennderservices.controller;
 
-import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.services.CategoriaServices;
 import cl.bennder.entitybennderwebrest.request.BeneficiosRequest;
+import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
@@ -28,6 +28,24 @@ public class CategoriaController {
     
     @Autowired
     private CategoriaServices categoriaServices;
+    
+     @RequestMapping(value = "obtenerCategoriasById",method = RequestMethod.POST)
+    public CategoriasResponse obtenerCategoriasById(@RequestBody CategoriaByIdRequest request){
+        log.info("INICIO");
+        CategoriasResponse response = categoriaServices.obtenerCategoriasById(request);
+        log.info("response ->{}",response.toString());
+        log.info("FIN");
+        return response;
+    }
+    @RequestMapping(value = "getBeneficiosByIdCat",method = RequestMethod.POST)
+    public BeneficiosResponse getBeneficiosByIdCat(@RequestBody CategoriaByIdRequest request){
+        log.info("INICIO");
+        BeneficiosResponse response = categoriaServices.getBeneficiosByIdCat(request);
+        log.info("response ->{}",response.toString());
+        log.info("FIN");
+        return response;
+    }
+    
     
     //.- login
     @RequestMapping(value = "getCategorias",method = RequestMethod.POST)

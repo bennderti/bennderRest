@@ -10,7 +10,9 @@ import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
 import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
+import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
 import org.slf4j.Logger;
@@ -35,6 +37,44 @@ public class CategoriaServicesImpl implements CategoriaServices{
     @Autowired
     private BeneficioMapper beneficioMapper;
 
+    @Override
+    public BeneficiosResponse getBeneficiosByIdCat(CategoriaByIdRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+       response.setValidacion(new Validacion("0","1","Sin beneficios"));
+       log.info("inicio");
+        try {
+            response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoria(request.getIdCategoria()));
+            response.setValidacion(new Validacion("0","0","Beneficios OK"));
+            if(response!=null && response.getBeneficios()!=null){
+                log.info("Obtención de getBeneficios->{}",response.getBeneficios().size());
+            }
+        } catch (Exception e) {
+            log.error("Exception getBeneficiosByIdCat,",e);
+        }
+        log.info("fin");
+        return response;
+    }
+
+    
+    @Override
+    public CategoriasResponse obtenerCategoriasById(CategoriaByIdRequest request) {
+       CategoriasResponse response = new CategoriasResponse();
+       response.setValidacion(new Validacion("0","1","Sin Categorias"));
+       log.info("inicio");
+        try {
+            response.setCategorias(categoriaMapper.obtenerCategoriasById(request.getIdCategoria()));
+            response.setValidacion(new Validacion("0","0","Categorías OK"));
+            if(response!=null && response.getCategorias()!=null){
+                log.info("Obtención de categorías->{}",response.getCategorias().size());
+            }
+        } catch (Exception e) {
+            log.error("Exception obtenerCategoriasById,",e);
+        }
+        log.info("fin");
+        return response;
+    }
+
+    
     @Override
     public CategoriasResponse getCategorias(CategoriasRequest request) {
         CategoriasResponse response = new CategoriasResponse();
