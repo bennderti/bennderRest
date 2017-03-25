@@ -17,28 +17,35 @@ import org.apache.ibatis.annotations.*;
  */
 public interface CategoriaMapper {
 
-   @Select("SELECT id_categoria, nombre FROM categoria WHERE id_categoria_padre = -1")
-   @Results(value = {
-		   @Result (property = "idCategoria", column = "id_categoria"),
-		   @Result (property = "nombre", column = "nombre"),
-		   @Result (property = "subCategorias", column = "id_categoria", javaType=List.class, many = @Many(select = "obtenerSubCategorias"))
-   })
-   List<Categoria> getCategorias();
+    @Select("SELECT id_categoria, nombre FROM categoria WHERE id_categoria_padre = -1")
+    @Results(value = {
+           @Result (property = "idCategoria", column = "id_categoria"),
+           @Result (property = "nombre", column = "nombre"),
+           @Result (property = "subCategorias", column = "id_categoria", javaType=List.class, many = @Many(select = "obtenerSubCategorias"))
+    })
+    List<Categoria> getCategorias();
 
-   @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM categoria WHERE id_categoria_padre = #{idCategoriaPadre}")
-   List<Categoria> obtenerSubCategorias(Integer idCategoriaPadre);
+    @Select(" SELECT c.id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre, COUNT(b.id_beneficio) as cantidadBeneficios" +
+            " FROM categoria c" +
+            " LEFT JOIN beneficio b ON b.id_categoria = c.id_categoria" +
+            " WHERE id_categoria_padre = #{idCategoriaPadre}" +
+            " GROUP BY c.id_categoria")
+    List<Categoria> obtenerSubCategorias(Integer idCategoriaPadre);
 
-   @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM categoria WHERE nombre = #{nombreCategoria}")
-   Categoria obtenerCategoriaPorNombre(String nombreCategoria);
-   
-   /***
+    @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM categoria WHERE nombre = #{nombreCategoria}")
+    Categoria obtenerCategoriaPorNombre(String nombreCategoria);
+
+    /***
     * Obtiene las categorias asociada a una categoria en especial
     * @param idCategoria
-    * @return 
+    * @return
     */
-   
-   @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria_padre = #{idCategoria}")
-    public List<Categoria> obtenerCategoriasById(Integer idCategoria);
+
+    @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria_padre = #{idCategoria}")
+    List<Categoria> obtenerCategoriasById(Integer idCategoria);
+
+    @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria = #{idCategoria}")
+    Categoria obtenerCategoriaPorId(Integer idCategoria);
 
 
 }

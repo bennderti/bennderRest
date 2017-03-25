@@ -147,15 +147,19 @@ public class CategoriaServicesImpl implements CategoriaServices{
                     switch (categoria.getIdCategoriaPadre()) {
                         case -1:
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategorias(categoria.getIdCategoria()));
+                            response.setCategoriaPadre(categoria);
+                            response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria()));
                             break;
                         default:
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategorias(categoria.getIdCategoriaPadre()));
+                            response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
+                            response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria()));
                             break;
                     }
                     response.setValidacion(new Validacion("0", "0", "Categorías OK"));
                     log.info("Obtención de categorías->{}", response.getCategoriasRelacionadas().size());
 
-                    response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria()));
+
                 }
             }
         }
