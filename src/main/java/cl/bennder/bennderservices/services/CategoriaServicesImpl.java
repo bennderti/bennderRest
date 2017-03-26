@@ -8,6 +8,8 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
+import cl.bennder.entitybennderwebrest.model.Beneficio;
+import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
@@ -15,11 +17,14 @@ import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  *
@@ -40,7 +45,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     @Override
     public BeneficiosResponse getBeneficiosByIdCat(CategoriaByIdRequest request) {
         BeneficiosResponse response = new BeneficiosResponse();
-       response.setValidacion(new Validacion("0","1","Sin beneficios"));
+        response.setValidacion(new Validacion("0","1","Sin beneficios"));
        log.info("inicio");
         try {
             response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoria(request.getIdCategoria()));
@@ -144,16 +149,21 @@ public class CategoriaServicesImpl implements CategoriaServices{
                     log.error("Objeto categoria esta vacio");
                     response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
                 } else {
+                    List<Beneficio> beneficios;
                     switch (categoria.getIdCategoriaPadre()) {
                         case -1:
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
                             response.setCategoriaPadre(categoria);
-                            response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria()));
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            convertirImagenesBeneficiosABase64(beneficios);
+                            response.setBeneficios(beneficios);
                             break;
                         default:
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoriaPadre()));
                             response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
-                            response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria()));
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
+                            convertirImagenesBeneficiosABase64(beneficios);
+                            response.setBeneficios(beneficios);
                             break;
                     }
                     response.setValidacion(new Validacion("0", "0", "Categorías OK"));
@@ -168,6 +178,21 @@ public class CategoriaServicesImpl implements CategoriaServices{
         }
 
         return response;
+    }
+
+    private void convertirImagenesBeneficiosABase64(List<Beneficio> beneficios) {
+
+        for (Beneficio beneficio : beneficios) {
+            for (BeneficioImagen beneficioImagen : beneficio.getImagenesBeneficio()){
+                convertirImagenABase64(beneficioImagen);
+            }
+        }
+    }
+
+    private void convertirImagenABase64(BeneficioImagen beneficioImagen) {
+
+        beneficioImagen.setImagenBase64(Base64.encodeBase64String(beneficioImagen.getImagen()));
+        beneficioImagen.setImagen(null);
     }
 
 }

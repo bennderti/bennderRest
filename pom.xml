@@ -176,7 +176,14 @@
             <artifactId>EntityBennderWebRest</artifactId>
             <version>1.0</version>
         </dependency>
-        <!--Libreria entidades compartidas web/rest - fin--> 
+        <!--Libreria entidades compartidas web/rest - fin-->
+
+        <!-- BASE 64 DECODER -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
          
     </dependencies>
 
