@@ -7,6 +7,7 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
+import cl.bennder.entitybennderwebrest.model.Usuario;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.LoginRequest;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
@@ -49,14 +50,20 @@ public class UsuarioServicesImpl implements UsuarioServices{
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
         log.info("INICIO");
         Integer validacion = 0;
+        Usuario usuario;
+        
         try {
-            if(request.getUser()!=null && request.getPassword()!=null){
+            if(request.getUser()!=null && request.getPassword()!=null)
+            {
                 log.info("Validando usuario ->{}",request.getUser());
                 //usuario existe?
-                validacion = usuarioMapper.validaUsuario(request.getUser(), request.getPassword());
-                if(validacion!=null && validacion.compareTo(1) == 0){
+//                validacion = usuarioMapper.validaUsuario(request.getUser(), request.getPassword());
+                usuario = usuarioMapper.getUsuarioValidacion(request.getUser(), request.getPassword());
+                
+                if(usuario != null){
                     //.- obtener idUSuario(rut usuario sin dv) por usuario
-                    response.setIdUsuario(usuarioMapper.getIdUsuario(request.getUser()));                    
+                    response.setIdUsuario(usuario.getIdUsuario());    
+                    response.setIdEstadoUsuario(usuario.getIdEstado());
                     response.getValidacion().setCodigo(CodigoValidacion.OK);
                     response.getValidacion().setMensaje("Validación OK");
                     log.info("Validación OK");

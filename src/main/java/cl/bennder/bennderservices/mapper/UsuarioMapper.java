@@ -76,5 +76,14 @@ public interface UsuarioMapper {
         @Result(property="contacto.correo", column="CORREO", javaType = Contacto.class,typeHandler = StringTypeHandler.class)
     }) 
    public Usuario getDatosUsuario(@Param("idUsuario") Integer idUsuario);
+   
+   /**
+    * Método que valida si existe el usuario con el password indicado. Retorna un idUsuario con su estado
+    * @param usuario, password
+    * @return Usuario 
+    * @author mgutierrez
+    */
+   @Select("SELECT ID_USUARIO AS IDUSUARIO, ID_ESTADO_USUARIO AS IDESTADO  FROM USUARIO WHERE USUARIO = #{usuario} AND PASSWORD =#{pass}")
+   public Usuario getUsuarioValidacion(@Param("usuario") String usuario,@Param("pass") String password);
     
 }
