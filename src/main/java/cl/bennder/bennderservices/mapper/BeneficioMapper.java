@@ -19,9 +19,11 @@ public interface BeneficioMapper {
             " tb.nombre," +
             " bd.porcentaje_descuento as porcentajeDescuento," +
             " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta" +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
             " FROM beneficio b" +
             " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
             " WHERE b.id_categoria = #{idCategoria}")
@@ -34,7 +36,7 @@ public interface BeneficioMapper {
     @Results({
             @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
-            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
     List<Beneficio> obtenerBeneficiosPorCategoria(Integer idCategoria);
 
@@ -46,9 +48,11 @@ public interface BeneficioMapper {
             " tb.nombre," +
             " bd.porcentaje_descuento as porcentajeDescuento," +
             " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta" +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
             " FROM beneficio b" +
             " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
             " WHERE b.id_categoria in (SELECT id_categoria FROM categoria WHERE id_categoria_padre = #{idCategoriaPadre})")
@@ -61,7 +65,7 @@ public interface BeneficioMapper {
     @Results({
             @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
-            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
     List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
 
@@ -72,9 +76,11 @@ public interface BeneficioMapper {
             " tb.nombre," +
             " bd.porcentaje_descuento as porcentajeDescuento," +
             " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta" +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
             " FROM beneficio b" +
             " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
             " WHERE b.id_beneficio = #{idBeneficio}")
@@ -97,4 +103,9 @@ public interface BeneficioMapper {
             " WHERE id_beneficio = #{idBeneficio}")
     List<BeneficioImagen> obtenerImagenesBeneficio(Integer idBeneficio);
 
+    @Select(" SELECT imagen " +
+            " FROM beneficio_imagen" +
+            " WHERE id_beneficio = #{idBeneficio}" +
+            " AND orden in (1,2)")
+    List<BeneficioImagen> obtenerImagenesBeneficioPreview(Integer idBeneficio);
 }
