@@ -100,17 +100,18 @@ create table BENEFICIO (
    ID_BENEFICIO         SERIAL               not null,
    TITULO               VARCHAR(50)             not null,
    DESCRIPCION          VARCHAR(1000)           not null,
-   FECHA_CREACION       date                 not null,
+   FECHA_CREACION       date                 not null default now(),
+   FECHA_INICIAL        date                 not null default now(),
    FECHA_EXPIRACION     date                 not null,
    CONDICION            VARCHAR(50)             null,
-   HABILITADO           BOOL                 not null,
-   CALIFICACION         INT4                 not null,
+   HABILITADO           BOOL                 not null default false,
+   CALIFICACION         INT4                 not null default 0,
    STOCK                INT4                 not null,
    ID_PROVEEDOR         INT4                 not null,
    ID_CATEGORIA         INT4                 not null,
    ID_TIPO_BENEFICIO    INT4                 null,
    LIMITE_STOCK         INT4                 null,
-   VISITAS_GENERAL      INT4                 null,
+   VISITAS_GENERAL      INT4                 not null default 0,
    constraint PK_BENEFICIO primary key (ID_BENEFICIO)
 );
 
@@ -156,7 +157,7 @@ create table CARGO (
 /* Table: CATEGORIA                                             */
 /*==============================================================*/
 create table CATEGORIA (
-   ID_CATEGORIA         SERIAL               not null,
+   ID_CATEGORIA         INT4               not null,
    ID_CATEGORIA_PADRE   INT4                 not null default -1,
    NOMBRE               varchar(50)          not null,
    DESCRIPCION          varchar(500)         not null,
@@ -386,8 +387,12 @@ create table USUARIO (
    ID_CONTACTO          INT4                 not null,
    ID_DIRECCION         INT4                 null,
    ID_ESTADO_USUARIO    INT4                 null,
-   PASSWORD             VARCHAR(15)             not null,
+   PASSWORD             VARCHAR(15)          not null,
    USUARIO              VARCHAR(50)          not null,
+   NOMBRES              VARCHAR(50)          not null,
+   APELLIDO_P           VARCHAR(50)          not null,
+   APELLIDO_M           VARCHAR(50)          not null,
+   FECHA_NACIMIENTO     DATE                 not null
    constraint PK_USUARIO primary key (ID_USUARIO)
 );
 
