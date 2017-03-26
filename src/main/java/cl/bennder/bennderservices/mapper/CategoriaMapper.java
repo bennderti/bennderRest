@@ -17,7 +17,13 @@ import org.apache.ibatis.annotations.*;
  */
 public interface CategoriaMapper {
 
-    @Select("SELECT id_categoria, nombre FROM categoria WHERE id_categoria_padre = -1")
+    @Select( "SELECT c.id_categoria, c.nombre" +
+            " FROM categoria c " +
+            " INNER JOIN categoria c2 on c.id_categoria = c2.id_categoria_padre" +
+            " INNER JOIN beneficio b ON b.id_categoria = c2.id_categoria " +
+            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor " +
+            " WHERE c.id_categoria_padre = -1 AND p.habilitado = true AND b.habilitado = true" +
+            " GROUP BY c.id_categoria")
     @Results(value = {
            @Result (property = "idCategoria", column = "id_categoria"),
            @Result (property = "nombre", column = "nombre"),
@@ -25,12 +31,24 @@ public interface CategoriaMapper {
     })
     List<Categoria> getCategorias();
 
-    @Select(" SELECT c.id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre, COUNT(b.id_beneficio) as cantidadBeneficios" +
+    @Select(" SELECT c.id_categoria AS idCategoria, c.nombre, id_categoria_padre AS idCategoriaPadre" +
             " FROM categoria c" +
-            " LEFT JOIN beneficio b ON b.id_categoria = c.id_categoria" +
+            " INNER JOIN beneficio b ON b.id_categoria = c.id_categoria" +
+            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " WHERE id_categoria_padre = #{idCategoriaPadre}" +
-            " GROUP BY c.id_categoria")
+            " AND p.habilitado = true" +
+            " AND b.habilitado = true")
     List<Categoria> obtenerSubCategorias(Integer idCategoriaPadre);
+
+    @Select(" SELECT c.id_categoria AS idCategoria, c.nombre, c.id_categoria_padre AS idCategoriaPadre, COUNT(b.id_beneficio) as cantidadBeneficios" +
+            " FROM categoria c" +
+            " INNER JOIN beneficio b ON b.id_categoria = c.id_categoria" +
+            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " WHERE id_categoria_padre = #{idCategoriaPadre}" +
+            " AND p.habilitado = true" +
+            " AND b.habilitado = true" +
+            " GROUP BY c.id_categoria")
+    List<Categoria> obtenerSubCategoriasConCantidadBeneficios(Integer idCategoriaPadre);
 
     @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM categoria WHERE nombre = #{nombreCategoria}")
     Categoria obtenerCategoriaPorNombre(String nombreCategoria);
