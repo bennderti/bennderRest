@@ -5,10 +5,16 @@
  */
 package cl.bennder.bennderservices.mapper;
 
-import cl.bennder.bennderservices.model.Usuario;
+import cl.bennder.entitybennderwebrest.model.Contacto;
+import cl.bennder.entitybennderwebrest.model.Direccion;
+import cl.bennder.entitybennderwebrest.model.Usuario;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.type.IntegerTypeHandler;
+import org.apache.ibatis.type.StringTypeHandler;
 
 /**
  *
@@ -54,11 +60,21 @@ public interface UsuarioMapper {
     * @return Usuario 
     * @author mgutierrez
     */
-   @Select("SELECT U.NOMBRES, U.APELLIDO_P, U.APELLIDO_M, D.ID_COMUNA, D.CALLE, D.NUMERO, D.DEPARTAMENTO, D.VILLA, C.CELULAR, C.TELEFONO_FIJO, C.CORREO "
+   @Select("SELECT U.NOMBRES, U.APELLIDO_P AS APELLIDOP, U.APELLIDO_M AS APELLIDOM, D.ID_COMUNA, D.CALLE, D.NUMERO, D.DEPARTAMENTO, D.VILLA, C.CELULAR, C.TELEFONO_FIJO, C.CORREO "
            + "FROM USUARIO U "
            + "INNER JOIN DIRECCION D ON U.ID_DIRECCION = D.ID_DIRECCION "
            + "INNER JOIN CONTACTO C ON U.ID_CONTACTO = C.ID_CONTACTO "
            + "WHERE U.ID_USUARIO = #{idUsuario}")
+   @Results({
+        @Result(property="direccion.idComuna", column="ID_COMUNA", javaType = Direccion.class, typeHandler = IntegerTypeHandler.class),
+        @Result(property="direccion.calle", column="CALLE", javaType = Direccion.class, typeHandler = StringTypeHandler.class),
+        @Result(property="direccion.numero", column="NUMERO", javaType = Direccion.class,typeHandler = StringTypeHandler.class),
+        @Result(property="direccion.departamento", column="DEPARTAMENTO", javaType = Direccion.class,typeHandler = StringTypeHandler.class),
+        @Result(property="direccion.villa", column="VILLA", javaType = Direccion.class,typeHandler = StringTypeHandler.class),
+        @Result(property="contacto.celular", column="CELULAR", javaType = Contacto.class,typeHandler = IntegerTypeHandler.class),
+        @Result(property="contacto.fonoFijo", column="TELEFONO_FIJO", javaType = Contacto.class,typeHandler = IntegerTypeHandler.class),
+        @Result(property="contacto.correo", column="CORREO", javaType = Contacto.class,typeHandler = StringTypeHandler.class)
+    }) 
    public Usuario getDatosUsuario(@Param("idUsuario") Integer idUsuario);
     
 }
