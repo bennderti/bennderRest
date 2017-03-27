@@ -9,6 +9,7 @@ import cl.bennder.bennderservices.services.CategoriaServices;
 import cl.bennder.entitybennderwebrest.request.BeneficiosRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
@@ -38,9 +39,9 @@ public class CategoriaController {
         return response;
     }
     @RequestMapping(value = "getBeneficiosByIdCat",method = RequestMethod.POST)
-    public BeneficiosResponse getBeneficiosByIdCat(@RequestBody CategoriaByIdRequest request){
+    public BeneficiosCargadorResponse getBeneficiosByIdCat(@RequestBody CategoriaByIdRequest request){
         log.info("INICIO");
-        BeneficiosResponse response = categoriaServices.getBeneficiosByIdCat(request);
+        BeneficiosCargadorResponse response = categoriaServices.getBeneficiosByIdCat(request);
         log.info("response ->{}",response.toString());
         log.info("FIN");
         return response;
