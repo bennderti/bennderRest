@@ -11,6 +11,14 @@ import java.util.List;
  * Created by Diego on 10-03-2017.
  */
 public interface BeneficioMapper {
+    
+    /***
+     * Obtiene los beneficios de una categoria seleccionda para el cargador (datos simples)
+     * @param idCategoria Identificador de la categoria
+     * @return 
+     */
+    @Select("SELECT ID_BENEFICIO AS idBeneficio,TITULO as titulo FROM BENEFICIO WHERE ID_CATEGORIA = #{idCategoria}")
+    List<BeneficioCargador> getBeneficiosCargadorByIdCat(Integer idCategoria);
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +

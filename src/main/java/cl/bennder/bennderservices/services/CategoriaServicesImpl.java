@@ -15,6 +15,7 @@ import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
@@ -44,12 +45,12 @@ public class CategoriaServicesImpl implements CategoriaServices{
     private BeneficioMapper beneficioMapper;
 
     @Override
-    public BeneficiosResponse getBeneficiosByIdCat(CategoriaByIdRequest request) {
-        BeneficiosResponse response = new BeneficiosResponse();
+    public BeneficiosCargadorResponse getBeneficiosByIdCat(CategoriaByIdRequest request) {
+        BeneficiosCargadorResponse response = new BeneficiosCargadorResponse();
         response.setValidacion(new Validacion("0","1","Sin beneficios"));
        log.info("inicio");
         try {
-            response.setBeneficios(beneficioMapper.obtenerBeneficiosPorCategoria(request.getIdCategoria()));
+            response.setBeneficios(beneficioMapper.getBeneficiosCargadorByIdCat(request.getIdCategoria()));
             response.setValidacion(new Validacion("0","0","Beneficios OK"));
             if(response!=null && response.getBeneficios()!=null){
                 log.info("Obtención de getBeneficios->{}",response.getBeneficios().size());
