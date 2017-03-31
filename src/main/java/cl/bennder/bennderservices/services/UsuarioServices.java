@@ -14,6 +14,6 @@ import cl.bennder.entitybennderwebrest.response.LoginResponse;
  * @author dyanez
  */
 public interface UsuarioServices {
-    public void listarUsuarios();
+    //public void listarUsuarios();
     public LoginResponse validacionUsuario(LoginRequest request);
 }

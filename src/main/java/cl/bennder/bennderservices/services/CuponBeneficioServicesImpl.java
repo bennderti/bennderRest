@@ -17,6 +17,7 @@ import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
 import cl.bennder.entitybennderwebrest.response.UploadBeneficioImagenResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.BadElementException;
 import java.io.ByteArrayInputStream;
@@ -85,13 +86,16 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     @Autowired
     ParametroSistemaServices parametroSistemaServices;
     
+    @Autowired
+    EmailServices emailServices;
+    
     
 
     @Override
-    public void registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado) {
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado) {
         log.info("inicio");        
         //.- reducir stock
-        
+        Validacion validacion = new Validacion("1", "0", "Problemas al registrar  beneficio");
         try {
             UsuarioBeneficio uBeneficionQuery = new UsuarioBeneficio();
             uBeneficionQuery.setIdBeneficio(idBeneficio);
@@ -133,11 +137,19 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                 log.info("guardamos auditoria de fecha de beneficio...");
                 beneficioMapper.insertaFechaAccionUsuarioBeneficio(uBeneficionQuery);
             }
+            validacion.setCodigo("0");
+            validacion.setCodigoNegocio("0");
+            validacion.setMensaje("Registro de cupón beneficion OK");
+            
             
         } catch (Exception e) {
             log.info("Error Exception:",e); 
+            validacion.setCodigo("1");
+            validacion.setCodigoNegocio("0");
+            validacion.setMensaje("Error al registrar  beneficio");
         }        
         log.info("fin");
+        return validacion;
     }
     
     
@@ -156,9 +168,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
        log.info("inicio");
        String mensajeLog = "";
         try {
-            //.- Validamos que usuario no haya seleccionado beneficio previamente
-            //.- Generamos código encriptado de beneficio
-            //.- Guardamos accion de  beneficio de usuario como estado "obtenido"
+            //.- Validamos que usuario no haya seleccionado beneficio previamente - OK
+            //.- Generamos código encriptado de beneficio - OK
+            //.- Guardamos accion de  beneficio de usuario como estado "obtenido" - OK
             //.- Enviamos correo con url para que cliente pinche y generar cupón beneficion QR            
             if(request != null && request.getIdUsuario()!= null && request.getIdBeneficio() != null){
                 mensajeLog = "[idUsuario -> "+request.getIdUsuario()+"] ";
@@ -190,13 +202,30 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                             String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
                             log.info("{} urlDownloadCupon ->{}",mensajeLog,urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.",mensajeLog);
-                            this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(),codEncriptado);
-                            
-                            
-                            
-                            
-                            
-                            
+                            Integer stockBeneficio = beneficioMapper.getStockBeneficio(request.getIdBeneficio());
+                            if(stockBeneficio.equals(0)){
+                                log.info("Sin stock para beneficio seleccionado.");
+                                response.getValidacion().setCodigoNegocio("2");
+                                response.getValidacion().setMensaje("Sin stock para beneficio seleccionado");
+                            }
+                            else{
+                                if(stockBeneficio < request.getCantidad()){
+                                    log.info("{} Sotck Actual->{} de beneficio ->{} es inferior al seleccionado por usuario, el cual es de ->{}. Por tanto se actualizará con stock actual",mensajeLog,stockBeneficio,request.getIdBeneficio(),request.getCantidad());
+                                    request.setCantidad(stockBeneficio);
+                                }
+                                Validacion validacion =  this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(),codEncriptado);
+                                if(validacion!=null && "0".equals(validacion.getCodigo()) && "0".equals(validacion.getCodigoNegocio())){
+                                   log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
+                                    ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(request.getIdUsuario(), request.getIdBeneficio(), urlDownloadCupon);
+                                    response.setValidacion(vResponse.getValidacion());
+                                    log.info("{} Formando correo a enviar a usuario - fin", mensajeLog); 
+                                }
+                                else{
+                                   log.info("{} Problemas al registrar beneficio", mensajeLog);
+                                    response.getValidacion().setCodigoNegocio("3");
+                                    response.getValidacion().setMensaje("Problemas al registrar beneficio"); 
+                                }
+                            }
                         }
                         else{
                             log.info("{} No existen datos para formar url de descarga/generacion de cupón beneficio",mensajeLog);

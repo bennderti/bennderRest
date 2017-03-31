@@ -5,7 +5,9 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.EmailMapper;
+import cl.bennder.bennderservices.mapper.UsuarioMapper;
 import cl.bennder.bennderservices.model.EmailTemplate;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.PlantillaCorreo;
@@ -43,11 +45,16 @@ public class EmailServicesImpl implements EmailServices{
     private static final String TP_BENNDER_USUARIO = "BENNDER_USUARIO";
     private static final String C_URL_PLATAFORMA = "URL_PLATAFORMA";
     private static final Integer ID_TEMPLATE_RECUPERACION_CORREO = 1;
+    private static final Integer ID_TEMPLATE_ENVIO_LINK_CUPON = 2;
     
-    
+    @Autowired
+    private UsuarioMapper usuarioMapper;
     
     @Autowired
     private EmailMapper emailMapper; 
+    
+    @Autowired
+    private BeneficioMapper beneficioMapper; 
     
     @Autowired
     private ParametroSistemaServices parametroSistemaServices;
@@ -110,6 +117,78 @@ public class EmailServicesImpl implements EmailServices{
         log.info("fin");
     }
 
+    @Override
+    public ValidacionResponse envioCorreoLinkCuponBeneficio(Integer idUsuario, Integer idBeneficio,String linkUrlDescargaCupon) {
+        log.info("inicio");
+        ValidacionResponse response = new ValidacionResponse(new Validacion("0", "1", "Problemas al recuperar contraseña"));
+        try {
+            String correoUsuario = usuarioMapper.getUsuarioCorreo(idUsuario);
+            if(correoUsuario != null){
+                log.info("correo de usuario ->{} login en donde se enviará link de generación de cupon para usuario ->{}",correoUsuario,idUsuario);
+                String mensajeLog = "[usuario -> "+idUsuario+"] ";                
+                log.info("{} Obteniendo datos para formar correo y enviara usuario...",mensajeLog);
+                log.info("obteniendo credenciales de correo de salida...");
+                ParametroSistema paramCorreo = this.parametroSistemaServices.getDatosParametroSistema(TP_CORREO_SOPORTE, C_CREDENCIALES);
+                if(paramCorreo != null){
+                    EmailTemplate datosEmailTemplate = new EmailTemplate();
+                    datosEmailTemplate.setMailFrom(paramCorreo.getValorA());
+                    String passMailFrom = paramCorreo.getValorB();
+                    //.- datos de plantilla
+                    log.info("obteniendo datos de plantilla html...");
+                    PlantillaCorreo plantillaCorreo = emailMapper.getDatosPlantillaCorreo(ID_TEMPLATE_ENVIO_LINK_CUPON);
+                    if(plantillaCorreo != null){
+                        log.info("datos plantilla correo ->{}",plantillaCorreo.toString());
+                        String nombreBeneficio = beneficioMapper.getTituloBeneficioAsuntoEnvioCorreo(idBeneficio);
+                        log.info("{} nombreBeneficio ->{}",mensajeLog,nombreBeneficio);
+                        datosEmailTemplate.setMailSubject(plantillaCorreo.getAsunto()+nombreBeneficio);
+                        datosEmailTemplate.setNombreTemplate(plantillaCorreo.getNombre());
+                        datosEmailTemplate.setMailTo(correoUsuario);
+
+                       //Completando datos de contexto
+                       log.info("{} Completando datos de contexto",mensajeLog);
+                        VelocityContext velocityContext = new VelocityContext();
+                        velocityContext.put("user", correoUsuario);
+                        velocityContext.put("nombreBeneficio", nombreBeneficio);
+                        velocityContext.put("linkUrlDownloadCupon", linkUrlDescargaCupon);
+                        datosEmailTemplate.setContext(velocityContext);
+                        log.info("obteniendo beans de email...");
+                        ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
+                        Mailer mailer = (Mailer) context.getBean("mailer");
+                        Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
+                        response.setValidacion(val);
+                    }
+                    else{
+                        response.getValidacion().setCodigoNegocio("2");
+                        response.getValidacion().setMensaje("Datos de plantilla de correo no encontrada");
+                        log.info("{} Datos de plantilla de correo no encontrada",mensajeLog);
+                    }
+                }
+                else{
+                    response.getValidacion().setCodigoNegocio("1");
+                    response.getValidacion().setMensaje("Datos de correo de salida no encontrados");
+                    log.info("Datos de correo de salida no encontrados");
+                }
+                
+            }
+            else{
+               response.getValidacion().setCodigoNegocio("1");
+               response.getValidacion().setMensaje("No existe usuario correo utilizado para login");
+               log.info("No existe usuario correo utilizado para login");
+            }
+            
+            
+        } catch (Exception e) {
+            log.error("Error en envioLinkCuponBeneficio.",e);
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al enviar link a usuario para cupon de beneficio");
+        }
+        log.info("fin");
+        return response;
+    }
+
+    
+    
     @Override
     public ValidacionResponse recuperacionPassword(RecuperacionPasswordRequest request) {
         log.info("inicio");
@@ -193,7 +272,7 @@ public class EmailServicesImpl implements EmailServices{
                         log.info("obteniendo beans de email...");
                         ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
                         Mailer mailer = (Mailer) context.getBean("mailer");
-                        response = mailer.enviarCorreoPassword(datosEmailTemplate, passMailFrom); 
+                        response = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
                     }
                     else{  
                         response.setCodigoNegocio("3");

@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.GeneraQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
 import cl.bennder.entitybennderwebrest.response.GeneraQrResponse;
@@ -42,7 +43,7 @@ public interface CuponBeneficioServices {
      * @param cantidad Cantidad de la unidades de beneficio seleccionada por usuario
      * @param codigoBeneficioEncriptado código beneficio encriptado en AES
      */
-    public void registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado);
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado);
     //.- generar QR
     //.- generar codigo idenficador beneficio
     public String generaImagenQR();

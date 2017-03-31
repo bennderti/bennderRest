@@ -32,17 +32,17 @@ public class UsuarioServicesImpl implements UsuarioServices{
     @Autowired
     private UsuarioMapper usuarioMapper;
 
-    @Override
-    public void listarUsuarios() {
-        log.info("INICIO");
-        List<Integer> users = usuarioMapper.getUsers();
-        if(users!= null){
-            for(Integer user:users){
-                log.info("usuario ->{}",user);
-            }
-        }
-        log.info("FIN");
-    }
+//    @Override
+//    public void listarUsuarios() {
+//        log.info("INICIO");
+//        List<Integer> users = usuarioMapper.getUsers();
+//        if(users!= null){
+//            for(Integer user:users){
+//                log.info("usuario ->{}",user);
+//            }
+//        }
+//        log.info("FIN");
+//    }
 
     @Override
     public LoginResponse validacionUsuario(LoginRequest request) {

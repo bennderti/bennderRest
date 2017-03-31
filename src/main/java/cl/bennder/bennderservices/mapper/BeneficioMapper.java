@@ -13,6 +13,23 @@ import java.util.List;
  */
 public interface BeneficioMapper {
     
+    /***
+     * Obtiene el título del beneficio para completar asunto cuando se envia correo de beneficio seleccionado
+     * @param idBeneficio iddentificador de beneficio
+     * @author dyanez
+     * @return 
+     */
+    @Select("select titulo from beneficio where id_beneficio=#{idBeneficio}")
+    public String getTituloBeneficioAsuntoEnvioCorreo(Integer idBeneficio);
+    
+    /***
+     * Obtiene el stock actual del beneficio seleccionado
+     * @author dyanez
+     * @param idBeneficio identificador de beneficio
+     * @return Stock beneficio
+     */
+    @Select("select stock from beneficio where id_beneficio= #{idBeneficio}")
+    public Integer getStockBeneficio(Integer idBeneficio);
     
     /***
      * Obtiene ultima información del usuario sobre  beneficio

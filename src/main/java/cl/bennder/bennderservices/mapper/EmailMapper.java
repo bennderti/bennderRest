@@ -31,6 +31,7 @@ public interface EmailMapper {
     @Select("SELECT COUNT(1) FROM USUARIO WHERE USUARIO = #{correoUsuario}")
     public Integer existeUsuarioCorreo(String correoUsuario);
     
+    
     /****
      * @author dyanez 18.03.2017
      * Método encargado de obtener la contraseña del usuario

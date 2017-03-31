@@ -21,9 +21,16 @@ import org.apache.ibatis.type.StringTypeHandler;
  * @author dyanez
  */
 public interface UsuarioMapper {
+  
     
-   @Select("SELECT USUARIO FROM B_USUARIO") 
-   public List<Integer> getUsers();
+    /***
+     * Obtención de correo que utiliza el usuario para login
+     * @param idUsuario rut de usuario sin dv
+     * @author dyanez
+     * @return correo de login de usuario
+     */
+   @Select("select  USUARIO from usuario WHERE ID_USUARIO = #{idUsuario}") 
+   public String getUsuarioCorreo(Integer idUsuario);
    
    /**
    * Valida la existencia de usuario con password/usuario

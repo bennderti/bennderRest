@@ -75,7 +75,7 @@ public class Mailer {
      }
 
  }
- public Validacion enviarCorreoPassword(EmailTemplate emailTemplate, String passMailFrom){
+ public Validacion envioCorreoTemplate(EmailTemplate emailTemplate, String passMailFrom){
      Validacion response = new Validacion("0", "1", "Problemas al enviar correo");
     log.info("inicio");
     try {
@@ -112,6 +112,7 @@ public class Mailer {
     log.info("fin");
     return response;
  }
+ 
  public void sendMailMimeMessageHelper(SimpleMail mail,String nombreTemplate) {
      try {
          
