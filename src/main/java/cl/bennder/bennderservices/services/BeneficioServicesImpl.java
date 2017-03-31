@@ -1,6 +1,8 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
+import cl.bennder.bennderservices.util.ImagenUtil;
+import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
@@ -35,7 +37,9 @@ public class BeneficioServicesImpl implements BeneficioServices {
         log.info("INICIO");
 
         try {
-            response.setBeneficio(beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio()));
+            Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
+            ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+            response.setBeneficio(beneficio);
             if(response != null && response.getBeneficio() != null){
                 log.info("Obtención de detalleBeneficio->{}",response.getBeneficio().toString());
             }

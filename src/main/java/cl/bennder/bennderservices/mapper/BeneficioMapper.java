@@ -96,6 +96,7 @@ public interface BeneficioMapper {
     List<BeneficioCargador> getBeneficiosCargadorByIdCat(Integer idCategoria);
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio," +
             " b.titulo, " +
             " b.descripcion," +
             " tb.id_tipo_beneficio," +
@@ -119,12 +120,13 @@ public interface BeneficioMapper {
     @Results({
             @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
-            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
     List<Beneficio> obtenerBeneficiosPorCategoria(Integer idCategoria);
 
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio," +
             " b.titulo, " +
             " b.descripcion," +
             " tb.id_tipo_beneficio," +
@@ -148,7 +150,7 @@ public interface BeneficioMapper {
     @Results({
             @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
-            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
     List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
 

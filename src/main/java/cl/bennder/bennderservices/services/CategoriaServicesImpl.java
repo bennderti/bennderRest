@@ -8,6 +8,7 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
+import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Categoria;
@@ -156,14 +157,16 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
                             response.setCategoriaPadre(categoria);
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
-                            convertirImagenesBeneficiosABase64(beneficios);
+                            for (Beneficio beneficio : beneficios)
+                                ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
                             response.setBeneficios(beneficios);
                             break;
                         default:
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoriaPadre()));
                             response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
-                            convertirImagenesBeneficiosABase64(beneficios);
+                            for (Beneficio beneficio : beneficios)
+                                ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
                             response.setBeneficios(beneficios);
                             break;
                     }
@@ -181,19 +184,5 @@ public class CategoriaServicesImpl implements CategoriaServices{
         return response;
     }
 
-    private void convertirImagenesBeneficiosABase64(List<Beneficio> beneficios) {
-
-        for (Beneficio beneficio : beneficios) {
-            for (BeneficioImagen beneficioImagen : beneficio.getImagenesBeneficio()){
-                convertirImagenABase64(beneficioImagen);
-            }
-        }
-    }
-
-    private void convertirImagenABase64(BeneficioImagen beneficioImagen) {
-
-        beneficioImagen.setImagenBase64(Base64.encodeBase64String(beneficioImagen.getImagen()));
-        beneficioImagen.setImagen(null);
-    }
 
 }
