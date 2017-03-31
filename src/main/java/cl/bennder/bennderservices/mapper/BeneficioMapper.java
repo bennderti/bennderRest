@@ -1,5 +1,6 @@
 package cl.bennder.bennderservices.mapper;
 
+import cl.bennder.bennderservices.model.UsuarioBeneficio;
 import cl.bennder.entitybennderwebrest.model.*;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.IntegerTypeHandler;
@@ -11,6 +12,80 @@ import java.util.List;
  * Created by Diego on 10-03-2017.
  */
 public interface BeneficioMapper {
+    
+    
+    /***
+     * Obtiene ultima información del usuario sobre  beneficio
+     * @param uBeneficio
+     * @return 
+     */
+    @Select("SELECT id_usuario as idUsuario,id_beneficio as idBeneficio,id_accion_beneficio as idAccionBeneficio,"
+            + " cantidad,codigo_beneficio as codigoBeneficio  FROM USUARIO_BENEFICIO WHERE id_usuario = #{idUsuario} AND id_beneficio = #{idBeneficio}")
+    public UsuarioBeneficio getUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    
+    /***
+     * Descuenta X cantidad de stock a beneficio seleccionado/obtenido
+     * @param uBeneficio informacion de beneficio
+     */
+    @Update("UPDATE BENEFICIO SET STOCK = (SELECT STOCK FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) - #{cantidad} WHERE ID_BENEFICIO = #{idBeneficio};")
+    public void descuentaStockBeneficio(UsuarioBeneficio uBeneficio);
+    
+    /***
+     * Inserta accion de usuario beneficio
+     * @param uBeneficio 
+     */
+    @Insert("INSERT INTO usuario_beneficio( " +
+"            id_usuario, id_beneficio, id_accion_beneficio, cantidad, codigo_beneficio,codigo_beneficio_encriptado) " +
+"    VALUES (#{idUsuario}, #{idBeneficio}, #{idAccionBeneficio}, #{cantidad}, #{codigoBeneficio},#{codigoBeneficioEncriptado})")
+    public void guardarUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    /***
+     * Actualiza la ultima accion del usuario sobre beneficio en la tabla de negocio
+     * @param uBeneficio 
+     */
+    @Update("UPDATE usuario_beneficio " +
+    "   SET  id_accion_beneficio= #{idAccionBeneficio} " +
+    " WHERE id_usuario = #{idUsuario} AND id_beneficio = #{idBeneficio}")
+    public void actualizaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    @Update("UPDATE fecha_accion_beneficio " +
+    "   SET  FECHA = now() " +
+    " WHERE id_usuario = #{idUsuario} AND id_beneficio = #{idBeneficio} AND id_accion_beneficio = #{idAccionBeneficio}")
+    public void actualizaFechaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    /***
+     * Inseerta fecha asociada a la acccion del usuario sobre beneficio/auditoria
+     * @param uBeneficio 
+     */
+    @Insert("INSERT INTO fecha_accion_beneficio( " +
+"            id_usuario, id_beneficio, id_accion_beneficio, fecha) " +
+"    VALUES (#{idUsuario}, #{idBeneficio}, #{idAccionBeneficio}, now())")
+    public void insertaFechaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    /***
+     * Registra fecha accion de beneficio/auditoria sobre estado de beneficio
+     * @param uBeneficio
+     * @return 
+     */
+    @Select("SELECT count(1) FROM fecha_accion_beneficio "
+            + " WHERE id_usuario = #{idUsuario} "
+            + " AND id_beneficio = #{idBeneficio} "
+            + " id_accion_beneficio = #{idAccionBeneficio}")
+    public Integer getFechaUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    
+    
+    //https://www.postgresql.org/docs/8.1/static/functions-datetime.html 
+    /***
+     * Valida si cliente ya habia obtenido determinado beneficio dentro de fecha de vigencia
+     * @param idUsuario Identificador de usuario
+     * @param idBeneficio Identificador de beneficio
+     * @return 
+     */
+    @Select("SELECT COUNT(1) FROM BENEFICIO B INNER JOIN USUARIO_BENEFICIO UB ON UB.ID_BENEFICIO = B.ID_BENEFICIO " +
+            "WHERE current_date <=  B.fecha_expiracion AND UB.ID_BENEFICIO = #{b} AND UB.ID_USUARIO = #{u}")
+    public Integer usuarioHaObtenidoCuponbeneficio(@Param("u") Integer idUsuario,@Param("b") Integer idBeneficio);
     
     /***
      * Obtiene los beneficios de una categoria seleccionda para el cargador (datos simples)

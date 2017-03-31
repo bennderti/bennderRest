@@ -1,10 +1,15 @@
 package cl.bennder.bennderservices.controller;
 
 import cl.bennder.bennderservices.services.BeneficioServices;
+import cl.bennder.bennderservices.services.CuponBeneficioServices;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.GeneraQrRequest;
+import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
+import cl.bennder.entitybennderwebrest.response.GeneraQrResponse;
+import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +28,22 @@ public class BeneficioController {
 
     @Autowired
     BeneficioServices beneficioServices;
+    
+    @Autowired
+    CuponBeneficioServices cuponBeneficioServices;
+    
+    /***
+     * Permite obtener y enviar correo a usuario con link para generar cupon beneficio QR
+     * @param request datos de beneficio/usuario/cantidad(unidades)
+     * @return 
+     */
+    @RequestMapping(value = "getCuponBeneficio",method = RequestMethod.POST)
+    public GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request) {
+        log.info("INICIO");
+        GetCuponBeneficioResponse response = cuponBeneficioServices.getCuponBeneficio(request);
+        log.info("FIN");
+        return response;
+    }
 
     /**
      * @author Diego Riveros

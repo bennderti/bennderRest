@@ -223,9 +223,8 @@ create table ESTADO_USUARIO (
 create table FECHA_ACCION_BENEFICIO (
    ID_USUARIO           INT4                 not null,
    ID_BENEFICIO         INT4                 not null,
-   ID_ACCION_BENEFICIO  INT4                 null,
-   FECHA                INT4                 null,
-   constraint PK_FECHA_ACCION_BENEFICIO primary key (ID_USUARIO, ID_BENEFICIO)
+   ID_ACCION_BENEFICIO  INT4                 not null,
+   FECHA                date                 not null 
 );
 
 /*==============================================================*/
@@ -404,7 +403,8 @@ create table USUARIO_BENEFICIO (
    ID_USUARIO           INT4                 not null,
    ID_ACCION_BENEFICIO  INT4                 null,
    CANTIDAD             INT4                 not null,
-   CODIGO_BENEFICIO     VARCHAR(15)             null,
+   CODIGO_BENEFICIO     VARCHAR(50)             null,
+   CODIGO_BENEFICIO_ENCRIPTADO     VARCHAR(100)             null,
    constraint PK_USUARIO_BENEFICIO primary key (ID_BENEFICIO, ID_USUARIO)
 );
 
