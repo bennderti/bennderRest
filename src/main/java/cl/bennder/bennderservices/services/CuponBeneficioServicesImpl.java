@@ -9,29 +9,25 @@ import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.UsuarioBeneficio;
+import cl.bennder.entitybennderwebrest.model.Beneficio;
+import cl.bennder.entitybennderwebrest.model.BeneficioCargador;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
-import cl.bennder.entitybennderwebrest.request.GeneraQrRequest;
+import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
-import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
-import cl.bennder.entitybennderwebrest.response.GeneraQrResponse;
+import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
-import cl.bennder.entitybennderwebrest.response.UploadBeneficioImagenResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cl.bennder.entitybennderwebrest.utils.UtilsBennder;
 import com.itextpdf.text.BadElementException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRParameter;
@@ -46,10 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileCopyUtils;
 import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
-import org.springframework.core.io.ClassPathResource;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -58,9 +52,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.Image;
 import java.io.FileOutputStream;
 import com.itextpdf.text.Paragraph;
-import java.text.SimpleDateFormat;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import java.util.ArrayList;
 import java.util.Calendar;
-import javax.crypto.Cipher;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -76,6 +72,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     private static final String PARAMETROS_ENCRIPTACION = "PARAMETROS_ENCRIPTACION";
     private static final String GENERACION_CUPON_QR = "GENERACION_CUPON_QR";
     private static final String URL_DOWNLOAD = "URL_DOWNLOAD";
+    private static final String URL_CANJE = "URL_CANJE";
     
     @Autowired
     BeneficioMapper beneficioMapper;
@@ -88,9 +85,56 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     
     @Autowired
     EmailServices emailServices;
-    
-    
 
+    @Override
+    public UsuarioBeneficio desencriptaCodigoBeneficio(String codigoEncriptado) {
+        UsuarioBeneficio uBeneficio = null;
+        log.info("inicio"); 
+        try {
+            if(codigoEncriptado!=null && !"".equals(codigoEncriptado) && !"".equals(codigoEncriptado.trim())){
+                log.info("codigoEncriptado ->{}",codigoEncriptado);
+                log.info("Obteniendo parametros para desencriptar código");
+                 ParametroSistema paramEncripCupon = parametroSistemaServices.getDatosParametroSistema(ENCRIPTACION_COD_BENEFICIO, PARAMETROS_ENCRIPTACION);
+                 if(paramEncripCupon!=null){
+                    String codDesencriptado = encriptacionServices.desencriptar(paramEncripCupon.getValorA(), paramEncripCupon.getValorB(), codigoEncriptado);
+                    log.info("codDesencriptado ->{}",codDesencriptado);
+                    if(codDesencriptado!=null && !"".equals(codDesencriptado) && !"".equals(codDesencriptado.trim())){
+                        String[] param = codDesencriptado.split("-");
+                        if(param!=null && param.length == 3){
+                            log.info("Datos obtenidos correctamente");
+                            //String codigo = idBeneficio+"-"+idUsuario+"-"+Calendar.getInstance().getTime().getTime();
+                            uBeneficio = new UsuarioBeneficio();
+                            uBeneficio.setIdBeneficio(Integer.parseInt(param[0]));
+                            uBeneficio.setIdUsuario(Integer.parseInt(param[1]));
+                            uBeneficio.setCodigoBeneficio(codDesencriptado);
+                            
+                        }
+                        else{
+                            log.info("código descriptado no cumple formato");
+                        }
+                    }
+                    else{
+                        log.info("código descriptado no válido."); 
+                    }
+                 }
+                 else{
+                     log.info("sin datos parmetricos para desencriptar"); 
+                 }
+            }
+            else{
+                log.info("código nulo o vacio, no válido.");
+            }
+            
+        } catch (Exception e) {
+            log.error("Error en desencriptaCodigoBeneficio.",e);
+        }
+        
+        log.info("fin");
+        return uBeneficio;
+    }
+    
+    
+     
     @Override
     public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado) {
         log.info("inicio");        
@@ -108,6 +152,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                 log.info("información actual de accion de usuario beneficio ->{}",uBeneficio.toString());
                 //.- existe registro de fecha con determinada accion?
                 //.- si(actualizamos)
+                uBeneficio.setIdAccionBeneficio(accion);
+                beneficioMapper.actualizaAccionUsuarioBeneficio(uBeneficio);
                 Integer existeFechaUsuarioBeneficio = beneficioMapper.getFechaUsuarioBeneficio(uBeneficio);
                 if(existeFechaUsuarioBeneficio > 0){
                     log.info("actualizamos fecha para accion de beneficio...");
@@ -137,9 +183,11 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                 log.info("guardamos auditoria de fecha de beneficio...");
                 beneficioMapper.insertaFechaAccionUsuarioBeneficio(uBeneficionQuery);
             }
+            
             validacion.setCodigo("0");
             validacion.setCodigoNegocio("0");
             validacion.setMensaje("Registro de cupón beneficion OK");
+            log.info("Registro de cupón beneficion OK");
             
             
         } catch (Exception e) {
@@ -255,35 +303,37 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     
     
     @Override
-    public String generaImagenQR() {
+    public String generaImagenCodigoQRBeneficio(String urlCanjeoCupon,int anchoCupon, int altoCupon,String nombreImagenQR) {
         log.info("inicio");
-        String pathImage = null;
-        ByteArrayInputStream inStream = null;
+        String rutaImagenQR = null;
+        try {
         ByteArrayOutputStream bout =
-                QRCode.from("https://www.google.cl/?gws_rd=ssl")
-                        .withSize(250, 250)
+                QRCode.from(urlCanjeoCupon)
+                        .withSize(anchoCupon, altoCupon)
                         .to(ImageType.PNG)
                         .stream();
-        try {
-            String path = System.getProperty("java.io.tmpdir");            
-            pathImage = path+"/cuponQr.png";
-            File f = new File(pathImage);
-            log.info("pathImage QR ->{}",pathImage);
-            log.info("file(qr) ->{}",f.getAbsolutePath());
-            OutputStream out = new FileOutputStream(pathImage);
+        
+            String pathTemporal = System.getProperty("java.io.tmpdir");            
+            rutaImagenQR = pathTemporal + nombreImagenQR +".png";
+            File f = new File(rutaImagenQR);
+            log.info("rutaImagenQR ->{}",rutaImagenQR);
+            log.info("f.getAbsolutePath() ->{}",f.getAbsolutePath());
+            OutputStream out = new FileOutputStream(rutaImagenQR);
             bout.writeTo(out);
-            pathImage = f.getAbsolutePath();
+            //rutaImagenQR = f.getAbsolutePath();
             //inStream = new ByteArrayInputStream( bout.toByteArray() );
             out.flush();
             out.close();
         } catch (FileNotFoundException e){
             log.error("Error en FileNotFoundException.",e);
+            rutaImagenQR = null;
             
         } catch (IOException e) {            
             log.error("Error en IOException.",e);
+            rutaImagenQR = null;
         }
         log.info("fin");
-        return pathImage;
+        return rutaImagenQR;
     }
     
     @Override
@@ -320,95 +370,238 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     }
     
     @Override
-    public GeneraQrResponse generaCuponQR(GeneraQrRequest request) {
-        GeneraQrResponse response = new GeneraQrResponse();
+    public GeneraCuponQrResponse generaCuponQR(GeneraCuponQrRequest request) {
+        GeneraCuponQrResponse response = new GeneraCuponQrResponse();
         response.setValidacion(new Validacion("0","1","Problemas al generar cupon QR"));
         log.info("inicio");
         try {
-            Map<String, Object> mapa = new HashMap<>();
-            String path = this.generaImagenQR();
-            //mapa.put("codQR", path);
-            mapa.put("aParameter", "HOLA MUNDO!!!!");
-            crearPdf(path);
-            String key = "Bar12345Bar12345"; // 128 bit key
-            String initVector = "RandomInitVector"; // 16 bytes IV
-            String encriptar = encriptacionServices.encriptar(key, initVector, "Hello From Chile!!");
-            String desencriptar = encriptacionServices.desencriptar(key, initVector, encriptar);
-            log.info("key ->{}",key);
-            log.info("initVector ->{}",initVector);
-            log.info("value ->Hello From Chile!!");
-            log.info("encriptar ->{}",encriptar);
-            log.info("desencriptar ->{}",desencriptar);
             
-            //byte[] pdf = this.generaPdfFromJasper("/jasper/cuponBeneficio.jrxml",mapa);
-            byte[] pdf = null;//this.generaPdfFromJasper("/jasper/test.jrxml",mapa);
-            //generaPdfFromJasperII("/jasper/test.jrxml",mapa);
-            if(pdf != null){     
-//                String pathPdf = System.getProperty("java.io.tmpdir");
-//                pathPdf = pathPdf+"/cupon.pdf";
-//                OutputStream out = new FileOutputStream(pathPdf);
-//                out.write(pdf);
-//                out.close();
-//                log.info("pathPdf->{}",pathPdf);
-//                log.info("pdf.length ->{} Bytes",(pdf.length));
-                
-                /*
-                File temporal = File.createTempFile(UUID.randomUUID().toString() + "_", null, new File(directory));
-                FileCopyUtils.copy(input, temporal);
-                JasperDesign path = JRXmlLoader.load(temporal);
-                JasperReport report = JasperCompileManager.compileReport(path);
-                JasperPrint print = JasperFillManager.fillReport(report, mapa);
-                LOG.info("Se crea el print : {}", print.getName());
-                bytesPdfIn = JasperExportManager.exportReportToPdf(print);
-                LOG.info("Se crea el bytesPdfIn : {}", bytesPdfIn.length);
-                temporal.delete();
-                */
+            //.- validando datos - OK
+            //.- descriptando código beneficio - OK
+            //.- creando código QR
+            //.- Creando pdf de información de cupon de beneficio - OK
+            //.- generando byte array de pdf - OK
+            //.- eliminando datos temporarales - OK
+            //.- registrnado estado de cupon descargado/generado - OK
+            
+            
+            if(request!=null && request.getIdUsuario()!=null && request.getCodigoBeneficioEncriptado()!=null){
+                String mensajeLog = "[idUsuario -> "+request.getIdUsuario()+"] ";
+                UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoBeneficioEncriptado());
+                if(uBeneficio != null){
+                    if( uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0){
+                        //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
+                        UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
+                        if(uBeneficioCanjeado!=null){                            
+                            //.- validando si cupón ya ha sido canjeado
+                            if(uBeneficioCanjeado.getIdAccionBeneficio().compareTo(AccionBeneficioUsuario.CANJEADO) == 0){
+                                log.info("{} Este beneficio ya habia sido canjeado en punto de venta.",mensajeLog);
+                                response.getValidacion().setCodigoNegocio("4");
+                                response.getValidacion().setMensaje("Este beneficio ya habia sido canjeado en punto de venta.");
+                            }
+                            else{
+                                //.-
+                                ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_CANJE);
+                                if(paramUrlCupon != null){
+                                    String urlCanje = paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
+                                    String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 250, 250, uBeneficio.getCodigoBeneficio());
+                                    if(rutaImagenQR!=null && !"".equals(rutaImagenQR)){
+
+                                        byte[] bytePdf = this.generaCuponPdf(uBeneficio, rutaImagenQR, uBeneficio.getCodigoBeneficio());
+                                        if(bytePdf!=null && bytePdf.length > 0){
+                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "");
+                                            if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio()) ){
+                                                log.info("{} Cupon pdf generado correctamente",mensajeLog);
+                                                vRegistro.setMensaje("Cupon pdf generado correctamente");
+                                            }
+                                            response.setCuponPdf(bytePdf);
+                                            response.setValidacion(vRegistro);
+                                        }
+                                        else{
+                                            log.info("{} Cupon no generado",mensajeLog);
+                                        }
+                                    }
+                                    else{
+                                        log.info("{} Problemas al generar imagen de beneficio formato QR",mensajeLog);
+                                    }
+                                }
+                                else{
+                                   log.info("{} Sin datos de url base para canejo de cupón",mensajeLog); 
+                                }
+                            }
+                            
+                        }
+                        else{
+                            log.info("{} No existe información de dicho beneficio enviada previamente a correo",mensajeLog);
+                            response.getValidacion().setCodigoNegocio("4");
+                            response.getValidacion().setMensaje("No existe información de dicho beneficio enviada previamente a correo");
+                        }
+                    }
+                    else{
+                        log.info("{} Usuario no corresponde al usuario que ha obtenido el beneficio enviado",mensajeLog);
+                        response.getValidacion().setCodigoNegocio("3");
+                        response.getValidacion().setMensaje("Ud no corresponde al usuario que ha obtenido el beneficio previamente.");
+                    }
+                }
+                else{
+                    log.info("{} No es posible obtener información de beneficio enviado",mensajeLog);
+                    response.getValidacion().setCodigoNegocio("2");
+                    response.getValidacion().setMensaje("No es posible obtener información de beneficio enviado");
+                }
             }
+            else{
+                log.info("Favor completar datos para generar cupón de descuento (usuario/codigo beneficio)");
+                response.getValidacion().setCodigoNegocio("1");
+                response.getValidacion().setMensaje("Favor completar datos para generar cupón de descuento (usuario/codigo beneficio)");
+            }
+                        
+//            String path = this.generaImagenQR();
+//            crearPdf(path);
             
         } catch (Exception e) {
             log.error("Exception generaCuponQR,",e);
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al generar cupon QR");
         }
         log.info("fin");
         return response;
         
     }
-    public void crearPdf(String imagePath){
+    @Override
+    public byte[] generaCuponPdf(UsuarioBeneficio uBeneficio, String rutaImagenQR,String nombrePdf){
+        
+        //.- Informaciónde base de beneficio
+        //.- Inclusión de QR en pdf
+        //.- eliminación de pdf e imagen temporal
+        List<String> pathEliminar = new ArrayList<>();
+        
         log.info("inicio");
+        byte[] bytePdf = null;
         Document document = new Document();
         try {
             try {
                 
-                File f = new File(System.getProperty("java.io.tmpdir"), "sample1.pdf");
+                File filePdf = new File(System.getProperty("java.io.tmpdir"), nombrePdf+".pdf");
                 //PdfWriter.getInstance(document, new FileOutputStream("sample1.pdf"));
-                log.info(".getAbsolutePath()->{}",f.getAbsolutePath());
-                PdfWriter.getInstance(document, new FileOutputStream(f.getAbsolutePath()));
-                 document.open();
+                log.info("filePdf.getAbsolutePath()->{}",filePdf.getAbsolutePath());
+                PdfWriter.getInstance(document, new FileOutputStream(filePdf.getAbsolutePath()));
+                document.open();
                 Image img;
                 try {
-                    img = Image.getInstance(imagePath);
+                    log.info("obteniendo imagen de ruta temporal ->{}",rutaImagenQR);
+                    img = Image.getInstance(rutaImagenQR);
                     img.setAlignment(Image.ALIGN_CENTER);
-      
-                    Paragraph p = new Paragraph("Cupón de descuento");
-                    p.setAlignment(Element.ALIGN_CENTER);
-                    document.add(p);
+                    log.info("Obteniendo información de beneficio");
+                    Beneficio infoBeneficio = beneficioMapper.obtenerDetalleBeneficio(uBeneficio.getIdBeneficio());
+                    infoBeneficio.setIdBeneficio(uBeneficio.getIdBeneficio());
+                    
+                    //.- titulo
+                    log.info("título ->{}",infoBeneficio.getTitulo());
+                    Paragraph pTitulo = new Paragraph("Título : "+infoBeneficio.getTitulo());
+                    pTitulo.setAlignment(Element.ALIGN_CENTER);
+                    document.add(pTitulo);
+                    //- descripcion
+                    log.info("Descripción ->{}",infoBeneficio.getDescripcion());
+                    Paragraph pDescripcion = new Paragraph("Descripción : "+infoBeneficio.getDescripcion());
+                    pDescripcion.setAlignment(Element.ALIGN_CENTER);
+                    document.add(pDescripcion);       
+                    //.- proveedor
+                    log.info("Nombre Proveedor ->{}",infoBeneficio.getNombreProveedor());
+                    Paragraph pProveedor = new Paragraph("Local de venta : "+infoBeneficio.getNombreProveedor());
+                    pProveedor.setAlignment(Element.ALIGN_CENTER);
+                    document.add(pProveedor);                             
+                    //.- imagen QR
+                    log.info("Agregando imagen QR");
+                    Paragraph pPresentar = new Paragraph("Código QR a presentar.");
+                    pPresentar.setAlignment(Element.ALIGN_CENTER);
+                    document.add(pPresentar); 
                     document.add(img);
+                    
+                    
+                    pathEliminar.add(filePdf.getAbsolutePath());
+                    pathEliminar.add(rutaImagenQR);
+                    
+                    //.-imagenes beneficio   
+                    
+                    if(infoBeneficio.getImagenesBeneficio()!=null && infoBeneficio.getImagenesBeneficio().size() > 0){
+                        PdfPTable table = new PdfPTable(1);
+                        table.setWidthPercentage(30);
+                        table.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        int i = 0;
+                        for(BeneficioImagen bImagen : infoBeneficio.getImagenesBeneficio()){
+                            if(i == 2){
+                                break;
+                            }
+                            else{
+                                log.info("agregando imagen a celda...");
+                                
+                                StringBuilder sb = new StringBuilder();
+                                sb.append(Calendar.getInstance().getTime().getTime())
+                                  .append(uBeneficio.getIdUsuario())
+                                  .append(uBeneficio.getIdUsuario())
+                                  .append("img")
+                                  .append(""+i)
+                                  .append(".png");
+                                
+                                File fileTemp = new File(System.getProperty("java.io.tmpdir"), sb.toString());
+                                UtilsBennder.writeBytesToFile(bImagen.getImagen(), sb.toString());
+                                UtilsBennder.writeBytesToFile(bImagen.getImagen(), fileTemp.getAbsolutePath());
+                                pathEliminar.add(fileTemp.getAbsolutePath());
+                                PdfPCell cell = new PdfPCell();
+                                //cell.addElement(Image.getInstance(sb.toString()));
+                                cell.addElement(Image.getInstance(fileTemp.getAbsolutePath()));
+                                table.addCell(cell);
+                            }
+                            i++;
+                            
+                        }
+                        document.add(table);
+                    }
                     document.close();
-                    System.out.println("Done");
+                    log.info("Documento close/listo!");
+                    log.info("Obteniendo byte[] de cupon pdf");
+                    bytePdf = UtilsBennder.readContentIntoByteArray(filePdf);
+                    if(bytePdf!=null){
+                        log.info("Tamanio de cupon pdf ->{} Bytes",bytePdf.length);
+                    }
+                    log.info("Eliminando archivos...");
+                    if(pathEliminar.size() > 0){
+                        
+                        for(int j = 0;j<pathEliminar.size() ;j++){
+                           UtilsBennder.deleteFile(pathEliminar.get(j)); 
+                        }
+                    }
+                    if(bytePdf != null){
+                        log.info("Tamanio de cupon pdf(postEliminación) ->{} Bytes",bytePdf.length);
+                    }
+//                    Paragraph p = new Paragraph("Cupón de descuento");
+//                    p.setAlignment(Element.ALIGN_CENTER);
+//                    document.add(p);
+//                    document.add(img);
+                    
+//                    System.out.println("Done");
+                    
+                    
+                    
                 } catch (BadElementException ex) {
-                    java.util.logging.Logger.getLogger(CuponBeneficioServicesImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    log.error("Error BadElementException",ex);
                 } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(CuponBeneficioServicesImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    log.error("Error IOException",ex);
                 }
 
             } catch (FileNotFoundException ex) {
-                java.util.logging.Logger.getLogger(CuponBeneficioServicesImpl.class.getName()).log(Level.SEVERE, null, ex);
+                log.error("Error FileNotFoundException",ex);
             }
                    
         } catch (DocumentException ex) {
-            java.util.logging.Logger.getLogger(CuponBeneficioServicesImpl.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("Error DocumentException",ex);
         }
         log.info("fin");
+        return bytePdf;
     }
+    
+    
     
    
     

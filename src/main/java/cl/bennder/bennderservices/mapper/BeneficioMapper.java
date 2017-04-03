@@ -88,8 +88,10 @@ public interface BeneficioMapper {
     @Select("SELECT count(1) FROM fecha_accion_beneficio "
             + " WHERE id_usuario = #{idUsuario} "
             + " AND id_beneficio = #{idBeneficio} "
-            + " id_accion_beneficio = #{idAccionBeneficio}")
+            + " AND id_accion_beneficio = #{idAccionBeneficio}")
     public Integer getFechaUsuarioBeneficio(UsuarioBeneficio uBeneficio);
+    
+    
     
     
     
@@ -103,6 +105,7 @@ public interface BeneficioMapper {
     @Select("SELECT COUNT(1) FROM BENEFICIO B INNER JOIN USUARIO_BENEFICIO UB ON UB.ID_BENEFICIO = B.ID_BENEFICIO " +
             "WHERE current_date <=  B.fecha_expiracion AND UB.ID_BENEFICIO = #{b} AND UB.ID_USUARIO = #{u}")
     public Integer usuarioHaObtenidoCuponbeneficio(@Param("u") Integer idUsuario,@Param("b") Integer idBeneficio);
+    
     
     /***
      * Obtiene los beneficios de una categoria seleccionda para el cargador (datos simples)

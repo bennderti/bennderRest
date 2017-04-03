@@ -5,10 +5,11 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.model.UsuarioBeneficio;
 import cl.bennder.entitybennderwebrest.model.Validacion;
-import cl.bennder.entitybennderwebrest.request.GeneraQrRequest;
+import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
-import cl.bennder.entitybennderwebrest.response.GeneraQrResponse;
+import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
 import java.util.Map;
 
@@ -18,11 +19,28 @@ import java.util.Map;
  */
 public interface CuponBeneficioServices {
     
+    /***
+     * Método encargado de crear cupon pdf con información de beneficio
+     * @param uBeneficio datos de beneficio y usuario
+     * @param rutaImagenQR ruta de la imagen QR a incluir en pdf
+     * @param nombrePdf Nombre del pdf del cupon
+     * @return PDF de cupon de beneficios
+     * @author dyanez
+     */
+    public byte[] generaCuponPdf(UsuarioBeneficio uBeneficio, String rutaImagenQR,String nombrePdf);
+    /***
+     * Método que obtiene la información del código de beneficio encriptado
+     * @param codigoEncriptadpo Código beneficio encriptado
+     * @return Retorna información del código de cupon
+     * @author dyanez
+     */
+    public UsuarioBeneficio desencriptaCodigoBeneficio(String codigoEncriptadpo);
     
     /***
      * Registra acción y envía correo a usuario de beneficio seleccionado
      * @param request Datos de usuario y beneficio
      * @return Respuesta de validación d eobtención de beneficio
+     * @author dyanez
      */
     public GetCuponBeneficioResponse getCuponBeneficio(GetCuponBeneficioRequest request);
     
@@ -31,6 +49,7 @@ public interface CuponBeneficioServices {
      * @param idBeneficio id beneficio
      * @param idUsuario id de usuario
      * @return Código de beneficio apra usuario que lo ha obtenido/nomenclatura
+     * @author dyanez
      */
     public String generaCodigoCuponBeneficioUsuario(Integer idBeneficio,Integer idUsuario);
     
@@ -42,16 +61,27 @@ public interface CuponBeneficioServices {
      * @param codigoBeneficio Codigo de beneficio
      * @param cantidad Cantidad de la unidades de beneficio seleccionada por usuario
      * @param codigoBeneficioEncriptado código beneficio encriptado en AES
+     * @return 
+     * @author dyanez
      */
     public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado);
-    //.- generar QR
-    //.- generar codigo idenficador beneficio
-    public String generaImagenQR();
+    
+    /***
+     * Método que entrega la ruta de la imangen .png de codigo QR de url de canje
+     * @param urlCanjeoCupon url dentro del código QR utilziada para guardar estado de canje cuando se pistolee
+     * @param anchoCupon Ancho de imagen de QR
+     * @param altoCupon Alto de imagen de QR
+     * @param nombreImagenQR Nombre de la imagen QR (PNG)
+     * @return Ruta de la imagen QR. Dicho método no elimina imagen por lo que debe ser eliminada despues que se llame
+     */
+    public String generaImagenCodigoQRBeneficio(String urlCanjeoCupon,int anchoCupon, int altoCupon,String nombreImagenQR);
     public byte[] generaPdfFromJasper(String rutaJrxml,Map<String, Object> mapa);
-    public GeneraQrResponse generaCuponQR(GeneraQrRequest request);
-    //.- get beneficio (obtencion de beneficio//cambia estado
-    //.- download beneficio/ generar pdf y envia a cliente/cambia estado
-    //.- guarda estado, accion , fecha de cupon beneficio
-    //.- encriptacion código
+    /***
+     * Método que genera cupon con código QR e información de beneficio
+     * @param request información de código de beneficio
+     * @author dyanez
+     * @return 
+     */
+    public GeneraCuponQrResponse generaCuponQR(GeneraCuponQrRequest request);
     
 }
