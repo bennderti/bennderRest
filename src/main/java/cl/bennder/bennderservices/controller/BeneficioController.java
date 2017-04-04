@@ -48,7 +48,7 @@ public class BeneficioController {
      * @param request datos de beneficio/usuario/cantidad(unidades)
      * @return 
      */
-    @RequestMapping(value = "getCuponBeneficio",method = RequestMethod.POST)
+    @RequestMapping(value = "beneficio/getCuponBeneficio",method = RequestMethod.POST)
     public GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request) {
         log.info("INICIO");
         GetCuponBeneficioResponse response = cuponBeneficioServices.getCuponBeneficio(request);

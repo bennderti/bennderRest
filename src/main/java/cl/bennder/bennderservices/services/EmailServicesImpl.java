@@ -155,6 +155,10 @@ public class EmailServicesImpl implements EmailServices{
                         ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
                         Mailer mailer = (Mailer) context.getBean("mailer");
                         Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
+                        if(val!=null && "0".equals(val.getCodigo())&& "0".equals(val.getCodigoNegocio())){
+                           val.setMensaje("Se ha enviado información de beneficio obtenido a su correo: "+correoUsuario);
+                           log.info("{} Se ha enviado información de beneficio obtenido a su correo: {} ",mensajeLog,correoUsuario);
+                        }
                         response.setValidacion(val);
                     }
                     else{
