@@ -6,6 +6,7 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
+import cl.bennder.bennderservices.constantes.Fuente;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.UsuarioBeneficio;
@@ -48,10 +49,12 @@ import net.glxn.qrgen.javase.QRCode;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.Image;
 import java.io.FileOutputStream;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import java.util.ArrayList;
@@ -489,6 +492,18 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                 document.open();
                 Image img;
                 try {
+                    log.info("Obteniendo información de fuentes titulo/desctipción",rutaImagenQR);
+                    //.- fuente título
+                    BaseFont bFontTitulo = BaseFont.createFont(UtilsBennder.getPathAbsolutaResourcesFile(this.getClass(), Fuente.OPENSANS_SEMIBOLD_TTF), BaseFont.WINANSI, BaseFont.EMBEDDED);
+                    Font fontTitulo = new Font(bFontTitulo);
+                    fontTitulo.setSize(16);
+                    //.- fuente descripción                    
+                    BaseFont bFontDescripcion = BaseFont.createFont(UtilsBennder.getPathAbsolutaResourcesFile(this.getClass(), Fuente.OPENSANS_LIGHT_ITALIC_TTF), BaseFont.WINANSI, BaseFont.EMBEDDED);
+                    Font fontDescripcion = new Font(bFontDescripcion);
+                    //Copy Right
+                    Font fontCopyRight = new Font(bFontDescripcion);
+                    fontCopyRight.setSize(10);
+                    
                     log.info("obteniendo imagen de ruta temporal ->{}",rutaImagenQR);
                     img = Image.getInstance(rutaImagenQR);
                     img.setAlignment(Image.ALIGN_CENTER);
@@ -498,22 +513,22 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                     
                     //.- titulo
                     log.info("título ->{}",infoBeneficio.getTitulo());
-                    Paragraph pTitulo = new Paragraph("Título : "+infoBeneficio.getTitulo());
+                    Paragraph pTitulo = new Paragraph(infoBeneficio.getTitulo(),fontTitulo);
                     pTitulo.setAlignment(Element.ALIGN_CENTER);
                     document.add(pTitulo);
                     //- descripcion
                     log.info("Descripción ->{}",infoBeneficio.getDescripcion());
-                    Paragraph pDescripcion = new Paragraph("Descripción : "+infoBeneficio.getDescripcion());
+                    Paragraph pDescripcion = new Paragraph(infoBeneficio.getDescripcion(),fontDescripcion);
                     pDescripcion.setAlignment(Element.ALIGN_CENTER);
                     document.add(pDescripcion);       
                     //.- proveedor
                     log.info("Nombre Proveedor ->{}",infoBeneficio.getNombreProveedor());
-                    Paragraph pProveedor = new Paragraph("Local de venta : "+infoBeneficio.getNombreProveedor());
+                    Paragraph pProveedor = new Paragraph("Local de venta, "+infoBeneficio.getNombreProveedor(),fontDescripcion);
                     pProveedor.setAlignment(Element.ALIGN_CENTER);
                     document.add(pProveedor);                             
                     //.- imagen QR
                     log.info("Agregando imagen QR");
-                    Paragraph pPresentar = new Paragraph("Código QR a presentar.");
+                    Paragraph pPresentar = new Paragraph("Código QR a presentar.",fontDescripcion);
                     pPresentar.setAlignment(Element.ALIGN_CENTER);
                     document.add(pPresentar); 
                     document.add(img);
@@ -557,6 +572,18 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                             
                         }
                         document.add(table);
+                        log.info("Agregando logo bennder...");
+                        Paragraph pCopyRight = new Paragraph("Copyright © 2017 Bennder. Todos los derechos reservados",fontCopyRight);
+                        pCopyRight.setAlignment(Element.ALIGN_CENTER);
+                        ClassLoader classLoader = getClass().getClassLoader();
+                        File fileLogoBennder = new File(classLoader.getResource("cuponPdf/logo-bennder.png").getFile());
+                        log.info("fileLogoBennder.getAbsolutePath()->{}",fileLogoBennder.getAbsolutePath());
+                        Image imgLogo = Image.getInstance(fileLogoBennder.getAbsolutePath());
+                        imgLogo.setAlignment(Image.ALIGN_CENTER);
+                        document.add(pCopyRight);                         
+                        document.add(imgLogo);
+                        
+                        
                     }
                     document.close();
                     log.info("Documento close/listo!");
