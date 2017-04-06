@@ -3,9 +3,11 @@ package cl.bennder.bennderservices.controller;
 import cl.bennder.bennderservices.services.BeneficioServices;
 import cl.bennder.bennderservices.services.CuponBeneficioServices;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
+import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
 import org.slf4j.Logger;
@@ -29,6 +31,19 @@ public class BeneficioController {
     
     @Autowired
     CuponBeneficioServices cuponBeneficioServices;
+    
+    /***
+     * Servicio expuesto que permite validar/canjear cupion de beneficio al pistolear/escanear código QR
+     * @param request Datos código beneficio
+     * @return Validación de canje cupón
+     */
+    @RequestMapping(value = "beneficio/validaCanjeCupon",method = RequestMethod.POST)
+    public CanjeaCuponResponse validaCanjeCupon(@RequestBody CanjeaCuponRequest request){
+        log.info("INICIO");
+        CanjeaCuponResponse response = cuponBeneficioServices.validaCanjeCuponBeneficio(request);
+        log.info("FIN");
+        return response;
+    }
     
     /***
      * Permite generar cupón pdf código QR

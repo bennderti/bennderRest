@@ -7,8 +7,10 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.model.UsuarioBeneficio;
 import cl.bennder.entitybennderwebrest.model.Validacion;
+import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
+import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
 import java.util.Map;
@@ -18,6 +20,13 @@ import java.util.Map;
  * @author dyanez
  */
 public interface CuponBeneficioServices {
+    
+    /***
+     * Método que permite canjear o hacer efectivo el cupón de beneficio, cmbiando estado
+     * @param request Contiene código de cupón QR desde link
+     * @return Validación de cupón de beneficio
+     */
+    public CanjeaCuponResponse validaCanjeCuponBeneficio(CanjeaCuponRequest request);
     
     /***
      * Método encargado de crear cupon pdf con información de beneficio

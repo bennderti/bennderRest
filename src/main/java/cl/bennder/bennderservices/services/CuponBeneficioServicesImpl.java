@@ -14,8 +14,10 @@ import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.BeneficioCargador;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
+import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
+import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
@@ -88,6 +90,79 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     
     @Autowired
     EmailServices emailServices;
+
+    @Override
+    public CanjeaCuponResponse validaCanjeCuponBeneficio(CanjeaCuponRequest request) {
+        //.- Valida datos de entrada
+        //.- Descripta codigo de beneficio
+        //.- Valida que cupon no haya sido cobrado/canejado anteriormente
+        //.- registra estado
+        //.- genera respuesta
+        CanjeaCuponResponse response = new CanjeaCuponResponse();
+        response.setValidacion(new Validacion("0","1","Problemas al canjear cupón de beneficio"));
+        log.info("inicio");
+        try {            
+            
+            if(request!=null && request.getCodigoBeneficioEncriptado()!=null){
+                log.info("descriptando datos");
+                UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoBeneficioEncriptado());
+                if(uBeneficio != null){
+                    String mensajeLog = "[idUsuario(cupón) -> "+uBeneficio.getIdUsuario()+"] ";
+//                    if( uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0){
+                        //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
+                        UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
+                        if(uBeneficioCanjeado!=null){                            
+                            //.- validando si cupón ya ha sido canjeado
+                            if(uBeneficioCanjeado.getIdAccionBeneficio().compareTo(AccionBeneficioUsuario.CANJEADO) == 0){
+                                log.info("{} Este beneficio ya habia sido canjeado en punto de venta.",mensajeLog);
+                                response.getValidacion().setCodigoNegocio("5");
+                                response.getValidacion().setMensaje("Este beneficio ya habia sido canjeado en punto de venta.");
+                            }
+                            else{
+                                Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "");
+                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio()) ){
+                                    log.info("{} Cupon válido correctamente para ser canjeado",mensajeLog);
+                                    vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
+                                }
+                                response.setValidacion(vRegistro);
+                            }
+                        }
+                        else{
+                            log.info("{} No existe información de dicho código de beneficio",mensajeLog);
+                            response.getValidacion().setCodigoNegocio("4");
+                            response.getValidacion().setMensaje("No existe información de dicho código de beneficio");
+                        }
+//                    }
+//                    else{
+//                        log.info("{} Usuario no corresponde al usuario que ha obtenido el beneficio enviado",mensajeLog);
+//                        response.getValidacion().setCodigoNegocio("3");
+//                        response.getValidacion().setMensaje("Ud no corresponde al usuario que ha obtenido el beneficio previamente.");
+//                    }
+                }
+                else{
+                    log.info("No es posible obtener información de beneficio a canjear");
+                    response.getValidacion().setCodigoNegocio("2");
+                    response.getValidacion().setMensaje("No es posible obtener información de beneficio a canjear");
+                }
+            }
+            else{
+                log.info("Favor completar datos para generar cupón de descuento (codigo beneficio)");
+                response.getValidacion().setCodigoNegocio("1");
+                response.getValidacion().setMensaje("Favor completar datos para generar cupón de descuento (codigo beneficio)");
+            }
+            
+        } catch (Exception e) {
+            log.error("Exception canjearCuponBeneficio,",e);
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al canjear cupón de beneficio");
+        }
+        log.info("fin");
+        return response;
+    }
+    
+    
+    
 
     @Override
     public UsuarioBeneficio desencriptaCodigoBeneficio(String codigoEncriptado) {
