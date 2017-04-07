@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public interface CuponBeneficioServices {
     
+    
     /***
      * Método que permite canjear o hacer efectivo el cupón de beneficio, cmbiando estado
      * @param request Contiene código de cupón QR desde link

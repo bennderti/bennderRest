@@ -12,6 +12,7 @@ import cl.bennder.bennderservices.model.EmailTemplate;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.PlantillaCorreo;
 import cl.bennder.bennderservices.model.SimpleMail;
+import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.RecuperacionPasswordRequest;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
@@ -46,6 +47,7 @@ public class EmailServicesImpl implements EmailServices{
     private static final String C_URL_PLATAFORMA = "URL_PLATAFORMA";
     private static final Integer ID_TEMPLATE_RECUPERACION_CORREO = 1;
     private static final Integer ID_TEMPLATE_ENVIO_LINK_CUPON = 2;
+    private static final Integer ID_TEMPLATE_NOTIFICA_CANJE_BENEFICIO = 3;
     
     @Autowired
     private UsuarioMapper usuarioMapper;
@@ -116,6 +118,82 @@ public class EmailServicesImpl implements EmailServices{
         }
         log.info("fin");
     }
+
+    @Override
+    public ValidacionResponse notificarCanjeCuponBeneficio(Integer idUsuario, Integer idBeneficio) {
+       log.info("inicio");
+        ValidacionResponse response = new ValidacionResponse(new Validacion("0", "1", "Problemas al notificar canje de beneficio"));
+        try {
+            String correoUsuario = usuarioMapper.getUsuarioCorreo(idUsuario);
+            if(correoUsuario != null){
+                log.info("correo de usuario ->{} login en donde se enviará correo de validación/caje de cupon para usuario ->{}",correoUsuario,idUsuario);
+                String mensajeLog = "[usuario -> "+idUsuario+"] ";                
+                log.info("{} Obteniendo datos para formar correo y enviara usuario...",mensajeLog);
+                log.info("obteniendo credenciales de correo de salida...");
+                ParametroSistema paramCorreo = this.parametroSistemaServices.getDatosParametroSistema(TP_CORREO_SOPORTE, C_CREDENCIALES);
+                if(paramCorreo != null){
+                    EmailTemplate datosEmailTemplate = new EmailTemplate();
+                    datosEmailTemplate.setMailFrom(paramCorreo.getValorA());
+                    String passMailFrom = paramCorreo.getValorB();
+                    //.- datos de plantilla
+                    log.info("obteniendo datos de plantilla html...");
+                    PlantillaCorreo plantillaCorreo = emailMapper.getDatosPlantillaCorreo(ID_TEMPLATE_NOTIFICA_CANJE_BENEFICIO);
+                    if(plantillaCorreo != null){
+                        log.info("datos plantilla correo ->{}",plantillaCorreo.toString());
+                        Beneficio beneficio = beneficioMapper.getInfoGeneralBeneficio(idBeneficio);
+                        log.info("{} nombreBeneficio ->{}",mensajeLog,beneficio.getTitulo());
+                        datosEmailTemplate.setMailSubject(plantillaCorreo.getAsunto());
+                        datosEmailTemplate.setNombreTemplate(plantillaCorreo.getNombre());
+                        datosEmailTemplate.setMailTo(correoUsuario);
+
+                       //Completando datos de contexto
+                       log.info("{} Completando datos de contexto",mensajeLog);
+                        VelocityContext velocityContext = new VelocityContext();
+                        velocityContext.put("user", correoUsuario);
+                        velocityContext.put("nombreBeneficio", beneficio.getTitulo());
+                        velocityContext.put("proveedor", beneficio.getNombreProveedor());
+                        datosEmailTemplate.setContext(velocityContext);
+                        log.info("obteniendo beans de email...");
+                        ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
+                        Mailer mailer = (Mailer) context.getBean("mailer");
+                        Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
+                        if(val!=null && "0".equals(val.getCodigo())&& "0".equals(val.getCodigoNegocio())){
+                           val.setMensaje("Se ha enviado información de beneficio canjeado");
+                           log.info("{} Se ha enviado información de beneficio canjeado a correo: {} ",mensajeLog,correoUsuario);
+                        }
+                        response.setValidacion(val);
+                    }
+                    else{
+                        response.getValidacion().setCodigoNegocio("2");
+                        response.getValidacion().setMensaje("Datos de plantilla de correo no encontrada");
+                        log.info("{} Datos de plantilla de correo no encontrada",mensajeLog);
+                    }
+                }
+                else{
+                    response.getValidacion().setCodigoNegocio("1");
+                    response.getValidacion().setMensaje("Datos de correo de salida no encontrados");
+                    log.info("Datos de correo de salida no encontrados");
+                }
+                
+            }
+            else{
+               response.getValidacion().setCodigoNegocio("1");
+               response.getValidacion().setMensaje("No existe usuario correo utilizado para login");
+               log.info("No existe usuario correo utilizado para login");
+            }
+            
+            
+        } catch (Exception e) {
+            log.error("Error en notificarCanjeCuponBeneficio.",e);
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al notificar canje de beneficio");
+        }
+        log.info("fin");
+        return response;
+    }
+    
+    
 
     @Override
     public ValidacionResponse envioCorreoLinkCuponBeneficio(Integer idUsuario, Integer idBeneficio,String linkUrlDescargaCupon) {

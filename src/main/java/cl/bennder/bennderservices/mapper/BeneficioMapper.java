@@ -13,6 +13,11 @@ import java.util.List;
  */
 public interface BeneficioMapper {
     
+    @Select(  " select b.id_beneficio as idBeneficio,b.titulo,p.nombre as nombreProveedor "
+            + " from beneficio b inner join proveedor p on b.id_proveedor=p.id_proveedor " +
+              " where b.id_beneficio = #{idBeneficio}")
+    public Beneficio getInfoGeneralBeneficio(Integer idBeneficio);
+    
     /***
      * Obtiene el título del beneficio para completar asunto cuando se envia correo de beneficio seleccionado
      * @param idBeneficio iddentificador de beneficio

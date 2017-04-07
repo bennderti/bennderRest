@@ -224,7 +224,7 @@ create table FECHA_ACCION_BENEFICIO (
    ID_USUARIO           INT4                 not null,
    ID_BENEFICIO         INT4                 not null,
    ID_ACCION_BENEFICIO  INT4                 not null,
-   FECHA                date                 not null 
+   FECHA                timestamp                 not null 
 );
 
 /*==============================================================*/

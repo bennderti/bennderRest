@@ -91,6 +91,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     @Autowired
     EmailServices emailServices;
 
+
     @Override
     public CanjeaCuponResponse validaCanjeCuponBeneficio(CanjeaCuponRequest request) {
         //.- Valida datos de entrada
@@ -120,11 +121,25 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                             }
                             else{
                                 Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "");
-                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio()) ){
+                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())){
                                     log.info("{} Cupon válido correctamente para ser canjeado",mensajeLog);
                                     vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
+                                    log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
+                                    ValidacionResponse vResponse = emailServices.notificarCanjeCuponBeneficio(uBeneficio.getIdUsuario(), uBeneficio.getIdBeneficio());
+                                    response.setValidacion(vResponse.getValidacion());
+                                    log.info("{} Formando correo a enviar a usuario - fin", mensajeLog); 
                                 }
-                                response.setValidacion(vRegistro);
+                                else{
+                                   log.info("{} Problemas al registrar beneficio", mensajeLog);
+                                    response.getValidacion().setCodigoNegocio("3");
+                                    response.getValidacion().setMensaje("Problemas al registrar beneficio"); 
+                                } 
+                                
+//                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio()) ){
+//                                    log.info("{} Cupon válido correctamente para ser canjeado",mensajeLog);
+//                                    vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
+//                                }
+//                                response.setValidacion(vRegistro);
                             }
                         }
                         else{
@@ -341,7 +356,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                                 }
                                 Validacion validacion =  this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(),codEncriptado);
                                 if(validacion!=null && "0".equals(validacion.getCodigo()) && "0".equals(validacion.getCodigoNegocio())){
-                                   log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
+                                    log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
                                     ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(request.getIdUsuario(), request.getIdBeneficio(), urlDownloadCupon);
                                     response.setValidacion(vResponse.getValidacion());
                                     log.info("{} Formando correo a enviar a usuario - fin", mensajeLog); 

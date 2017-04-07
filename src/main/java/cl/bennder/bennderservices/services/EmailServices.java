@@ -45,4 +45,15 @@ public interface EmailServices {
      */
     public ValidacionResponse envioCorreoLinkCuponBeneficio(Integer idUsuario, Integer idBeneficio, String linkUrlDescargaCupon);
     
+    
+    
+    
+    /***
+     * Método encargado de generar correo y notificar a usuario que su cupón de beneficio ha sido canjeadodet 
+    * @param idUsuario identificador de usuario
+    * @param idBeneficio Identificador de beneficio
+     * @return validación de envío de correo
+     */
+    public ValidacionResponse notificarCanjeCuponBeneficio(Integer idUsuario,Integer idBeneficio);
+    
 }
