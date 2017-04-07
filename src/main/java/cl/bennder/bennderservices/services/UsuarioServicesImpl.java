@@ -32,6 +32,13 @@ public class UsuarioServicesImpl implements UsuarioServices{
     @Autowired
     private UsuarioMapper usuarioMapper;
 
+    @Override
+    public void registraAccesoUsuario(Integer idUsuario) {
+        usuarioMapper.registraAccesoUsuario(idUsuario);
+    }
+    
+    
+
 //    @Override
 //    public void listarUsuarios() {
 //        log.info("INICIO");
@@ -66,6 +73,10 @@ public class UsuarioServicesImpl implements UsuarioServices{
                     response.setIdEstadoUsuario(usuario.getIdEstado());
                     response.getValidacion().setCodigo(CodigoValidacion.OK);
                     response.getValidacion().setMensaje("Validación OK");
+                    log.info("registra acceso usuario ->{}",usuario.getIdUsuario());
+                    this.registraAccesoUsuario(usuario.getIdUsuario());
+                    
+                    
                     log.info("Validación OK");
                 }
                 else{

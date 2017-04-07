@@ -16,4 +16,11 @@ import cl.bennder.entitybennderwebrest.response.LoginResponse;
 public interface UsuarioServices {
     //public void listarUsuarios();
     public LoginResponse validacionUsuario(LoginRequest request);
+    
+    
+    /***
+     * Método que registra acceso de usuario
+     * @param idUsuario identificador de usuario
+     */
+    public void registraAccesoUsuario(Integer idUsuario);
 }

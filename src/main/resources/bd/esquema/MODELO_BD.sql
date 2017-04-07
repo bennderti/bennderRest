@@ -80,8 +80,8 @@ drop table if exists parametro_sistema;
 /* Table: ACCESO_USUARIO                                        */
 /*==============================================================*/
 create table ACCESO_USUARIO (
-   ID_USUARIO           INT4                 null,
-   FECHA_ACCESO         DATE                 not null
+   id_usuario integer,
+   fecha_acceso timestamp  DEFAULT NOW()
 );
 
 /*==============================================================*/

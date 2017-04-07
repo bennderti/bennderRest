@@ -9,6 +9,7 @@ import cl.bennder.entitybennderwebrest.model.Contacto;
 import cl.bennder.entitybennderwebrest.model.Direccion;
 import cl.bennder.entitybennderwebrest.model.Usuario;
 import java.util.List;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -22,6 +23,12 @@ import org.apache.ibatis.type.StringTypeHandler;
  */
 public interface UsuarioMapper {
   
+    /***
+     * Método que registra acceso de usuario
+     * @param idUsuario identificador de usuario
+     */
+    @Insert("insert into acceso_usuario(id_usuario) values(#{idUsuario});")
+    public void registraAccesoUsuario(Integer idUsuario);
     
     /***
      * Obtención de correo que utiliza el usuario para login
