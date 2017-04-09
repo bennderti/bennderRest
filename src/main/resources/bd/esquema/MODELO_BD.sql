@@ -643,3 +643,9 @@ alter table USUARIO_PROVEEDOR
       references PROVEEDOR (ID_PROVEEDOR)
       on delete restrict on update restrict;
 
+
+/*==============================================================*/
+/* SECUENCIAS                                                */
+/*==============================================================*/
+CREATE SEQUENCE beneficio_imagen_id_imagen_seq START 1;
+

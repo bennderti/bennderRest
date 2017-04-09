@@ -23,4 +23,20 @@ public interface CargadorServices {
      * @author dyanez
      */
     public UploadBeneficioImagenResponse uploadImagenesBeneficios(UploadBeneficioImagenRequest request);
+    
+    
+    /***
+     * Método que permite guardar la imagen en sistema de archivos, es decir directorio del Sistema Operativo,
+     * definido en standalone.xml location:ImagesDirHandlerLinux
+     * @param idProveedor Identificador directorio de proveedor
+     * @param imagen Image en byte array
+     * @param idMagen identificador de imagen
+     * @param extension Extensión de la imagen
+     * @param idBeneficio Identificador de beneficio (utilizado para directorio)
+     * @return Ruta del archivo almacenado
+     */
+    public String guardaImagenSistemaArchivos(byte[] imagen, Integer idProveedor, Integer idMagen,String extension,Integer idBeneficio);
+    
+    
+    
 }
