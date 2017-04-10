@@ -73,7 +73,9 @@ public class CargadorServicesImpl implements CargadorServices{
             stream = new BufferedOutputStream(new FileOutputStream(serverFile));            
             if(stream != null){
                 log.info("Escribiendo imagen correctamente...");
-                ruta = File.separator + idProveedor.toString()+ File.separator + idBeneficio.toString() + File.separator + idMagen.toString()+ "."+extension;
+                String locationServer = env.getProperty("directorio.imagen.location.server");
+                log.info("locationServer(handlerLocation)->{}",locationServer);
+                ruta = locationServer  + idProveedor.toString()+ "/" + idBeneficio.toString() + "/" + idMagen.toString()+ "."+extension;
                 //ruta = serverFile.getAbsolutePath();
                 stream.write(imagen);
                 stream.close();

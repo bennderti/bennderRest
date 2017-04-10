@@ -38,7 +38,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
 
         try {
             Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
-            ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+            //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
             response.setBeneficio(beneficio);
             if(response != null && response.getBeneficio() != null){
                 log.info("Obtención de detalleBeneficio->{}",response.getBeneficio().toString());

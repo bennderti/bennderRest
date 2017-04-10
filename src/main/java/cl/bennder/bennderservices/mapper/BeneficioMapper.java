@@ -206,14 +206,22 @@ public interface BeneficioMapper {
             @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
 
     })
+//    @Results({
+//            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+//            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+//            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+//
+//    })
     Beneficio obtenerDetalleBeneficio(Integer idBeneficio);
-
-    @Select(" SELECT imagen " +
+    //@Select(" SELECT imagen " +
+    @Select(" SELECT path " +
             " FROM beneficio_imagen" +
             " WHERE id_beneficio = #{idBeneficio}")
     List<BeneficioImagen> obtenerImagenesBeneficio(Integer idBeneficio);
+    
 
-    @Select(" SELECT imagen " +
+    //@Select(" SELECT imagen " +
+    @Select(" SELECT path " +
             " FROM beneficio_imagen" +
             " WHERE id_beneficio = #{idBeneficio}" +
             " AND orden in (1,2)")
