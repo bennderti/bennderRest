@@ -128,9 +128,11 @@ create table BENEFICIO_DESCUENTO (
 /* Table: BENEFICIO_IMAGEN                                      */
 /*==============================================================*/
 create table BENEFICIO_IMAGEN (
-   ID_BENEFICIO         INT4                 not null,
-   IMAGEN               bytea                not null,
-   ORDEN                INT4                 not null,
+    id_beneficio integer NOT NULL,
+    orden integer NOT NULL,
+    nombre character varying(30) NOT NULL,
+    path character varying(200),
+    id_imagen integer,
    constraint PK_BENEFICIO_IMAGEN primary key (ID_BENEFICIO, ORDEN)
 );
 
