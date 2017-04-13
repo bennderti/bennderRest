@@ -10,9 +10,11 @@ import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.ValidacionCuponPOSRequest;
 import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionCuponPOSResponse;
 import java.util.Map;
 
 /**
@@ -21,6 +23,13 @@ import java.util.Map;
  */
 public interface CuponBeneficioServices {
     
+    
+    /***
+     * Méotodo que permite validar el canje de cupón de beneficio en POS
+     * @param request Datos para validación en POS
+     * @return Validación de cupónde de beneficio en POS
+     */
+    public ValidacionCuponPOSResponse validacionCuponPOS(ValidacionCuponPOSRequest request);
     
     /***
      * Método que permite canjear o hacer efectivo el cupón de beneficio, cmbiando estado
@@ -71,10 +80,11 @@ public interface CuponBeneficioServices {
      * @param codigoBeneficio Codigo de beneficio
      * @param cantidad Cantidad de la unidades de beneficio seleccionada por usuario
      * @param codigoBeneficioEncriptado código beneficio encriptado en AES
+     * @param idVendedor rut sin dv de vendedor que validó cupón de beneficio en POS
      * @return 
      * @author dyanez
      */
-    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado);
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado,Integer idVendedor);
     
     /***
      * Método que entrega la ruta de la imangen .png de codigo QR de url de canje

@@ -19,11 +19,12 @@ public class UsuarioBeneficio {
     private String codigoBeneficio;
     private String codigoBeneficioEncriptado;
     private Date fecha;
+    private Integer idVendedorPOS;
 
     public UsuarioBeneficio() {
     }
 
-    public UsuarioBeneficio(Integer idBeneficio, Integer idUsuario, Integer idAccionBeneficio, Integer cantidad, String codigoBeneficio, String codigoBeneficioEncriptado, Date fecha) {
+    public UsuarioBeneficio(Integer idBeneficio, Integer idUsuario, Integer idAccionBeneficio, Integer cantidad, String codigoBeneficio, String codigoBeneficioEncriptado, Date fecha, Integer idVendedorPOS) {
         this.idBeneficio = idBeneficio;
         this.idUsuario = idUsuario;
         this.idAccionBeneficio = idAccionBeneficio;
@@ -31,7 +32,10 @@ public class UsuarioBeneficio {
         this.codigoBeneficio = codigoBeneficio;
         this.codigoBeneficioEncriptado = codigoBeneficioEncriptado;
         this.fecha = fecha;
+        this.idVendedorPOS = idVendedorPOS;
     }
+
+    
 
    
 
@@ -91,10 +95,20 @@ public class UsuarioBeneficio {
         this.codigoBeneficioEncriptado = codigoBeneficioEncriptado;
     }
 
+    public Integer getIdVendedorPOS() {
+        return idVendedorPOS;
+    }
+
+    public void setIdVendedorPOS(Integer idVendedorPOS) {
+        this.idVendedorPOS = idVendedorPOS;
+    }
+
     @Override
     public String toString() {
-        return "UsuarioBeneficio{" + "idBeneficio=" + idBeneficio + ", idUsuario=" + idUsuario + ", idAccionBeneficio=" + idAccionBeneficio + ", cantidad=" + cantidad + ", codigoBeneficio=" + codigoBeneficio + ", codigoBeneficioEncriptado=" + codigoBeneficioEncriptado + ", fecha=" + fecha + '}';
+        return "UsuarioBeneficio{" + "idBeneficio=" + idBeneficio + ", idUsuario=" + idUsuario + ", idAccionBeneficio=" + idAccionBeneficio + ", cantidad=" + cantidad + ", codigoBeneficio=" + codigoBeneficio + ", codigoBeneficioEncriptado=" + codigoBeneficioEncriptado + ", fecha=" + fecha + ", idVendedorPOS=" + idVendedorPOS + '}';
     }
+
+    
     
     
 }

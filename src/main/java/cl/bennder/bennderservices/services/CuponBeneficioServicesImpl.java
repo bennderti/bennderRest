@@ -11,27 +11,25 @@ import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.UsuarioBeneficio;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
-import cl.bennder.entitybennderwebrest.model.BeneficioCargador;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.ValidacionCuponPOSRequest;
 import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionCuponPOSResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 import cl.bennder.entitybennderwebrest.utils.UtilsBennder;
 import com.itextpdf.text.BadElementException;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -91,7 +89,95 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     @Autowired
     EmailServices emailServices;
 
+    @Override
+    public ValidacionCuponPOSResponse validacionCuponPOS(ValidacionCuponPOSRequest request) {
+       
+        ValidacionCuponPOSResponse response = new ValidacionCuponPOSResponse();
+        response.setValidacion(new Validacion("0","1","Problemas al validar cupón de beneficio en POS"));
+        log.info("inicio");
+        try {            
+            if(request!=null && request.getCodigoCuponEncriptado()!=null){                
+                if(request.getIdVendedor()!=null && request.getIdDireccionSucursal()!=null && request.getPasswordSucursal()!=null){                                   
+                    log.info("descriptando datos");
+                    UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoCuponEncriptado());
+                    if(uBeneficio != null){
+                        String mensajeLog = "[idUsuario(cupón) -> "+uBeneficio.getIdUsuario()+"] ";
+    //                    if( uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0){
+                            //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
+                            UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
+                            if(uBeneficioCanjeado!=null){                            
+                                //.- validando si cupón ya ha sido canjeado
+                                if(uBeneficioCanjeado.getIdAccionBeneficio().compareTo(AccionBeneficioUsuario.CANJEADO) == 0){
+                                    log.info("{} Este beneficio ya habia sido canjeado en punto de venta.",mensajeLog);
+                                    response.getValidacion().setCodigoNegocio("5");
+                                    response.getValidacion().setMensaje("Este beneficio ya habia sido canjeado en punto de venta.");
+                                }
+                                else{
+                                    //.- validamos si password es de surcusal seleccionada
+                                    log.info("{} validamos si password es de surcusal seleccionada",mensajeLog);
+                                    Beneficio b = this.beneficioMapper.getInfoGeneralBeneficio(uBeneficio.getIdBeneficio());
+                                    Integer passSucusalValida = beneficioMapper.esPasswordSucursalValida(request.getPasswordSucursal(), request.getIdDireccionSucursal(), b.getIdProveedor());
+                                    if(passSucusalValida > 0){
+                                        Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "",request.getIdVendedor());
+                                        if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())){
+                                            log.info("{} Cupon válido correctamente para ser canjeado",mensajeLog);
+                                            vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
+                                            log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
+                                            ValidacionResponse vResponse = emailServices.notificarCanjeCuponBeneficio(uBeneficio.getIdUsuario(), uBeneficio.getIdBeneficio());
+                                            response.setValidacion(vResponse.getValidacion());
+                                            log.info("{} Formando correo a enviar a usuario - fin", mensajeLog); 
+                                        }
+                                        else{
+                                            log.info("{} Problemas al registrar beneficio", mensajeLog);
+                                            response.getValidacion().setCodigoNegocio("3");
+                                            response.getValidacion().setMensaje("Problemas al registrar beneficio"); 
+                                        }                                    
+                                    }
+                                    else{
 
+                                        log.info("{} Password ingresada no corresponde al local seleccionado, favor ingresar correctamente", mensajeLog);
+                                        response.getValidacion().setCodigoNegocio("4");
+                                        response.getValidacion().setMensaje("Password ingresada no corresponde al local seleccionado, favor ingresar correctamente");
+                                    }
+                                }
+                            }
+                            else{
+                                log.info("{} No existe información de dicho código de beneficio",mensajeLog);
+                                response.getValidacion().setCodigoNegocio("3");
+                                response.getValidacion().setMensaje("No existe información de dicho código de beneficio");
+                            }
+                    }
+                    else{
+                        log.info("No es posible obtener información de beneficio a canjear");
+                        response.getValidacion().setCodigoNegocio("2");
+                        response.getValidacion().setMensaje("No es posible obtener información de beneficio a canjear");
+                    }
+                }
+                else{
+                    log.info("Favor completar datos para validar cupón de descuento (sucursal, password y rut vendedor sin dv.)");
+                    response.getValidacion().setCodigoNegocio("1");
+                    response.getValidacion().setMensaje("Favor completar datos para validar cupón de descuento (sucursal, password y rut vendedor sin dv.)");
+                }
+ 
+            }
+            else{
+                log.info("Favor completar datos para validar cupón de descuento (codigo beneficio)");
+                response.getValidacion().setCodigoNegocio("1");
+                response.getValidacion().setMensaje("Favor completar datos para generar cupón de descuento (codigo beneficio)");
+            }
+            
+        } catch (Exception e) {
+            log.error("Exception validacionCuponPOS,",e);
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al validar cupón de beneficio en POS");
+        }
+        log.info("fin");
+        return response;
+    }
+
+    
+    
     @Override
     public CanjeaCuponResponse validaCanjeCuponBeneficio(CanjeaCuponRequest request) {
         //.- Valida datos de entrada
@@ -120,26 +206,33 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                                 response.getValidacion().setMensaje("Este beneficio ya habia sido canjeado en punto de venta.");
                             }
                             else{
-                                Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "");
-                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())){
-                                    log.info("{} Cupon válido correctamente para ser canjeado",mensajeLog);
-                                    vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
-                                    log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
-                                    ValidacionResponse vResponse = emailServices.notificarCanjeCuponBeneficio(uBeneficio.getIdUsuario(), uBeneficio.getIdBeneficio());
-                                    response.setValidacion(vResponse.getValidacion());
-                                    log.info("{} Formando correo a enviar a usuario - fin", mensajeLog); 
-                                }
-                                else{
-                                   log.info("{} Problemas al registrar beneficio", mensajeLog);
-                                    response.getValidacion().setCodigoNegocio("3");
-                                    response.getValidacion().setMensaje("Problemas al registrar beneficio"); 
-                                } 
-                                
-//                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio()) ){
+//                                Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "");
+//                                if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())){
 //                                    log.info("{} Cupon válido correctamente para ser canjeado",mensajeLog);
 //                                    vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
+//                                    log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
+//                                    ValidacionResponse vResponse = emailServices.notificarCanjeCuponBeneficio(uBeneficio.getIdUsuario(), uBeneficio.getIdBeneficio());
+//                                    response.setValidacion(vResponse.getValidacion());
+//                                    log.info("{} Formando correo a enviar a usuario - fin", mensajeLog); 
 //                                }
-//                                response.setValidacion(vRegistro);
+//                                else{
+//                                   log.info("{} Problemas al registrar beneficio", mensajeLog);
+//                                    response.getValidacion().setCodigoNegocio("3");
+//                                    response.getValidacion().setMensaje("Problemas al registrar beneficio"); 
+//                                }
+
+                                //.- Obteniendo surcusales del proveedor de beneficio
+                                response.setSucursales(beneficioMapper.getSucursalesProveedorByBeneficio(uBeneficio.getIdBeneficio()));
+                                if(response.getSucursales()!=null && response.getSucursales().size() > 0){
+                                    log.info("{} Cupon válido para ser canjeado en sucurcusal (POS)", mensajeLog);
+                                    response.getValidacion().setCodigoNegocio("0");
+                                    response.getValidacion().setMensaje("Cupon válido para ser canjeado en sucurcusal (POS)");
+                                }
+                                else{
+                                    log.info("{} Sin sucursales configuradas para proveedor de beneficio ->{}", mensajeLog,uBeneficio.getIdBeneficio());
+                                    response.getValidacion().setCodigoNegocio("6");
+                                    response.getValidacion().setMensaje("Sin sucursales configuradas para proveedor");
+                                }
                             }
                         }
                         else{
@@ -229,7 +322,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     
      
     @Override
-    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado) {
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado, Integer idVendedor) {
         log.info("inicio");        
         //.- reducir stock
         Validacion validacion = new Validacion("1", "0", "Problemas al registrar  beneficio");
@@ -240,6 +333,12 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
             log.info("uBeneficionQuery ->{}",uBeneficionQuery.toString());
             log.info("Obtienendo ultima informacion de usuario sobre beneficio(negocio)..");
             UsuarioBeneficio uBeneficio = beneficioMapper.getUsuarioBeneficio(uBeneficionQuery);
+            
+            if(accion.equals(AccionBeneficioUsuario.CANJEADO)){
+                log.info("seteando vendedor que validó cupon de beneficio en POS ->{}",idVendedor);
+                uBeneficio.setIdVendedorPOS(idVendedor);
+            }
+            
             //.- Existe
             if(uBeneficio != null){
                 log.info("información actual de accion de usuario beneficio ->{}",uBeneficio.toString());
@@ -354,7 +453,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                                     log.info("{} Sotck Actual->{} de beneficio ->{} es inferior al seleccionado por usuario, el cual es de ->{}. Por tanto se actualizará con stock actual",mensajeLog,stockBeneficio,request.getIdBeneficio(),request.getCantidad());
                                     request.setCantidad(stockBeneficio);
                                 }
-                                Validacion validacion =  this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(),codEncriptado);
+                                Validacion validacion =  this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(),codEncriptado,null);
                                 if(validacion!=null && "0".equals(validacion.getCodigo()) && "0".equals(validacion.getCodigoNegocio())){
                                     log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog); 
                                     ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(request.getIdUsuario(), request.getIdBeneficio(), urlDownloadCupon);
@@ -502,7 +601,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
 
                                         byte[] bytePdf = this.generaCuponPdf(uBeneficio, rutaImagenQR, uBeneficio.getCodigoBeneficio());
                                         if(bytePdf!=null && bytePdf.length > 0){
-                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "");
+                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "",null);
                                             if(vRegistro!=null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio()) ){
                                                 log.info("{} Cupon pdf generado correctamente",mensajeLog);
                                                 vRegistro.setMensaje("Cupon pdf generado correctamente");

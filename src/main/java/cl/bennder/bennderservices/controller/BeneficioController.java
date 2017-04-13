@@ -6,10 +6,12 @@ import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
 import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.ValidacionCuponPOSRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
 import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionCuponPOSResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,18 @@ public class BeneficioController {
     @Autowired
     CuponBeneficioServices cuponBeneficioServices;
     
+    /***
+     * Méotodo que permite validar el canje de cupón de beneficio en POS
+     * @param request Datos para validación en POS
+     * @return Validación de cupón de de beneficio en POS
+     */
+    @RequestMapping(value = "beneficio/validacionCuponPOS",method = RequestMethod.POST)
+    public ValidacionCuponPOSResponse validacionCuponPOS(@RequestBody ValidacionCuponPOSRequest request){
+        log.info("INICIO");
+        ValidacionCuponPOSResponse response = cuponBeneficioServices.validacionCuponPOS(request);
+        log.info("FIN");
+        return response;
+    }
     /***
      * Servicio expuesto que permite validar/canjear cupion de beneficio al pistolear/escanear código QR
      * @param request Datos código beneficio

@@ -226,7 +226,8 @@ create table FECHA_ACCION_BENEFICIO (
    ID_USUARIO           INT4                 not null,
    ID_BENEFICIO         INT4                 not null,
    ID_ACCION_BENEFICIO  INT4                 not null,
-   FECHA                timestamp                 not null 
+   FECHA                timestamp                 not null,
+   ID_VENDEDOR_POS INT4
 );
 
 /*==============================================================*/
@@ -350,6 +351,7 @@ create table STOP_WORD (
 create table SUCURSAL_PROVEEDOR (
    ID_PROVEEDOR         INT4                 not null,
    ID_DIRECCION         INT4                 not null,
+   PASSWORD             VARCHAR(25)           not null,
    constraint PK_SUCURSAL_PROVEEDOR primary key (ID_PROVEEDOR, ID_DIRECCION)
 );
 
