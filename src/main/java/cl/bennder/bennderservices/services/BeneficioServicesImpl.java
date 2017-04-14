@@ -3,25 +3,33 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
+import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
-import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by Diego on 26-03-2017.
  */
+@PropertySource("classpath:bennder.properties")
 @Service
 @Transactional
 public class BeneficioServicesImpl implements BeneficioServices {
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
-
+    
+    
+    @Autowired
+    private Environment env;
+    
+    
     @Autowired
     BeneficioMapper beneficioMapper;
 
@@ -38,6 +46,16 @@ public class BeneficioServicesImpl implements BeneficioServices {
 
         try {
             Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
+            //.- setean ruta http de imagen de servidor
+            log.info("obteniendo ruta http de imagen publicada en servidor...");
+            if(beneficio!=null && beneficio.getImagenesBeneficio()!=null && beneficio.getImagenesBeneficio().size() > 0){
+                String server = env.getProperty("server");
+                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+//                for(BeneficioImagen imagen : beneficio.getImagenesBeneficio()){
+//                    imagen.setUrlImagen(server + imagen.getPath());
+//                    log.info("imagen.getUrlImagen() ->{}",imagen.getUrlImagen());
+//                }
+            }
             //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
             response.setBeneficio(beneficio);
             if(response != null && response.getBeneficio() != null){

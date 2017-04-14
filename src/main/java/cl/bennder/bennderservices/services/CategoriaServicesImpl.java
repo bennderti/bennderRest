@@ -10,16 +10,13 @@ import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
-import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
-import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +24,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 /**
  *
  * @author dyanez
  */
+@PropertySource("classpath:bennder.properties")
 @Service
 @Transactional
 public class CategoriaServicesImpl implements CategoriaServices{
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
     
+    
+    @Autowired
+    private Environment env;
+            
+            
     @Autowired
     private CategoriaMapper categoriaMapper;
 
@@ -138,7 +143,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     public CategoriaResponse cargarCategoria(CategoriasRequest request) {
         CategoriaResponse response = new CategoriaResponse();
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
-
+        String server = env.getProperty("server");
         try {
             String nombreCategoria = request.getNombreCategoria();
             if (nombreCategoria == null || nombreCategoria.isEmpty()){
@@ -157,16 +162,21 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
                             response.setCategoriaPadre(categoria);
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
-                            for (Beneficio beneficio : beneficios)
-                                ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                            for (Beneficio beneficio : beneficios){
+                                //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                            }
                             response.setBeneficios(beneficios);
                             break;
                         default:
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoriaPadre()));
                             response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
-                            for (Beneficio beneficio : beneficios)
-                                ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                            
+                            for (Beneficio beneficio : beneficios){
+                                //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                            }
                             response.setBeneficios(beneficios);
                             break;
                     }

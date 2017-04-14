@@ -57,6 +57,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -761,13 +762,19 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                                 PdfPCell cell = new PdfPCell();
                                 
                                 String rutaRaiz = env.getProperty("directorio.imagen.raiz");
+                                String server = env.getProperty("server");
                                 log.info("rutaRaiz ->{}",rutaRaiz);
+                                log.info("server ->{}",server);
                                 //log.info("path de imagen servidor ->{}",bImagen.getPath());
                                 String pathImagen = rutaRaiz + bImagen.getPath();
                                 log.info("pathImagen ->{}",pathImagen);
+                                String httpImagen = server + bImagen.getPath();
+                                log.info("httpImagen ->{}",httpImagen);
                                 //cell.addElement(Image.getInstance(sb.toString()));
                                 //cell.addElement(Image.getInstance(fileTemp.getAbsolutePath()));
-                                cell.addElement(Image.getInstance(pathImagen));
+                                //cell.addElement(Image.getInstance(pathImagen));
+                                cell.addElement(Image.getInstance(new URL(httpImagen)));
+                                //cell.addElement(UtilsBennder.getImageFromServer(httpImagen));
                                 table.addCell(cell);
                             }
                             i++;
