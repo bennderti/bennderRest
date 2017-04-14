@@ -61,11 +61,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 /**
  *
  * @author dyanez
  */
+@PropertySource("classpath:bennder.properties")
 @Service
 @Transactional
 public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
@@ -76,6 +79,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
     private static final String GENERACION_CUPON_QR = "GENERACION_CUPON_QR";
     private static final String URL_DOWNLOAD = "URL_DOWNLOAD";
     private static final String URL_CANJE = "URL_CANJE";
+    
+    @Autowired
+    private Environment env;
     
     @Autowired
     BeneficioMapper beneficioMapper;
@@ -748,13 +754,20 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                                   .append(""+i)
                                   .append(".png");
                                 
-                                File fileTemp = new File(System.getProperty("java.io.tmpdir"), sb.toString());
-                                UtilsBennder.writeBytesToFile(bImagen.getImagen(), sb.toString());
-                                UtilsBennder.writeBytesToFile(bImagen.getImagen(), fileTemp.getAbsolutePath());
-                                pathEliminar.add(fileTemp.getAbsolutePath());
+                                //File fileTemp = new File(System.getProperty("java.io.tmpdir"), sb.toString());
+                                //UtilsBennder.writeBytesToFile(bImagen.getImagen(), sb.toString());
+                                //UtilsBennder.writeBytesToFile(bImagen.getImagen(), fileTemp.getAbsolutePath());
+                                //pathEliminar.add(fileTemp.getAbsolutePath());
                                 PdfPCell cell = new PdfPCell();
+                                
+                                String rutaRaiz = env.getProperty("directorio.imagen.raiz");
+                                log.info("rutaRaiz ->{}",rutaRaiz);
+                                //log.info("path de imagen servidor ->{}",bImagen.getPath());
+                                String pathImagen = rutaRaiz + bImagen.getPath();
+                                log.info("pathImagen ->{}",pathImagen);
                                 //cell.addElement(Image.getInstance(sb.toString()));
-                                cell.addElement(Image.getInstance(fileTemp.getAbsolutePath()));
+                                //cell.addElement(Image.getInstance(fileTemp.getAbsolutePath()));
+                                cell.addElement(Image.getInstance(pathImagen));
                                 table.addCell(cell);
                             }
                             i++;
@@ -790,15 +803,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                     }
                     if(bytePdf != null){
                         log.info("Tamanio de cupon pdf(postEliminación) ->{} Bytes",bytePdf.length);
-                    }
-//                    Paragraph p = new Paragraph("Cupón de descuento");
-//                    p.setAlignment(Element.ALIGN_CENTER);
-//                    document.add(p);
-//                    document.add(img);
-                    
-//                    System.out.println("Done");
-                    
-                    
+                    }      
                     
                 } catch (BadElementException ex) {
                     log.error("Error BadElementException",ex);
