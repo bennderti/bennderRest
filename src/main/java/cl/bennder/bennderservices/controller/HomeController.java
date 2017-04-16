@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import cl.bennder.bennderservices.services.EmailServices;
+import cl.bennder.bennderservices.services.HomeServices;
+import cl.bennder.entitybennderwebrest.request.CargarHomeRequest;
 import cl.bennder.entitybennderwebrest.request.LoginRequest;
 import cl.bennder.entitybennderwebrest.request.RecuperacionPasswordRequest;
+import cl.bennder.entitybennderwebrest.response.CargarHomeResponse;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 
@@ -35,6 +38,9 @@ public class HomeController {
 
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private HomeServices homeServices;
 
     //.- login
     @RequestMapping(value = "login", method = RequestMethod.POST)
@@ -68,6 +74,24 @@ public class HomeController {
         log.info("[mail/recuperacionPassword] - inicio ");
         ValidacionResponse response = emailServices.recuperacionPassword(request);
         log.info("[mail/recuperacionPassword] - fin ");
+        return response;
+    }
+    
+    /**
+     * Método para obtener toda la informaciòn a cargar en el home
+     * MG - 9.4.2017
+     * @param request usuario
+     * @return response lista de categorías, beneficios preferenciales, ùltimos vistos, tendencias, publicidad
+     */
+    @RequestMapping(value = "home/cargarHome", method = RequestMethod.POST)
+    public @ResponseBody
+    CargarHomeResponse login(@RequestBody CargarHomeRequest request) {
+        log.info("[home/cargarHome] - inicio ");
+        CargarHomeResponse response =  homeServices.cargarHome(request);
+        
+//        log.info("response ->{}", response.toString());
+        log.info("[home/cargarHome] - fin ");
+        
         return response;
     }
 }

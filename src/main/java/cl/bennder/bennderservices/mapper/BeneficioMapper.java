@@ -242,4 +242,86 @@ public interface BeneficioMapper {
             " WHERE id_beneficio = #{idBeneficio}" +
             " AND orden in (1,2)")
     List<BeneficioImagen> obtenerImagenesBeneficioPreview(Integer idBeneficio);
+    
+    /**
+     * Obtiene lista de los beneficios con mejor calificaciòn, basado en las preferencias de categoría del usuario, con un limite de 9 items.
+     * Finalmente si la cantidad de beneficios es menor a 9, lo completa con los beneficios generales con mejor calificación
+     * @param idUsuario
+     * @return 
+     */
+    @Select("(SELECT B.ID_BENEFICIO, B.TITULO, B.CALIFICACION, B.ID_TIPO_BENEFICIO, BP.PRECIO_NORMAL, BP.PRECIO_OFERTA, BD.PORCENTAJE_DESCUENTO, BG.GANCHO, P.NOMBRE " +
+            "FROM BENEFICIO B " +
+            "INNER JOIN INTERES_USUARIO IU ON B.ID_CATEGORIA = IU.ID_CATEGORIA AND IU.ID_USUARIO = #{idUsuario} " +
+            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
+            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
+            "ORDER BY B.CALIFICACION DESC, B.FECHA_EXPIRACION)" +
+            "UNION" +
+            "(SELECT B.ID_BENEFICIO " +
+            "FROM BENEFICIO B " +
+            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
+            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
+            "ORDER BY B.CALIFICACION DESC, B.FECHA_EXPIRACION)" +
+            "LIMIT 9")
+    List<Beneficio> obtenerBeneficiosDestacadosInteresUsuario (Integer idUsuario);
+    
+    /**
+     * Obtiene lista de los últimos 9 visitados beneficios visitados por el usuario.
+     * Si faltan items, la lista se completa con los beneficios más visitados de bennder.
+     * @param idUsuario
+     * @return 
+     */
+    @Select("(SELECT B.ID_BENEFICIO, B.TITULO, B.CALIFICACION, B.ID_TIPO_BENEFICIO, BP.PRECIO_NORMAL, BP.PRECIO_OFERTA, BD.PORCENTAJE_DESCUENTO, BG.GANCHO, P.NOMBRE " +
+            "FROM BENEFICIO B " +
+            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "INNER JOIN USUARIO_BENEFICIO UB ON B.ID_BENEFICIO = UB.ID_BENEFICIO AND UB.ID_USUARIO = #{idUsuario} AND UB.ID_ACCION_BENEFICIO = 0 " +
+            "INNER JOIN FECHA_ACCION_BENEFICIO FAB ON UB.ID_BENEFICIO = FAB.ID_BENEFICIO AND UB.ID_USUARIO = FAB.ID_USUARIO " +
+            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
+            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
+            "ORDER BY FAB.FECHA DESC)" +
+            "UNION" +
+            "(SELECT B.ID_BENEFICIO " +
+            "FROM BENEFICIO B " +
+            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
+            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
+            "ORDER BY VISITAS_GENERAL DESC)" +
+            "LIMIT 9")
+    List<Beneficio> obtenerUltimosBeneficiosVistosUsuario (Integer idUsuario);
+    
+    /**
+     * Obtiene la lista de los nuevos beneficios agregados a bennder, con un máximo de 9 items.
+     * Se toma como prioridad los beneficios con las categorìas elegidas por el usuario.
+     * @param idUsuario
+     * @return 
+     */
+    @Select("(SELECT B.ID_BENEFICIO, B.TITULO, B.CALIFICACION, B.ID_TIPO_BENEFICIO, BP.PRECIO_NORMAL, BP.PRECIO_OFERTA, BD.PORCENTAJE_DESCUENTO, BG.GANCHO, P.NOMBRE " +
+            "FROM BENEFICIO B " +
+            "INNER JOIN INTERES_USUARIO IU ON B.ID_CATEGORIA = IU.ID_CATEGORIA AND IU.ID_USUARIO = #{idUsuario} " +
+            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
+            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
+            "ORDER BY B.FECHA_CREACION DESC)" +
+            "UNION" +
+            "(SELECT B.ID_BENEFICIO " +
+            "FROM BENEFICIO B " +
+            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
+            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
+            "ORDER BY B.FECHA_CREACION DESC)" +
+            "LIMIT 9")
+    List<Beneficio> obtenerNuevosBeneficiosInteresUsuario (Integer idUsuario);
 }

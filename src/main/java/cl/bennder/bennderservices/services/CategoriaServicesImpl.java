@@ -17,6 +17,7 @@ import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,5 +195,18 @@ public class CategoriaServicesImpl implements CategoriaServices{
         return response;
     }
 
+    @Override
+    public List<Categoria> getCategorias() {
+        
+        List<Categoria> response = new ArrayList<>();
+        
+        try {
+            response = categoriaMapper.getCategorias();
+            log.info("Obtención de categorías->{}",response.size());
+        } catch (Exception e) {
+            log.error("Exception getCategorias,",e);
+        }
+        return response;
+    }
 
 }
