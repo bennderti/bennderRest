@@ -395,7 +395,7 @@ create table USUARIO (
    NOMBRES              VARCHAR(50)          not null,
    APELLIDO_P           VARCHAR(50)          not null,
    APELLIDO_M           VARCHAR(50)          not null,
-   FECHA_NACIMIENTO     DATE                 not null
+   FECHA_NACIMIENTO     DATE                 not null,
    constraint PK_USUARIO primary key (ID_USUARIO)
 );
 
@@ -437,7 +437,7 @@ create table USUARIO_PROVEEDOR (
 
 
 /*==============================================================*/
-/* Table: PLANTILLA_CORREO, PARA DEFINIR PLANTILLAS DE CORREO                                     */
+/* Table: PLANTILLA_CORREO, PARA DEFINIR PLANTILLAS DE CORREO   */
 /*==============================================================*/
 CREATE TABLE plantilla_correo
 (
@@ -450,7 +450,7 @@ CREATE TABLE plantilla_correo
 
 
 /*==============================================================*/
-/* TABLAS parametro_sistema UTILIZADAS PARA GUARDAR DATOS DE PARAMETROS DE SISTEMA
+/* Table: parametro_sistema UTILIZADAS PARA GUARDAR DATOS DE PARAMETROS DE SISTEMA */
 /*==============================================================*/
 
 CREATE TABLE parametro_sistema
@@ -652,6 +652,9 @@ alter table USUARIO_PROVEEDOR
 /* SECUENCIAS                                                */
 /*==============================================================*/
 CREATE SEQUENCE beneficio_imagen_id_imagen_seq START 1;
+
+
+
 
 CREATE TABLE anuncio
 (
