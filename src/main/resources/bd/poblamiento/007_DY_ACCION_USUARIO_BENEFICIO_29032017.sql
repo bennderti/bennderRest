@@ -1,5 +1,5 @@
 /*==============================================================*/
-/* ESTADO DE ACCCION DE USUARIO SOBRE BENEFICIO
+/* ESTADO DE ACCCION DE USUARIO SOBRE BENEFICIO */
 /*==============================================================*/
 
 

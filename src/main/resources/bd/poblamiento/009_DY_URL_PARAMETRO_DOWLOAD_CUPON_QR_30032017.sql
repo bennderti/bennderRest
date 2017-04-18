@@ -1,5 +1,5 @@
 /*==============================================================*/
-/* URL PARA GENERACION/DESCARGA DE CUPON QR ENVIADA A CORREO
+/* URL PARA GENERACION/DESCARGA DE CUPON QR ENVIADA A CORREO */
 /*==============================================================*/
 
 

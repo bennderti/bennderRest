@@ -333,7 +333,7 @@ create table RATING_REVIEW (
 create table REGION (
    ID_REGION            INT4                 not null,
    ID_PAIS              INT4                 null,
-   NOMBRE               VARCHAR(20)             not null,
+   NOMBRE               VARCHAR(50)             not null,
    constraint PK_REGION primary key (ID_REGION)
 );
 

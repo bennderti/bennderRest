@@ -1,5 +1,5 @@
 /*==============================================================*/
-/* PARAMETROS PARA ENCRIPTAR CODIGO BENEIFICIO UTILIZANDO AES CON KEY Y INITVECTOR
+/* PARAMETROS PARA ENCRIPTAR CODIGO BENEIFICIO UTILIZANDO AES CON KEY Y INITVECTOR */
 /*==============================================================*/
 
 
