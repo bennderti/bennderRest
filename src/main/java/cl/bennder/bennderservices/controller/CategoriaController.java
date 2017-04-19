@@ -9,10 +9,12 @@ import cl.bennder.bennderservices.services.CategoriaServices;
 import cl.bennder.entitybennderwebrest.request.BeneficiosRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
+import cl.bennder.entitybennderwebrest.response.SubCategoriaProveedorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class CategoriaController {
     @Autowired
     private CategoriaServices categoriaServices;
     
-     @RequestMapping(value = "obtenerCategoriasById",method = RequestMethod.POST)
+  @RequestMapping(value = "obtenerCategoriasById",method = RequestMethod.POST)
     public CategoriasResponse obtenerCategoriasById(@RequestBody CategoriaByIdRequest request){
         log.info("INICIO");
         CategoriasResponse response = categoriaServices.obtenerCategoriasById(request);
@@ -42,6 +44,15 @@ public class CategoriaController {
     public BeneficiosCargadorResponse getBeneficiosByIdCat(@RequestBody CategoriaByIdRequest request){
         log.info("INICIO");
         BeneficiosCargadorResponse response = categoriaServices.getBeneficiosByIdCat(request);
+        log.info("response ->{}",response.toString());
+        log.info("FIN");
+        return response;
+    }
+    
+    @RequestMapping(value = "categoria/getSubCategoriasProveedor",method = RequestMethod.POST)
+    public SubCategoriaProveedorResponse getSubCategoriasProveedor(@RequestBody SubCategoriaProveedorRequest request){
+        log.info("INICIO");
+        SubCategoriaProveedorResponse response = categoriaServices.getSubCategoriasProveedor(request);
         log.info("response ->{}",response.toString());
         log.info("FIN");
         return response;

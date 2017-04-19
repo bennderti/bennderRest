@@ -70,6 +70,17 @@ public interface CategoriaMapper {
 
     @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria_padre = #{idCategoria}")
     List<Categoria> obtenerCategoriasById(Integer idCategoria);
+    
+    /***
+     * Pérmite obtener las subcategorias de las categorias de beneficios habilitados para el proveedor
+     * @param idCategoria identificador de categoria padre
+     * @param idProveedor identificadr de proveedor
+     * @return 
+     */
+    @Select("SELECT c.id_categoria as idCategoria, c.nombre FROM categoria c " +
+            "WHERE id_categoria_padre = #{idCat} and id_categoria in(select distinct id_categoria from beneficio where id_proveedor = #{idProv})")
+    List<Categoria> obtenerSubCategoriasByIdCatProveedor(@Param("idCat") Integer idCategoria,@Param("idProv") Integer idProveedor);
+    
 
     @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria = #{idCategoria}")
     Categoria obtenerCategoriaPorId(Integer idCategoria);

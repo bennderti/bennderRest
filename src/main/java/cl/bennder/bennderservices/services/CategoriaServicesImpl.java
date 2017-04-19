@@ -14,9 +14,11 @@ import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
+import cl.bennder.entitybennderwebrest.response.SubCategoriaProveedorResponse;
 import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +65,26 @@ public class CategoriaServicesImpl implements CategoriaServices{
             }
         } catch (Exception e) {
             log.error("Exception getBeneficiosByIdCat,",e);
+        }
+        log.info("fin");
+        return response;
+    }
+
+    @Override
+    public SubCategoriaProveedorResponse getSubCategoriasProveedor(SubCategoriaProveedorRequest request) {
+       SubCategoriaProveedorResponse response = new SubCategoriaProveedorResponse();
+       response.setValidacion(new Validacion("0","1","Sin sub-categorias para categoria indicada del proveedor"));
+       log.info("inicio");
+        try {
+            log.info("Datos de entrada ->{}",request.toString());
+            response.setSubCategorias(categoriaMapper.obtenerSubCategoriasByIdCatProveedor(request.getIdCategoria(),request.getIdProveedor()));
+            response.setValidacion(new Validacion("0","0","Sub-Categorias OK"));
+            if(response!=null && response.getSubCategorias()!=null){
+                log.info("Obtención de sub-categorias->{}",response.getSubCategorias().size());
+            }
+        } catch (Exception e) {
+            log.error("Exception obtenerCategoriasById,",e);
+            response.setValidacion(new Validacion("1","1","Problemas al obtener sub-categorias para categoria indicada del proveedor"));
         }
         log.info("fin");
         return response;

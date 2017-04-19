@@ -353,6 +353,8 @@ create table SUCURSAL_PROVEEDOR (
    ID_PROVEEDOR         INT4                 not null,
    ID_DIRECCION         INT4                 not null,
    PASSWORD             VARCHAR(25)           not null,
+   NOMBRE               VARCHAR(30),
+   HABILITADO       boolean not null,
    constraint PK_SUCURSAL_PROVEEDOR primary key (ID_PROVEEDOR, ID_DIRECCION)
 );
 
