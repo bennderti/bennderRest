@@ -31,13 +31,22 @@ public interface CategoriaMapper {
     })
     List<Categoria> getCategorias();
 
-    @Select(" SELECT c.id_categoria AS idCategoria, c.nombre, id_categoria_padre AS idCategoriaPadre" +
-            " FROM categoria c" +
-            " INNER JOIN beneficio b ON b.id_categoria = c.id_categoria" +
-            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " WHERE id_categoria_padre = #{idCategoriaPadre}" +
-            " AND p.habilitado = true" +
-            " AND b.habilitado = true")
+//    @Select(" SELECT c.id_categoria AS idCategoria, c.nombre, id_categoria_padre AS idCategoriaPadre" +
+//            " FROM categoria c" +
+//            " INNER JOIN beneficio b ON b.id_categoria = c.id_categoria" +
+//            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
+//            " WHERE id_categoria_padre = #{idCategoriaPadre}" +
+//            " AND p.habilitado = true" +
+//            " AND b.habilitado = true")
+    @Select("SELECT c1.id_categoria AS idCategoria, c1.nombre, c1.id_categoria_padre AS idCategoriaPadre " +
+            "FROM categoria c1 WHERE c1.id_categoria in( " +
+            "SELECT distinct c.id_categoria " +
+            "FROM categoria c " +
+            "INNER JOIN beneficio b ON b.id_categoria = c.id_categoria " +
+            "INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor " +
+            "WHERE id_categoria_padre =#{idCategoriaPadre} " +
+            "AND p.habilitado = true " +
+            "AND b.habilitado = true)")
     List<Categoria> obtenerSubCategorias(Integer idCategoriaPadre);
 
     @Select(" SELECT c.id_categoria AS idCategoria, c.nombre, c.id_categoria_padre AS idCategoriaPadre, COUNT(b.id_beneficio) as cantidadBeneficios" +

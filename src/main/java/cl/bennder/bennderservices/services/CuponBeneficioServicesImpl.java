@@ -450,6 +450,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
                             log.info("{} urlDownloadCupon ->{}",mensajeLog,urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.",mensajeLog);
                             Integer stockBeneficio = beneficioMapper.getStockBeneficio(request.getIdBeneficio());
+                            log.info("{} stockBeneficio->{}",mensajeLog,stockBeneficio);
                             if(stockBeneficio.equals(0)){
                                 log.info("Sin stock para beneficio seleccionado.");
                                 response.getValidacion().setCodigoNegocio("2");

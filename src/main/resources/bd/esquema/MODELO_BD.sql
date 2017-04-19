@@ -194,7 +194,7 @@ create table DIRECCION (
    ID_DIRECCION         SERIAL               not null,
    ID_COMUNA            INT4                 null,
    CALLE                VARCHAR(20)             not null,
-   NUMERO               VARCHAR(10)             not null,
+   NUMERO               VARCHAR(10)             null,
    DEPARTAMENTO         VARCHAR(10)             null,
    VILLA                VARCHAR(20)             null,
    constraint PK_DIRECCION primary key (ID_DIRECCION)
@@ -313,6 +313,7 @@ create table PROVEEDOR (
    FECHA_INGRESO        DATE                 not null,
    FECHA_SALIDA         DATE                 null,
    HABILITADO           BOOL                 not null,
+   path_logo character varying(200),
    constraint PK_PROVEEDOR primary key (ID_PROVEEDOR)
 );
 

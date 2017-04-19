@@ -21,7 +21,7 @@ public interface ProveedorMapper {
      * @return lista de proveedores
      * @author dyanez
      */
-    @Select("SELECT ID_PROVEEDOR AS idProveedor,NOMBRE,RUT FROM PROVEEDOR WHERE HABILITADO=TRUE")
+    @Select("SELECT ID_PROVEEDOR AS idProveedor,NOMBRE,RUT,path_logo as path FROM PROVEEDOR WHERE HABILITADO = TRUE")
     public List<Proveedor> obtenerProveedorHabilitados();
     
     
