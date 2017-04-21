@@ -7,9 +7,11 @@ package cl.bennder.bennderservices.controller;
 
 import cl.bennder.bennderservices.services.CargadorServices;
 import cl.bennder.bennderservices.services.ProveedorServices;
+import cl.bennder.entitybennderwebrest.request.DatosGeneralProveedorRequest;
 import cl.bennder.entitybennderwebrest.request.ProveedorIdRequest;
 import cl.bennder.entitybennderwebrest.request.UploadBeneficioImagenRequest;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
+import cl.bennder.entitybennderwebrest.response.DatosGeneralProveedorResponse;
 import cl.bennder.entitybennderwebrest.response.ProveedoresResponse;
 import cl.bennder.entitybennderwebrest.response.UploadBeneficioImagenResponse;
 import org.slf4j.Logger;
@@ -35,6 +37,15 @@ public class ProveedorController {
     
     @Autowired
     private CargadorServices cargadorServices;
+    
+    
+    @RequestMapping(value = "proveedor/guardaDatosGenerales",method = RequestMethod.POST)
+    public DatosGeneralProveedorResponse guardaDatosGeneralesProveedor(@RequestBody DatosGeneralProveedorRequest request){
+        log.info("INICIO");
+        DatosGeneralProveedorResponse response = proveedorServices.guardaDatosGeneralesProveedor(request);
+        log.info("FIN");
+        return response;
+    }
     
     @RequestMapping(value = "obtenerCategoriaByProveedor",method = RequestMethod.POST)
     public CategoriasResponse obtenerCategoriasById(@RequestBody ProveedorIdRequest request){

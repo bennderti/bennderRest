@@ -230,6 +230,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
 
                                 //.- Obteniendo surcusales del proveedor de beneficio
                                 response.setSucursales(beneficioMapper.getSucursalesProveedorByBeneficio(uBeneficio.getIdBeneficio()));
+                                String server = env.getProperty("server");
+                                String urlLogo = server + beneficioMapper.getPathLogoProveedorByBeneficio(uBeneficio.getIdBeneficio());
+                                log.info("{} URL logo de proveedor ->{}", mensajeLog,urlLogo);
+                                response.setUrlLogoProveedor(urlLogo);
                                 if(response.getSucursales()!=null && response.getSucursales().size() > 0){
                                     log.info("{} Cupon válido para ser canjeado en sucurcusal (POS)", mensajeLog);
                                     response.getValidacion().setCodigoNegocio("0");

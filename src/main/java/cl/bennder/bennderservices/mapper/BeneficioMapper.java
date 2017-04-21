@@ -18,10 +18,10 @@ public interface BeneficioMapper {
      * @param idBeneficio Identificador de beneficio
      * @return Lista de sucursales de proveedor
      */
-    @Select("select sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal " +
-            "from sucursal_proveedor sp inner join direccion d on sp.id_direccion=d.id_direccion " +
-            "inner join comuna c on c.id_comuna=d.id_comuna " +
-            "where sp.id_proveedor =(select id_proveedor from beneficio where id_beneficio = #{idBeneficio})")
+    @Select("select sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal  " +
+            "from sucursal_proveedor sp inner join direccion d on sp.id_direccion=d.id_direccion  " +
+            "inner join comuna c on c.id_comuna=d.id_comuna  " +
+            "where sp.id_proveedor =(select id_proveedor from beneficio where id_beneficio = #{idBeneficio}  and habilitado=true) and habilitado=true ")
     public List<SucursalProveedor> getSucursalesProveedorByBeneficio(Integer idBeneficio);
     
     @Select(  " select b.id_beneficio as idBeneficio,b.titulo,p.nombre as nombreProveedor,b.id_proveedor as idProveedor "
@@ -324,4 +324,13 @@ public interface BeneficioMapper {
             "ORDER BY B.FECHA_CREACION DESC)" +
             "LIMIT 9")
     List<Beneficio> obtenerNuevosBeneficiosInteresUsuario (Integer idUsuario);
+    
+    /***
+     * Obtiene path location a nivel de servidor del logo del proveedor
+     * @param idBeneficio identificador de beneficio
+     * @return 
+     */
+    @Select("SELECT PATH_LOGO FROM PROVEEDOR WHERE ID_PROVEEDOR =( " +
+            "SELECT ID_PROVEEDOR FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio} )")
+    public String getPathLogoProveedorByBeneficio(Integer idBeneficio);
 }
