@@ -656,37 +656,17 @@ alter table USUARIO_PROVEEDOR
 /*==============================================================*/
 CREATE SEQUENCE beneficio_imagen_id_imagen_seq START 1;
 
-
-
-
 CREATE TABLE anuncio
 (
-    id_anuncio integer NOT NULL DEFAULT nextval('"Anuncio_id_anuncio_seq"'::regclass),
-    titulo character(50) COLLATE pg_catalog."default",
-    descripcion character(200) COLLATE pg_catalog."default",
+    id_anuncio SERIAL NOT NULL,
+    titulo VARCHAR(50),
+    descripcion VARCHAR(200),
     fecha_inicial date NOT NULL,
     fecha_termino date NOT NULL,
-    orden integer NOT NULL,
+    orden INT4 NOT NULL,
     habilitado boolean NOT NULL,
-    link character(200) COLLATE pg_catalog."default",
-    imagen character(20) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT "Anuncio_pkey" PRIMARY KEY (id_anuncio)
-)
-
-COMMENT ON TABLE anuncio
-    IS 'Anuncios de Bennder para los trabajadores';
-
-CREATE TABLE anuncio_empresa
-(
-    id_anuncio integer NOT NULL DEFAULT nextval('"Anuncio_id_anuncio_seq"'::regclass),
-    titulo character(50) COLLATE pg_catalog."default",
-    descripcion character(200) COLLATE pg_catalog."default",
-    fecha_inicial date NOT NULL,
-    fecha_termino date NOT NULL,
-    orden integer NOT NULL,
-    habilitado boolean NOT NULL,
-    link character(200) COLLATE pg_catalog."default",
-    imagen character(20) COLLATE pg_catalog."default" NOT NULL,
+    link VARCHAR(200),
+    imagen VARCHAR(20) NOT NULL,
     CONSTRAINT "Anuncio_pkey" PRIMARY KEY (id_anuncio)
 );
 
@@ -695,15 +675,15 @@ COMMENT ON TABLE anuncio
 
 CREATE TABLE anuncio_empresa
 (
-    id_anuncio integer NOT NULL DEFAULT nextval('anuncio_empresa_id_anuncio_seq'::regclass),
-    titulo character(50) COLLATE pg_catalog."default",
-    descripcion character(200) COLLATE pg_catalog."default",
+    id_anuncio SERIAL NOT NULL,
+    titulo VARCHAR(50),
+    descripcion VARCHAR(200),
     fecha_inicial date NOT NULL,
     fecha_termino date NOT NULL,
     habilitado boolean NOT NULL,
-    link character(200) COLLATE pg_catalog."default",
-    imagen character(20) COLLATE pg_catalog."default" NOT NULL,
-    orden integer,
+    link VARCHAR(200),
+    imagen VARCHAR(20) NOT NULL,
+    orden INT4,
     CONSTRAINT anuncio_empresa_pkey PRIMARY KEY (id_anuncio)
 );
 
@@ -712,8 +692,8 @@ COMMENT ON TABLE anuncio_empresa
 
 CREATE TABLE beneficio_gancho
 (
-    id_beneficio integer NOT NULL,
-    gancho character(1) COLLATE pg_catalog."default",
+    id_beneficio INT4 NOT NULL,
+    gancho VARCHAR(200),
     CONSTRAINT beneficio_gancho_pkey PRIMARY KEY (id_beneficio),
     CONSTRAINT beneficio_gancho_fk1 FOREIGN KEY (id_beneficio)
         REFERENCES beneficio (id_beneficio) MATCH SIMPLE
