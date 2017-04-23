@@ -1,5 +1,6 @@
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
@@ -24,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class BeneficioServicesImpl implements BeneficioServices {
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
+    
+    @Autowired
+    private CuponBeneficioServices cuponBeneficioServices;
     
     
     @Autowired
@@ -51,10 +55,14 @@ public class BeneficioServicesImpl implements BeneficioServices {
             if(beneficio!=null && beneficio.getImagenesBeneficio()!=null && beneficio.getImagenesBeneficio().size() > 0){
                 String server = env.getProperty("server");
                 ImagenUtil.setUrlImagenesBenecio(server, beneficio);
-//                for(BeneficioImagen imagen : beneficio.getImagenesBeneficio()){
-//                    imagen.setUrlImagen(server + imagen.getPath());
-//                    log.info("imagen.getUrlImagen() ->{}",imagen.getUrlImagen());
-//                }
+                
+                
+                //.- Registrando visitas y accion de usuario
+                //Integer ,String , Integer ,String ,Integer 
+                log.info("Registrando estado de visitas");
+                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.VISITADO, null, 0, null, null);
+                
+                
             }
             //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
             response.setBeneficio(beneficio);
