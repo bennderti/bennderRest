@@ -5,11 +5,11 @@
  */
 package cl.bennder.bennderservices.services;
 
-import cl.bennder.entitybennderwebrest.model.Proveedor;
+import cl.bennder.entitybennderwebrest.request.DatosGeneralProveedorRequest;
 import cl.bennder.entitybennderwebrest.request.ProveedorIdRequest;
 import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
+import cl.bennder.entitybennderwebrest.response.DatosGeneralProveedorResponse;
 import cl.bennder.entitybennderwebrest.response.ProveedoresResponse;
-import java.util.List;
 
 /**
  *
@@ -31,4 +31,21 @@ public interface ProveedorServices {
      * @return 
      */
     public ProveedoresResponse obtenerProveedorHabilitados(ProveedorIdRequest request);
+    
+    /***
+     * Servicio que permite guardar/actualizar los datos generales de proveedor
+     * @param request Datos generales de proveedor
+     * @return Validación de guardado de proveedor
+     */
+    public DatosGeneralProveedorResponse guardaDatosGeneralesProveedor(DatosGeneralProveedorRequest request);
+    
+    /***
+     * Método encargado de generar y guardar logo de imagen de proveedor en sistema de archivos de servidor
+     * DY - 19.04.2017 
+     * @param imagen Logo de proveedor
+     * @param idProveedor Identificador de proveedor
+     * @param extension Extensión del logo
+     * @return Ruta de logo en sistema de archivos
+     */
+    public String guardaLogoImagenSistemaArchivos(byte[] imagen, Integer idProveedor,  String extension);
 }

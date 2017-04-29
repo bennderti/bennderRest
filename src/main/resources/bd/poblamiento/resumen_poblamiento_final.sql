@@ -471,3 +471,9 @@ VALUES('GENERACION_CUPON_QR','URL_CANJE','http://170.239.84.50:8080/BennderWeb/c
 
 INSERT INTO plantilla_correo(id_plantilla,nombre,asunto,descripcion)
 values(3,'notificacion-canje-cupon-beneficio.vm','Validación y Canje de Beneficio','Plantilla utilizada para enviar correo de validación/canje beneficio');
+
+
+/*==============================================================*/
+/*Se agrega estado de accion de usuario sobre beneficio : visitado */
+/*==============================================================*/
+insert into accion_usuario_beneficio values(0,'visitado');

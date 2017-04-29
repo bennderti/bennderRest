@@ -10,7 +10,8 @@ package cl.bennder.bennderservices.constantes;
  * @author dyanez
  */
 public abstract class AccionBeneficioUsuario {
-    public static Integer OBTENIDO = 1;
-    public static Integer DESCARGADO = 2;
-    public static Integer CANJEADO = 3;
+    public static Integer VISITADO = 0;//Cuando usuario pincha beneficio para visualizar
+    public static Integer OBTENIDO = 1;//cuando usuario selecciona beneficio
+    public static Integer DESCARGADO = 2;//cuando usuario ha descargado y generado cupon beneficio
+    public static Integer CANJEADO = 3;//cuando usuario ha canjeado o ha hecho efectivo beneficio en POS de sucursal
 }

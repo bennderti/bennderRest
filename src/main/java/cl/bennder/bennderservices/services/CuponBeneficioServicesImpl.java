@@ -230,6 +230,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
 
                                 //.- Obteniendo surcusales del proveedor de beneficio
                                 response.setSucursales(beneficioMapper.getSucursalesProveedorByBeneficio(uBeneficio.getIdBeneficio()));
+                                String server = env.getProperty("server");
+                                String urlLogo = server + beneficioMapper.getPathLogoProveedorByBeneficio(uBeneficio.getIdBeneficio());
+                                log.info("{} URL logo de proveedor ->{}", mensajeLog,urlLogo);
+                                response.setUrlLogoProveedor(urlLogo);
                                 if(response.getSucursales()!=null && response.getSucursales().size() > 0){
                                     log.info("{} Cupon válido para ser canjeado en sucurcusal (POS)", mensajeLog);
                                     response.getValidacion().setCodigoNegocio("0");
@@ -330,7 +334,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
      
     @Override
     public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado, Integer idVendedor) {
-        log.info("inicio");        
+        log.info("inicio");   
+        log.info("Datos  -> idBeneficio:{},idUsuario:{},accion:{}",idBeneficio,idUsuario,accion); 
         //.- reducir stock
         Validacion validacion = new Validacion("1", "0", "Problemas al registrar  beneficio");
         try {
@@ -341,6 +346,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
             log.info("Obtienendo ultima informacion de usuario sobre beneficio(negocio)..");
             UsuarioBeneficio uBeneficio = beneficioMapper.getUsuarioBeneficio(uBeneficionQuery);
             
+            if(accion.equals(AccionBeneficioUsuario.VISITADO)){
+                log.info("Se actualiza visitas general de beneficio ->{}",idBeneficio);
+                beneficioMapper.actualizarVisitasBeneficio(idBeneficio);
+            }            
             if(accion.equals(AccionBeneficioUsuario.CANJEADO)){
                 log.info("seteando vendedor que validó cupon de beneficio en POS ->{}",idVendedor);
                 uBeneficio.setIdVendedorPOS(idVendedor);
@@ -348,34 +357,48 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices{
             
             //.- Existe
             if(uBeneficio != null){
+                                
                 log.info("información actual de accion de usuario beneficio ->{}",uBeneficio.toString());
+                if(accion.equals(AccionBeneficioUsuario.OBTENIDO)){
+                    uBeneficio.setCantidad(cantidad);
+                    log.info("actualizamos stock de beneficio, en donde se reduce en ->{} unidades, para accion de obtenido!",cantidad);
+                    beneficioMapper.descuentaStockBeneficio(uBeneficio);
+                    uBeneficio.setCodigoBeneficio(codigoBeneficio);
+                    uBeneficio.setCodigoBeneficioEncriptado(codigoBeneficioEncriptado);
+                    //.- actualizamos datos cupon beneficio generado
+                    log.info("actualizamos datos para beneficio obtenido. Datos ->{}",uBeneficio.toString());
+                    beneficioMapper.actualizaCodigoBeneficioObtenido(uBeneficio);
+                    
+                }
                 //.- existe registro de fecha con determinada accion?
                 //.- si(actualizamos)
-                uBeneficio.setIdAccionBeneficio(accion);
-                beneficioMapper.actualizaAccionUsuarioBeneficio(uBeneficio);
-                Integer existeFechaUsuarioBeneficio = beneficioMapper.getFechaUsuarioBeneficio(uBeneficio);
-                if(existeFechaUsuarioBeneficio > 0){
-                    log.info("actualizamos fecha para accion de beneficio...");
-                    beneficioMapper.actualizaFechaAccionUsuarioBeneficio(uBeneficio);
+                
+                if(uBeneficio.getIdAccionBeneficio() <= accion){
+                    
+                    
+                    log.info("Accion ->{} válida par actualizar/insertar, ante la actual->{}",accion,uBeneficio.getIdAccionBeneficio());
+                    uBeneficio.setIdAccionBeneficio(accion);
+                    beneficioMapper.actualizaAccionUsuarioBeneficio(uBeneficio);
+                    Integer existeFechaUsuarioBeneficio = beneficioMapper.getFechaUsuarioBeneficio(uBeneficio);
+                    if(existeFechaUsuarioBeneficio > 0){
+                        log.info("actualizamos fecha para accion de beneficio...");
+                        beneficioMapper.actualizaFechaAccionUsuarioBeneficio(uBeneficio);
+                    }
+                    else{
+                        log.info("insertamos fecha para accion de beneficio...");
+                        beneficioMapper.insertaFechaAccionUsuarioBeneficio(uBeneficio);
+                    }
                 }
                 else{
-                    log.info("insertamos fecha para accion de beneficio...");
-                    beneficioMapper.insertaFechaAccionUsuarioBeneficio(uBeneficio);
+                    log.info("Accion ->{} NO válida par actualizar/insertar, ante la actual->{}",accion,uBeneficio.getIdAccionBeneficio());
                 }
 
             }
             //.- No existes
             else{
-                //.- insertamos
+                //.- insertamos    
                 uBeneficionQuery.setCantidad(cantidad);
-                uBeneficionQuery.setIdAccionBeneficio(accion);
-                uBeneficionQuery.setCodigoBeneficio(codigoBeneficio);
-                uBeneficionQuery.setCodigoBeneficioEncriptado(codigoBeneficioEncriptado);
-                if(accion.equals(AccionBeneficioUsuario.OBTENIDO)){
-                    log.info("actualizamos stock de beneficio, en donde se reduce en ->{} unidades, para accion de obtenido!",cantidad);
-                    beneficioMapper.descuentaStockBeneficio(uBeneficionQuery);
-                }
-
+                uBeneficionQuery.setIdAccionBeneficio(accion);                
                 log.info("insertamos accion beneficio. Datos ->{}",uBeneficionQuery.toString());
                 beneficioMapper.guardarUsuarioBeneficio(uBeneficionQuery);
                 //.- guardamos auditoria de fecha de beneficio

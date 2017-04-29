@@ -9,6 +9,7 @@ import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Proveedor;
 import java.util.List;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  *
@@ -21,7 +22,7 @@ public interface ProveedorMapper {
      * @return lista de proveedores
      * @author dyanez
      */
-    @Select("SELECT ID_PROVEEDOR AS idProveedor,NOMBRE,RUT,path_logo as path FROM PROVEEDOR WHERE HABILITADO = TRUE")
+    @Select("SELECT ID_PROVEEDOR AS idProveedor,nombre,rut,path_logo as pathLogo FROM PROVEEDOR WHERE HABILITADO = TRUE")
     public List<Proveedor> obtenerProveedorHabilitados();
     
     
@@ -35,4 +36,15 @@ public interface ProveedorMapper {
             "SELECT DISTINCT ID_CATEGORIA FROM BENEFICIO WHERE ID_PROVEEDOR = #{idProveedor}) B1 " +
             "ON B1.ID_CATEGORIA = C1.ID_CATEGORIA)  SUB ON SUB.ID_CATEGORIA_PADRE=CAT.ID_CATEGORIA ")
     public List<Categoria> obtenerCategoriaProveedor(Integer idProveedor);
+    
+    
+    /***
+     * Método que permite actualizar datos de proveedor
+     * @param proveedor Datos de proveedor
+     */
+    @Update("UPDATE proveedor " +
+            "   SET nombre= #{nombre}, rut=#{rut}," +
+            "   path_logo= #{pathLogo} " +
+            " WHERE id_proveedor = #{idProveedor}")
+    public void actualizaDatosGeneralesProveedor(Proveedor proveedor);
 }
