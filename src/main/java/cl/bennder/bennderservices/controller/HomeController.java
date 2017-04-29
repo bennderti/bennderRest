@@ -5,10 +5,21 @@
  */
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.services.UsuarioServices;
+import cl.bennder.entitybennderwebrest.request.JwtAuthenticationRequest;
+import cl.bennder.entitybennderwebrest.response.JwtAuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,12 +48,21 @@ public class HomeController {
     private UsuarioServices usuarioServices;
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
     private EmailServices emailServices;
     
     @Autowired
     private HomeServices homeServices;
 
-    //.- login
+    /*//.- login
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public @ResponseBody
     LoginResponse login(@RequestBody LoginRequest request) {
@@ -52,7 +72,27 @@ public class HomeController {
         log.info("[login] - fin ");
         
         return response;
+    }*/
+    @RequestMapping(value = "login", method = RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
+
+        // Perform the security
+        final Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authenticationRequest.getUsername(),
+                        authenticationRequest.getPassword()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Reload password post-security so we can generate token
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final String token = jwtTokenUtil.generateToken(userDetails);
+
+        // Return the token
+        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }
+
     /**
      * Utilizado para testear email utilizando velocity como template
      * @param  to Destinatario 
