@@ -5,36 +5,41 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Date;
 
 public class JwtUser implements UserDetails {
 
     private final Integer id;
     private final String username;
     private final String firstname;
-    private final String lastname;
+    private final String apellidoPaterno;
+    private final String apellidoMaterno;
     private final String password;
     private final String email;
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean enabled;
+    private final Integer idEstado;
 
     public JwtUser(
-          Integer id,
-          String username,
-          String firstname,
-          String lastname,
-          String email,
-          String password, Collection<? extends GrantedAuthority> authorities,
-          boolean enabled
-    ) {
+            Integer id,
+            String username,
+            String firstname,
+            String apellidoPaterno,
+            String apellidoMaterno,
+            String email,
+            String password, Collection<? extends GrantedAuthority> authorities,
+            boolean enabled,
+            Integer idEstado) {
+
         this.id = id;
         this.username = username;
         this.firstname = firstname;
-        this.lastname = lastname;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
         this.enabled = enabled;
+        this.idEstado = idEstado;
     }
 
     @JsonIgnore
@@ -69,8 +74,12 @@ public class JwtUser implements UserDetails {
         return firstname;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
     }
 
     public String getEmail() {
@@ -93,4 +102,7 @@ public class JwtUser implements UserDetails {
         return enabled;
     }
 
+    public Integer getIdEstado() {
+        return idEstado;
+    }
 }

@@ -19,10 +19,12 @@ public final class JwtUserFactory {
                 usuario.getUsuario(),
                 usuario.getNombres(),
                 usuario.getApellidoP(),
+                usuario.getApellidoM(),
                 usuario.getUsuario(),
                 usuario.getPassword(),
                 mapToGrantedAuthorities(usuario.getPerfiles()),
-                usuario.getHabilitado()
+                usuario.getHabilitado(),
+                usuario.getIdEstado()
         );
     }
 

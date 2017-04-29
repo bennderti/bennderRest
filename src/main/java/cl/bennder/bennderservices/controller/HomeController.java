@@ -6,7 +6,9 @@
 package cl.bennder.bennderservices.controller;
 
 import cl.bennder.bennderservices.security.JwtTokenUtil;
+import cl.bennder.bennderservices.security.JwtUser;
 import cl.bennder.bennderservices.services.UsuarioServices;
+import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.JwtAuthenticationRequest;
 import cl.bennder.entitybennderwebrest.response.JwtAuthenticationResponse;
 import org.slf4j.Logger;
@@ -74,23 +76,28 @@ public class HomeController {
         return response;
     }*/
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest authenticationRequest) throws AuthenticationException {
 
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setValidacion(new Validacion("0","1","Usuario no encontrado"));
         // Perform the security
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getUsername(),
+                        authenticationRequest.getUser(),
                         authenticationRequest.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Reload password post-security so we can generate token
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(authenticationRequest.getUser());
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         // Return the token
-        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+        loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
+        loginResponse.setToken(token);
+        loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
+        return ResponseEntity.ok(loginResponse);
     }
 
     /**
