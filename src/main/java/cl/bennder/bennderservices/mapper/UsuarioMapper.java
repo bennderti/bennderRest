@@ -109,11 +109,11 @@ public interface UsuarioMapper {
      * @return Usuario
      * @author driveros
      */
-    @Select(" SELECT ID_USUARIO AS IDUSUARIO, PASSWORD, USUARIO AS USUARIO, NOMBRES, APELLIDO_P AS APELLIDOP, APELLIDO_M AS APELLIDOM, ID_ESTADO_USUARIO IDESTADO, HABILITADO  " +
+    @Select(" SELECT ID_USUARIO AS IDUSUARIO, ID_USUARIO, PASSWORD, USUARIO AS USUARIO, NOMBRES, APELLIDO_P AS APELLIDOP, APELLIDO_M AS APELLIDOM, ID_ESTADO_USUARIO IDESTADO, HABILITADO  " +
             " FROM USUARIO u" +
             " WHERE USUARIO = #{usuario}")
     @Results(value = {
-            @Result (property = "perfiles", column = "IDUSUARIO", javaType=List.class, many = @Many(select = "obtenerPerfilesUsuario"))
+            @Result (property = "perfiles", column = "ID_USUARIO", javaType=List.class, many = @Many(select = "obtenerPerfilesUsuario"))
     })
     public Usuario getUsuarioByUsername(@Param("usuario") String usuario);
 
