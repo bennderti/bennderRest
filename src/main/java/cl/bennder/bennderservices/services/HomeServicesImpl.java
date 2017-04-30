@@ -8,6 +8,7 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.controller.HomeController;
 import cl.bennder.bennderservices.mapper.AnuncioMapper;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
+import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.entitybennderwebrest.request.CargarHomeRequest;
 import cl.bennder.entitybennderwebrest.response.CargarHomeResponse;
 import org.slf4j.Logger;
@@ -35,10 +36,19 @@ public class HomeServicesImpl implements HomeServices{
     @Autowired
     BeneficioMapper beneficioMapper;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     @Override
     public CargarHomeResponse cargarHome(CargarHomeRequest request) {
-        
-        log.info("[cargarHome] - idUsuario " + request.getIdUsuario());
+
+        if (request == null)
+            return null;
+
+        //obteniendo idUsuario desde token
+        Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
+
+        log.info("[cargarHome] - idUsuario " + idUsuario);
        
         CargarHomeResponse response = new CargarHomeResponse();     
                 
@@ -49,13 +59,13 @@ public class HomeServicesImpl implements HomeServices{
         response.setAnuncios(anuncioMapper.obtenerAnuncios());
         
         /*Obtener Beneficios Preferenciales*/
-        response.setBeneficiosDestacados(beneficioMapper.obtenerBeneficiosDestacadosInteresUsuario(request.getIdUsuario()));
+        response.setBeneficiosDestacados(beneficioMapper.obtenerBeneficiosDestacadosInteresUsuario(idUsuario));
         
         /*Obtener ultimos Benefcicios visitados*/
-        response.setBeneficiosVisitados(beneficioMapper.obtenerUltimosBeneficiosVistosUsuario(request.getIdUsuario()));
+        response.setBeneficiosVisitados(beneficioMapper.obtenerUltimosBeneficiosVistosUsuario(idUsuario));
         
         /*Obtener nuevos beneficios del usuario*/
-        response.setBeneficiosNuevos(beneficioMapper.obtenerNuevosBeneficiosInteresUsuario(request.getIdUsuario()));        
+        response.setBeneficiosNuevos(beneficioMapper.obtenerNuevosBeneficiosInteresUsuario(idUsuario));
         
         return response;
     }

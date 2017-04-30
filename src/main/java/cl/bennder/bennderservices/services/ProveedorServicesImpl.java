@@ -6,6 +6,7 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.mapper.ProveedorMapper;
+import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.DatosGeneralProveedorRequest;
 import cl.bennder.entitybennderwebrest.request.ProveedorIdRequest;
@@ -43,6 +44,9 @@ public class ProveedorServicesImpl implements ProveedorServices{
     
     @Autowired
     private ProveedorMapper proveedorMapper;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @Override
     public String guardaLogoImagenSistemaArchivos(byte[] imagen, Integer idProveedor, String extension) {
@@ -111,10 +115,15 @@ public class ProveedorServicesImpl implements ProveedorServices{
         
         log.info("inicio");
         try {
+            if (request == null)
+                return response;
+
+            //obteniendo idUsuario desde token
+            Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
              
             if(request!=null && request.getProveedor()!=null && request.getProveedor().getNombre()!= null
                && request.getProveedor().getRut()!=null){
-                String mensajeLog = "[idUsuario -> "+request.getIdUsuario()+"] ";
+                String mensajeLog = "[idUsuario -> " + idUsuario+"] ";
                 log.info("Datos request ->{}",request.toString());
                 if(request.getProveedor().getIdProveedor() == null){
                     log.info("{} Validando datos para la creación de proveedor...",mensajeLog);                    

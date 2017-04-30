@@ -2,6 +2,7 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
+import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
@@ -37,6 +38,9 @@ public class BeneficioServicesImpl implements BeneficioServices {
     @Autowired
     BeneficioMapper beneficioMapper;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     /**
      * @author Diego Riveros
      * @param request
@@ -49,6 +53,12 @@ public class BeneficioServicesImpl implements BeneficioServices {
         log.info("INICIO");
 
         try {
+            if (request == null)
+                return response;
+
+            //obteniendo idUsuario desde token
+            Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
+
             Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
             //.- setean ruta http de imagen de servidor
             log.info("obteniendo ruta http de imagen publicada en servidor...");
@@ -60,7 +70,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
                 //.- Registrando visitas y accion de usuario
                 //Integer ,String , Integer ,String ,Integer 
                 log.info("Registrando estado de visitas");
-                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.VISITADO, null, 0, null, null);
+                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), idUsuario, AccionBeneficioUsuario.VISITADO, null, 0, null, null);
                 
                 
             }

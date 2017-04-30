@@ -20,6 +20,7 @@ public class JwtTokenUtil implements Serializable {
     static final String CLAIM_KEY_USERNAME = "sub";
     static final String CLAIM_KEY_AUDIENCE = "audience";
     static final String CLAIM_KEY_CREATED = "created";
+    static final String CLAIM_KEY_ID_USUARIO = "idUsuario";
 
     private static final String AUDIENCE_UNKNOWN = "unknown";
     private static final String AUDIENCE_WEB = "web";
@@ -111,6 +112,7 @@ public class JwtTokenUtil implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_CREATED, new Date());
+        claims.put(CLAIM_KEY_ID_USUARIO, ((JwtUser) userDetails).getId());
         return generateToken(claims);
     }
 
@@ -148,5 +150,16 @@ public class JwtTokenUtil implements Serializable {
         return (
                 username.equals(user.getUsername())
                         && !isTokenExpired(token));
+    }
+
+    public Integer getIdUsuarioFromToken(String token) {
+        Integer idUsuario;
+        try {
+            final Claims claims = getClaimsFromToken(token);
+            idUsuario = (Integer) claims.get(CLAIM_KEY_ID_USUARIO);
+        } catch (Exception e) {
+            idUsuario = null;
+        }
+        return idUsuario;
     }
 }
