@@ -15,11 +15,14 @@ import cl.bennder.entitybennderwebrest.response.ValidacionCuponPOSResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by Diego on 26-03-2017.
@@ -34,6 +37,9 @@ public class BeneficioController {
     
     @Autowired
     CuponBeneficioServices cuponBeneficioServices;
+
+    @Value("${jwt.header}")
+    private String tokenHeader;
     
     /***
      * Méotodo que permite validar el canje de cupón de beneficio en POS
@@ -92,9 +98,10 @@ public class BeneficioController {
      * @return informaction detallada para un beneficio BeneficioResponse
      */
     @RequestMapping(value = "obtenerDetalleBeneficio",method = RequestMethod.POST)
-    public BeneficioResponse obtenerDetalleBeneficio(@RequestBody BeneficioRequest request) {
+    public BeneficioResponse obtenerDetalleBeneficio(@RequestBody BeneficioRequest beneficioRequest, HttpServletRequest request) {
         log.info("INICIO");
-        BeneficioResponse response = beneficioServices.obtenerDetalleBeneficio(request);
+        beneficioRequest.setToken(request.getHeader(this.tokenHeader));
+        BeneficioResponse response = beneficioServices.obtenerDetalleBeneficio(beneficioRequest);
         log.info("response ->{}",response.toString());
         log.info("FIN");
         return response;

@@ -156,7 +156,10 @@ public interface BeneficioMapper {
             " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
-            " WHERE b.id_categoria = #{idCategoria}")
+            " WHERE b.id_categoria = #{idCategoria}" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
             @Case(value = "1", type = Descuento.class),
@@ -186,7 +189,10 @@ public interface BeneficioMapper {
             " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
-            " WHERE b.id_categoria in (SELECT id_categoria FROM categoria WHERE id_categoria_padre = #{idCategoriaPadre})")
+            " WHERE b.id_categoria in (SELECT id_categoria FROM categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
                     @Case(value = "1", type = Descuento.class),
@@ -201,19 +207,32 @@ public interface BeneficioMapper {
     List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio as idBeneficioParaCondiciones," +
+            " b.id_beneficio as idBeneficioParaImagenes," +
             " b.titulo, " +
             " b.descripcion," +
+            " b.fecha_inicial as fechaInicial," +
+            " b.fecha_expiracion as fechaExpiracion," +
+            " b.fecha_creacion as fechaCreacion," +
+            " b.stock," +
+            " b.limite_stock as limiteStock," +
+            " b.calificacion," +
+            " b.visitas_general as visitasGeneral," +
             " tb.id_tipo_beneficio," +
             " tb.nombre," +
             " bd.porcentaje_descuento as porcentajeDescuento," +
             " bp.precio_normal as precioNormal," +
             " bp.precio_oferta as precioOferta," +
-            " p.nombre as nombreProveedor" +
+            " bg.gancho," +
+            " p.nombre as nombreProveedor," +
+            " c.nombre as nombreCategoria" +
             " FROM beneficio b" +
+            " INNER JOIN categoria c ON c.id_categoria = b.id_categoria" +
             " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
             " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " LEFT JOIN beneficio_gancho bg ON b.id_beneficio = bg.id_beneficio " +
             " WHERE b.id_beneficio = #{idBeneficio}")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
@@ -224,22 +243,23 @@ public interface BeneficioMapper {
     @Results({
             @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
-            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "imagenesBeneficio", column = "idBeneficioParaImagenes", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "condiciones", column = "idBeneficioParaCondiciones", javaType=List.class, many = @Many(select = "obtenerCondicionesBeneficio"))
 
     })
-//    @Results({
-//            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
-//            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
-//            @Result(property = "imagenesBeneficio", column = "idBeneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
-//
-//    })
     Beneficio obtenerDetalleBeneficio(Integer idBeneficio);
+
     //@Select(" SELECT imagen " +
     @Select(" SELECT path " +
             " FROM beneficio_imagen" +
             " WHERE id_beneficio = #{idBeneficio}")
     List<BeneficioImagen> obtenerImagenesBeneficio(Integer idBeneficio);
-    
+
+    @Select(" SELECT condicion " +
+            " FROM condicion_beneficio" +
+            " WHERE id_beneficio = #{idBeneficio}")
+    List<String> obtenerCondicionesBeneficio(Integer idBeneficio);
+
 
     //@Select(" SELECT imagen " +
     @Select(" SELECT path " +

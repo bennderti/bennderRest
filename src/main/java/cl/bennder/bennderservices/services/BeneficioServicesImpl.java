@@ -12,6 +12,7 @@ import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BeneficioServicesImpl implements BeneficioServices {
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
-    
+
     @Autowired
     private CuponBeneficioServices cuponBeneficioServices;
     
@@ -58,6 +59,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
 
             //obteniendo idUsuario desde token
             Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
+            log.debug("idUsuario -> " + idUsuario);
 
             Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
             //.- setean ruta http de imagen de servidor
