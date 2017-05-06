@@ -103,7 +103,6 @@ create table BENEFICIO (
    FECHA_CREACION       date                 not null default now(),
    FECHA_INICIAL        date                 not null default now(),
    FECHA_EXPIRACION     date                 not null,
-   CONDICION            VARCHAR(50)             null,
    HABILITADO           BOOL                 not null default false,
    CALIFICACION         INT4                 not null default 0,
    STOCK                INT4                 not null,
@@ -307,7 +306,7 @@ create table PERMISO_PERFIL (
 /* Table: PROVEEDOR                                             */
 /*==============================================================*/
 create table PROVEEDOR (
-   ID_PROVEEDOR         INT4                 not null,
+   ID_PROVEEDOR         SERIAL                 not null,
    NOMBRE               VARCHAR(50)             not null,
    RUT                  INT4                 not null,
    FECHA_INGRESO        DATE                 not null,
@@ -350,10 +349,13 @@ create table STOP_WORD (
 /* Table: SUCURSAL_PROVEEDOR                                    */
 /*==============================================================*/
 create table SUCURSAL_PROVEEDOR (
+   ID_SUCURSAL          SERIAL              not null,
    ID_PROVEEDOR         INT4                 not null,
    ID_DIRECCION         INT4                 not null,
    PASSWORD             VARCHAR(25)           not null,
-   constraint PK_SUCURSAL_PROVEEDOR primary key (ID_PROVEEDOR, ID_DIRECCION)
+   NOMBRE               VARCHAR(30),
+   HABILITADO       boolean not null,
+   constraint PK_SUCURSAL_PROVEEDOR primary key (ID_SUCURSAL)
 );
 
 /*==============================================================*/
@@ -654,37 +656,17 @@ alter table USUARIO_PROVEEDOR
 /*==============================================================*/
 CREATE SEQUENCE beneficio_imagen_id_imagen_seq START 1;
 
-
-
-
 CREATE TABLE anuncio
 (
-    id_anuncio integer NOT NULL DEFAULT nextval('"Anuncio_id_anuncio_seq"'::regclass),
-    titulo character(50) COLLATE pg_catalog."default",
-    descripcion character(200) COLLATE pg_catalog."default",
+    id_anuncio SERIAL NOT NULL,
+    titulo VARCHAR(50),
+    descripcion VARCHAR(200),
     fecha_inicial date NOT NULL,
     fecha_termino date NOT NULL,
-    orden integer NOT NULL,
+    orden INT4 NOT NULL,
     habilitado boolean NOT NULL,
-    link character(200) COLLATE pg_catalog."default",
-    imagen character(20) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT "Anuncio_pkey" PRIMARY KEY (id_anuncio)
-)
-
-COMMENT ON TABLE anuncio
-    IS 'Anuncios de Bennder para los trabajadores';
-
-CREATE TABLE anuncio_empresa
-(
-    id_anuncio integer NOT NULL DEFAULT nextval('"Anuncio_id_anuncio_seq"'::regclass),
-    titulo character(50) COLLATE pg_catalog."default",
-    descripcion character(200) COLLATE pg_catalog."default",
-    fecha_inicial date NOT NULL,
-    fecha_termino date NOT NULL,
-    orden integer NOT NULL,
-    habilitado boolean NOT NULL,
-    link character(200) COLLATE pg_catalog."default",
-    imagen character(20) COLLATE pg_catalog."default" NOT NULL,
+    link VARCHAR(200),
+    imagen VARCHAR(20) NOT NULL,
     CONSTRAINT "Anuncio_pkey" PRIMARY KEY (id_anuncio)
 );
 
@@ -693,15 +675,15 @@ COMMENT ON TABLE anuncio
 
 CREATE TABLE anuncio_empresa
 (
-    id_anuncio integer NOT NULL DEFAULT nextval('anuncio_empresa_id_anuncio_seq'::regclass),
-    titulo character(50) COLLATE pg_catalog."default",
-    descripcion character(200) COLLATE pg_catalog."default",
+    id_anuncio SERIAL NOT NULL,
+    titulo VARCHAR(50),
+    descripcion VARCHAR(200),
     fecha_inicial date NOT NULL,
     fecha_termino date NOT NULL,
     habilitado boolean NOT NULL,
-    link character(200) COLLATE pg_catalog."default",
-    imagen character(20) COLLATE pg_catalog."default" NOT NULL,
-    orden integer,
+    link VARCHAR(200),
+    imagen VARCHAR(20) NOT NULL,
+    orden INT4,
     CONSTRAINT anuncio_empresa_pkey PRIMARY KEY (id_anuncio)
 );
 
@@ -710,11 +692,36 @@ COMMENT ON TABLE anuncio_empresa
 
 CREATE TABLE beneficio_gancho
 (
-    id_beneficio integer NOT NULL,
-    gancho character(1) COLLATE pg_catalog."default",
+    id_beneficio INT4 NOT NULL,
+    gancho VARCHAR(200),
     CONSTRAINT beneficio_gancho_pkey PRIMARY KEY (id_beneficio),
     CONSTRAINT beneficio_gancho_fk1 FOREIGN KEY (id_beneficio)
         REFERENCES beneficio (id_beneficio) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE condicion_beneficio
+(
+    id_beneficio integer NOT NULL,
+    condicion character varying(100) NOT NULL,
+    CONSTRAINT condicion_beneficio_fk1 FOREIGN KEY (id_beneficio)
+        REFERENCES oldbennder.beneficio (id_beneficio) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE sucursal_beneficio
+(
+    id_beneficio integer NOT NULL,
+    id_sucursal integer NOT NULL,
+    CONSTRAINT sucursal_beneficio_pkey PRIMARY KEY (id_beneficio, id_sucursal),
+    CONSTRAINT sucursal_beneficio_fk1 FOREIGN KEY (id_beneficio)
+        REFERENCES beneficio (id_beneficio) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT sucursal_beneficio_fk2 FOREIGN KEY (id_beneficio)
+        REFERENCES sucursal_proveedor (id_sucursal) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
