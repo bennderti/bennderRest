@@ -134,7 +134,7 @@ public class HomeController {
      */
     @RequestMapping(value = "home/cargarHome", method = RequestMethod.POST)
     public @ResponseBody
-    CargarHomeResponse login(@RequestBody CargarHomeRequest cargarHomeRequest, HttpServletRequest request) {
+    CargarHomeResponse cargarHome(@RequestBody CargarHomeRequest cargarHomeRequest, HttpServletRequest request) {
         log.info("[home/cargarHome] - inicio ");
 
         //obteniendo idUsuario desde token
