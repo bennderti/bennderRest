@@ -57,10 +57,6 @@ public class BeneficioServicesImpl implements BeneficioServices {
             if (request == null)
                 return response;
 
-            //obteniendo idUsuario desde token
-            Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
-            log.debug("idUsuario -> " + idUsuario);
-
             Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
             //.- setean ruta http de imagen de servidor
             log.info("obteniendo ruta http de imagen publicada en servidor...");
@@ -72,7 +68,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
                 //.- Registrando visitas y accion de usuario
                 //Integer ,String , Integer ,String ,Integer 
                 log.info("Registrando estado de visitas");
-                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), idUsuario, AccionBeneficioUsuario.VISITADO, null, 0, null, null);
+                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.VISITADO, null, 0, null, null);
                 
                 
             }

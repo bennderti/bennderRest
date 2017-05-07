@@ -37,6 +37,8 @@ import cl.bennder.entitybennderwebrest.response.CargarHomeResponse;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  *
  * @author dyanez
@@ -132,9 +134,14 @@ public class HomeController {
      */
     @RequestMapping(value = "home/cargarHome", method = RequestMethod.POST)
     public @ResponseBody
-    CargarHomeResponse login(@RequestBody CargarHomeRequest request) {
+    CargarHomeResponse login(@RequestBody CargarHomeRequest cargarHomeRequest, HttpServletRequest request) {
         log.info("[home/cargarHome] - inicio ");
-        CargarHomeResponse response =  homeServices.cargarHome(request);
+
+        //obteniendo idUsuario desde token
+        cargarHomeRequest.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(request));
+        log.debug("idUsuario -> " + cargarHomeRequest.getIdUsuario());
+
+        CargarHomeResponse response =  homeServices.cargarHome(cargarHomeRequest);
         
 //        log.info("response ->{}", response.toString());
         log.info("[home/cargarHome] - fin ");

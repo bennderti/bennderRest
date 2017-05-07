@@ -1,5 +1,6 @@
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.services.BeneficioServices;
 import cl.bennder.bennderservices.services.CuponBeneficioServices;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
@@ -38,8 +39,8 @@ public class BeneficioController {
     @Autowired
     CuponBeneficioServices cuponBeneficioServices;
 
-    @Value("${jwt.header}")
-    private String tokenHeader;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
     
     /***
      * Méotodo que permite validar el canje de cupón de beneficio en POS
@@ -100,7 +101,11 @@ public class BeneficioController {
     @RequestMapping(value = "obtenerDetalleBeneficio",method = RequestMethod.POST)
     public BeneficioResponse obtenerDetalleBeneficio(@RequestBody BeneficioRequest beneficioRequest, HttpServletRequest request) {
         log.info("INICIO");
-        beneficioRequest.setToken(request.getHeader(this.tokenHeader));
+
+        //obteniendo idUsuario desde token
+        beneficioRequest.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(request));
+        log.debug("idUsuario -> " + beneficioRequest.getIdUsuario());
+
         BeneficioResponse response = beneficioServices.obtenerDetalleBeneficio(beneficioRequest);
         log.info("response ->{}",response.toString());
         log.info("FIN");

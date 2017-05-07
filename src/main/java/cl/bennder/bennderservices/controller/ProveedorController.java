@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.services.CargadorServices;
 import cl.bennder.bennderservices.services.ProveedorServices;
 import cl.bennder.entitybennderwebrest.request.DatosGeneralProveedorRequest;
@@ -17,10 +18,13 @@ import cl.bennder.entitybennderwebrest.response.UploadBeneficioImagenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -37,6 +41,9 @@ public class ProveedorController {
     
     @Autowired
     private CargadorServices cargadorServices;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
     
     
     @RequestMapping(value = "proveedor/guardaDatosGenerales",method = RequestMethod.POST)
@@ -48,9 +55,14 @@ public class ProveedorController {
     }
     
     @RequestMapping(value = "obtenerCategoriaByProveedor",method = RequestMethod.POST)
-    public CategoriasResponse obtenerCategoriasById(@RequestBody ProveedorIdRequest request){
+    public CategoriasResponse obtenerCategoriasById(@RequestBody ProveedorIdRequest proveedorIdRequest, HttpServletRequest request){
         log.info("INICIO");
-        CategoriasResponse response = proveedorServices.obtenerCategoriaByProveedor(request);
+
+        //obteniendo idUsuario desde token
+        proveedorIdRequest.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(request));
+        log.debug("idUsuario -> " + proveedorIdRequest.getIdUsuario());
+
+        CategoriasResponse response = proveedorServices.obtenerCategoriaByProveedor(proveedorIdRequest);
         log.info("FIN");
         return response;
     }

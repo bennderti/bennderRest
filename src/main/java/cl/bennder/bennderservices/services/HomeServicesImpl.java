@@ -45,10 +45,7 @@ public class HomeServicesImpl implements HomeServices{
         if (request == null)
             return null;
 
-        //obteniendo idUsuario desde token
-        Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
-
-        log.info("[cargarHome] - idUsuario " + idUsuario);
+        Integer idUsuario = request.getIdUsuario();
        
         CargarHomeResponse response = new CargarHomeResponse();     
                 

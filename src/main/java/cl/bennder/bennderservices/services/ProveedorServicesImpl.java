@@ -117,13 +117,10 @@ public class ProveedorServicesImpl implements ProveedorServices{
         try {
             if (request == null)
                 return response;
-
-            //obteniendo idUsuario desde token
-            Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
              
             if(request!=null && request.getProveedor()!=null && request.getProveedor().getNombre()!= null
                && request.getProveedor().getRut()!=null){
-                String mensajeLog = "[idUsuario -> " + idUsuario+"] ";
+                String mensajeLog = "[idUsuario -> " + request.getIdUsuario() +"] ";
                 log.info("Datos request ->{}",request.toString());
                 if(request.getProveedor().getIdProveedor() == null){
                     log.info("{} Validando datos para la creación de proveedor...",mensajeLog);                    

@@ -428,25 +428,22 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
         if (request == null)
             return response;
 
-        //obteniendo idUsuario desde token
-        Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
-
         try {
             //.- Validamos que usuario no haya seleccionado beneficio previamente - OK
             //.- Generamos código encriptado de beneficio - OK
             //.- Guardamos accion de  beneficio de usuario como estado "obtenido" - OK
             //.- Enviamos correo con url para que cliente pinche y generar cupón beneficion QR            
-            if (request != null && idUsuario != null && request.getIdBeneficio() != null) {
-                mensajeLog = "[idUsuario -> " + idUsuario + "] ";
+            if (request != null && request.getIdUsuario() != null && request.getIdBeneficio() != null) {
+                mensajeLog = "[idUsuario -> " + request.getIdUsuario() + "] ";
                 log.info("Datos de entrada ->{}", request.toString());
-                Integer beneficioSeleccionado = beneficioMapper.usuarioHaObtenidoCuponbeneficio(idUsuario, request.getIdBeneficio());
+                Integer beneficioSeleccionado = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), request.getIdBeneficio());
                 if (beneficioSeleccionado > 0) {
                     log.info("{} Ud ya habia obtenido beneficio dentro de periodo de vigencia", mensajeLog);
                     response.getValidacion().setCodigoNegocio("2");
                     response.getValidacion().setMensaje("Ud ya habia obtenido beneficio dentro de periodo de vigencia");
                 } else {
                     log.info("{} Generando código de beneficio seleccionado por usuario", mensajeLog);
-                    String codigo = this.generaCodigoCuponBeneficioUsuario(request.getIdBeneficio(), idUsuario);
+                    String codigo = this.generaCodigoCuponBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario());
                     log.info("{} Obteniendo parametros para encriptar código", mensajeLog);
                     ParametroSistema paramEncripCupon = parametroSistemaServices.getDatosParametroSistema(ENCRIPTACION_COD_BENEFICIO, PARAMETROS_ENCRIPTACION);
                     if (paramEncripCupon != null) {
@@ -476,10 +473,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                     log.info("{} Sotck Actual->{} de beneficio ->{} es inferior al seleccionado por usuario, el cual es de ->{}. Por tanto se actualizará con stock actual", mensajeLog, stockBeneficio, request.getIdBeneficio(), request.getCantidad());
                                     request.setCantidad(stockBeneficio);
                                 }
-                                Validacion validacion = this.registraAccionBeneficioUsuario(request.getIdBeneficio(), idUsuario, AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(), codEncriptado, null);
+                                Validacion validacion = this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(), codEncriptado, null);
                                 if (validacion != null && "0".equals(validacion.getCodigo()) && "0".equals(validacion.getCodigoNegocio())) {
                                     log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog);
-                                    ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(idUsuario, request.getIdBeneficio(), urlDownloadCupon);
+                                    ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(request.getIdUsuario(), request.getIdBeneficio(), urlDownloadCupon);
                                     response.setValidacion(vResponse.getValidacion());
                                     log.info("{} Formando correo a enviar a usuario - fin", mensajeLog);
                                 } else {
@@ -596,14 +593,11 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
             if (request == null)
                 return response;
 
-            //obteniendo idUsuario desde token
-            Integer idUsuario = jwtTokenUtil.getIdUsuarioFromToken(request.getToken());
-
-            if (idUsuario != null && request.getCodigoBeneficioEncriptado() != null) {
-                String mensajeLog = "[idUsuario -> " + idUsuario + "] ";
+            if (request.getIdUsuario() != null && request.getCodigoBeneficioEncriptado() != null) {
+                String mensajeLog = "[idUsuario -> " + request.getIdUsuario() + "] ";
                 UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoBeneficioEncriptado());
                 if (uBeneficio != null) {
-                    if (uBeneficio.getIdUsuario().compareTo(idUsuario) == 0) {
+                    if (uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0) {
                         //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
                         UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
                         if (uBeneficioCanjeado != null) {

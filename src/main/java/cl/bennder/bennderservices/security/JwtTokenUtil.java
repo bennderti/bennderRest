@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +33,9 @@ public class JwtTokenUtil implements Serializable {
 
     @Value("${jwt.expiration}")
     private Long expiration;
+
+    @Value("${jwt.header}")
+    private String tokenHeader;
 
     public String getUsernameFromToken(String token) {
         String username;
@@ -161,5 +165,14 @@ public class JwtTokenUtil implements Serializable {
             idUsuario = null;
         }
         return idUsuario;
+    }
+
+    /**
+     * Metodo que obtiene idUsuario desde el token seteado en el Header del request
+     * @param request
+     * @return idUsuario
+     */
+    public Integer getIdUsuarioDesdeRequest(HttpServletRequest request){
+        return getIdUsuarioFromToken(request.getHeader(this.tokenHeader));
     }
 }
