@@ -274,7 +274,18 @@ public interface BeneficioMapper {
      * @param idUsuario
      * @return 
      */
-    @Select("(SELECT B.ID_BENEFICIO, B.TITULO, B.CALIFICACION, B.ID_TIPO_BENEFICIO, BP.PRECIO_NORMAL, BP.PRECIO_OFERTA, BD.PORCENTAJE_DESCUENTO, BG.GANCHO, P.NOMBRE " +
+    @Select("(SELECT "
+                + "B.ID_BENEFICIO AS idBeneficio, "
+                + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+                + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+                + "B.TITULO, "
+                + "B.CALIFICACION, "
+                + "B.ID_TIPO_BENEFICIO, "
+                + "BP.PRECIO_NORMAL AS precioNormal, "
+                + "BP.PRECIO_OFERTA AS precioOferta, "
+                + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+                + "BG.GANCHO, "
+                + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
             "INNER JOIN INTERES_USUARIO IU ON B.ID_CATEGORIA = IU.ID_CATEGORIA AND IU.ID_USUARIO = #{idUsuario} " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
@@ -284,7 +295,18 @@ public interface BeneficioMapper {
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.CALIFICACION DESC, B.FECHA_EXPIRACION)" +
             "UNION" +
-            "(SELECT B.ID_BENEFICIO " +
+            "(SELECT "
+                + "B.ID_BENEFICIO AS idBeneficio, "
+                + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+                + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+                + "B.TITULO, "
+                + "B.CALIFICACION, "
+                + "B.ID_TIPO_BENEFICIO, "
+                + "BP.PRECIO_NORMAL AS precioNormal, "
+                + "BP.PRECIO_OFERTA AS precioOferta, "
+                + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+                + "BG.GANCHO, "
+                + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
@@ -293,6 +315,17 @@ public interface BeneficioMapper {
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.CALIFICACION DESC, B.FECHA_EXPIRACION)" +
             "LIMIT 9")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "idBeneficioParaImagenes", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+            @Result(property = "condiciones", column = "idBeneficioParaCondiciones", javaType=List.class, many = @Many(select = "obtenerCondicionesBeneficio"))  
+            })
     List<Beneficio> obtenerBeneficiosDestacadosInteresUsuario (Integer idUsuario);
     
     /**
@@ -301,7 +334,18 @@ public interface BeneficioMapper {
      * @param idUsuario
      * @return 
      */
-    @Select("(SELECT B.ID_BENEFICIO, B.TITULO, B.CALIFICACION, B.ID_TIPO_BENEFICIO, BP.PRECIO_NORMAL, BP.PRECIO_OFERTA, BD.PORCENTAJE_DESCUENTO, BG.GANCHO, P.NOMBRE " +
+    @Select("(SELECT "
+                + "B.ID_BENEFICIO AS idBeneficio, "
+                + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+                + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+                + "B.TITULO, "
+                + "B.CALIFICACION, "
+                + "B.ID_TIPO_BENEFICIO, "
+                + "BP.PRECIO_NORMAL AS precioNormal, "
+                + "BP.PRECIO_OFERTA AS precioOferta, "
+                + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+                + "BG.GANCHO, "
+                + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "INNER JOIN USUARIO_BENEFICIO UB ON B.ID_BENEFICIO = UB.ID_BENEFICIO AND UB.ID_USUARIO = #{idUsuario} AND UB.ID_ACCION_BENEFICIO = 0 " +
@@ -312,7 +356,18 @@ public interface BeneficioMapper {
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY FAB.FECHA DESC)" +
             "UNION" +
-            "(SELECT B.ID_BENEFICIO " +
+            "(SELECT "
+                + "B.ID_BENEFICIO AS idBeneficio, "
+                + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+                + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+                + "B.TITULO, "
+                + "B.CALIFICACION, "
+                + "B.ID_TIPO_BENEFICIO, "
+                + "BP.PRECIO_NORMAL AS precioNormal, "
+                + "BP.PRECIO_OFERTA AS precioOferta, "
+                + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+                + "BG.GANCHO, "
+                + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
@@ -321,6 +376,17 @@ public interface BeneficioMapper {
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY VISITAS_GENERAL DESC)" +
             "LIMIT 9")
+            @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "idBeneficioParaImagenes", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "condiciones", column = "idBeneficioParaCondiciones", javaType=List.class, many = @Many(select = "obtenerCondicionesBeneficio"))  
+            })
     List<Beneficio> obtenerUltimosBeneficiosVistosUsuario (Integer idUsuario);
     
     /**
@@ -329,7 +395,19 @@ public interface BeneficioMapper {
      * @param idUsuario
      * @return 
      */
-    @Select("(SELECT B.ID_BENEFICIO, B.TITULO, B.CALIFICACION, B.ID_TIPO_BENEFICIO, BP.PRECIO_NORMAL, BP.PRECIO_OFERTA, BD.PORCENTAJE_DESCUENTO, BG.GANCHO, P.NOMBRE " +
+    
+    @Select("(SELECT "
+                + "B.ID_BENEFICIO AS idBeneficio, "
+                + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+                + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+                + "B.TITULO, "
+                + "B.CALIFICACION, "
+                + "B.ID_TIPO_BENEFICIO, "
+                + "BP.PRECIO_NORMAL AS precioNormal, "
+                + "BP.PRECIO_OFERTA AS precioOferta, "
+                + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+                + "BG.GANCHO, "
+                + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
             "INNER JOIN INTERES_USUARIO IU ON B.ID_CATEGORIA = IU.ID_CATEGORIA AND IU.ID_USUARIO = #{idUsuario} " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
@@ -339,7 +417,18 @@ public interface BeneficioMapper {
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.FECHA_CREACION DESC)" +
             "UNION" +
-            "(SELECT B.ID_BENEFICIO " +
+            "(SELECT "
+                + "B.ID_BENEFICIO AS idBeneficio, "
+                + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+                + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+                + "B.TITULO, "
+                + "B.CALIFICACION, "
+                + "B.ID_TIPO_BENEFICIO, "
+                + "BP.PRECIO_NORMAL AS precioNormal, "
+                + "BP.PRECIO_OFERTA AS precioOferta, "
+                + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+                + "BG.GANCHO, "
+                + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
@@ -348,6 +437,17 @@ public interface BeneficioMapper {
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.FECHA_CREACION DESC)" +
             "LIMIT 9")
+            @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "idBeneficioParaImagenes", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "condiciones", column = "idBeneficioParaCondiciones", javaType=List.class, many = @Many(select = "obtenerCondicionesBeneficio"))  
+            })
     List<Beneficio> obtenerNuevosBeneficiosInteresUsuario (Integer idUsuario);
     
     /***

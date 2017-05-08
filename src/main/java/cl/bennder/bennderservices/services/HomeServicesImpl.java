@@ -14,6 +14,7 @@ import cl.bennder.entitybennderwebrest.response.CargarHomeResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +39,15 @@ public class HomeServicesImpl implements HomeServices{
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    
+    @Autowired
+    BeneficioServices beneficioServices;
+    
+    
 
     @Override
     public CargarHomeResponse cargarHome(CargarHomeRequest request) {
-
+      
         if (request == null)
             return null;
 
@@ -52,17 +58,31 @@ public class HomeServicesImpl implements HomeServices{
         /*Obtener Categorías*/
         response.setCategorias(categoriaServices.getCategorias());
         
+        log.info("cargarHome-> Cantidad de Categorías{}",response.getCategorias().size());
+        
         /*Obtener Anuncios*/        
         response.setAnuncios(anuncioMapper.obtenerAnuncios());
+        
+        log.info("cargarHome-> Cantidad de Anuncios{}",response.getAnuncios().size());
         
         /*Obtener Beneficios Preferenciales*/
         response.setBeneficiosDestacados(beneficioMapper.obtenerBeneficiosDestacadosInteresUsuario(idUsuario));
         
+        log.info("cargarHome-> Cantidad de Beneficios Destacados{}",response.getBeneficiosDestacados().size());     
+        
         /*Obtener ultimos Benefcicios visitados*/
         response.setBeneficiosVisitados(beneficioMapper.obtenerUltimosBeneficiosVistosUsuario(idUsuario));
         
+        log.info("cargarHome-> Cantidad de Beneficios Visitados{}",response.getBeneficiosVisitados().size());
+        
         /*Obtener nuevos beneficios del usuario*/
         response.setBeneficiosNuevos(beneficioMapper.obtenerNuevosBeneficiosInteresUsuario(idUsuario));
+        
+        log.info("cargarHome-> Cantidad de Nuevos Beneficios{}",response.getBeneficiosNuevos().size());
+        
+        beneficioServices.agrearUrlImagenListaBeneficios(response.getBeneficiosDestacados());
+        beneficioServices.agrearUrlImagenListaBeneficios(response.getBeneficiosNuevos());
+        beneficioServices.agrearUrlImagenListaBeneficios(response.getBeneficiosVisitados());
         
         return response;
     }

@@ -9,6 +9,7 @@ import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class BeneficioServicesImpl implements BeneficioServices {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
-    /**
+    
+     /**
      * @author Diego Riveros
      * @param request
      * @return informaction detallada para un beneficio BeneficioResponse
@@ -84,4 +85,25 @@ public class BeneficioServicesImpl implements BeneficioServices {
         log.info("fin");
         return response;
     }
+
+    @Override
+    public void agrearUrlImagenListaBeneficios(List<Beneficio> beneficios) {
+        String server = env.getProperty("server");
+        
+        if(beneficios!=null && !beneficios.isEmpty())
+        {
+            for(Beneficio beneficio: beneficios)
+            {
+                if(beneficio.getImagenesBeneficio()!=null && !beneficio.getImagenesBeneficio().isEmpty())
+                {
+                    for(BeneficioImagen imagen: beneficio.getImagenesBeneficio())
+                    {
+                        imagen.setUrlImagen(server + imagen.getPath());
+                    }
+                }                
+            }
+        }
+    }
+    
+    
 }
