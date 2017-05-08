@@ -145,6 +145,7 @@ public interface BeneficioMapper {
             " b.id_beneficio," +
             " b.titulo, " +
             " b.descripcion," +
+            " b.calificacion," +
             " tb.id_tipo_beneficio," +
             " tb.nombre," +
             " bd.porcentaje_descuento as porcentajeDescuento," +
@@ -178,6 +179,7 @@ public interface BeneficioMapper {
             " b.id_beneficio," +
             " b.titulo, " +
             " b.descripcion," +
+            " b.calificacion," +
             " tb.id_tipo_beneficio," +
             " tb.nombre," +
             " bd.porcentaje_descuento as porcentajeDescuento," +
