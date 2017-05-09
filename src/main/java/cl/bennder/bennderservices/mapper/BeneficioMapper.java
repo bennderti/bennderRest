@@ -343,12 +343,17 @@ public interface BeneficioMapper {
                 + "B.TITULO, "
                 + "B.CALIFICACION, "
                 + "B.ID_TIPO_BENEFICIO, "
+                + "B.ID_CATEGORIA AS idCategoria, "
+                + "B.FECHA_EXPIRACION AS fechaExpiracion, "
+                + "B.DESCRIPCION AS descripcion, "
                 + "BP.PRECIO_NORMAL AS precioNormal, "
                 + "BP.PRECIO_OFERTA AS precioOferta, "
                 + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
                 + "BG.GANCHO, "
+                + "C.NOMBRE AS nombreCategoria, "
                 + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
+            "INNER JOIN CATEGORIA C ON C.ID_CATEGORIA = B.ID_CATEGORIA " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "INNER JOIN USUARIO_BENEFICIO UB ON B.ID_BENEFICIO = UB.ID_BENEFICIO AND UB.ID_USUARIO = #{idUsuario} AND UB.ID_ACCION_BENEFICIO = 0 " +
             "INNER JOIN FECHA_ACCION_BENEFICIO FAB ON UB.ID_BENEFICIO = FAB.ID_BENEFICIO AND UB.ID_USUARIO = FAB.ID_USUARIO " +
@@ -365,12 +370,17 @@ public interface BeneficioMapper {
                 + "B.TITULO, "
                 + "B.CALIFICACION, "
                 + "B.ID_TIPO_BENEFICIO, "
+                + "B.ID_CATEGORIA AS idCategoria, "
+                + "B.FECHA_EXPIRACION AS fechaExpiracion, "
+                + "B.DESCRIPCION AS descripcion, "
                 + "BP.PRECIO_NORMAL AS precioNormal, "
                 + "BP.PRECIO_OFERTA AS precioOferta, "
                 + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
                 + "BG.GANCHO, "
+                + "C.NOMBRE AS nombreCategoria, "
                 + "P.NOMBRE AS nombreProveedor " +
             "FROM BENEFICIO B " +
+            "INNER JOIN CATEGORIA C ON C.ID_CATEGORIA = B.ID_CATEGORIA " +
             "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
             "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
