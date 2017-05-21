@@ -5,6 +5,7 @@ import cl.bennder.entitybennderwebrest.model.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,5 +33,23 @@ public final class JwtUserFactory {
         return perfiles.stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getNombre()))
                 .collect(Collectors.toList());
+    }
+
+    public static JwtUser create(Integer id,
+                                 String username,
+                                 Collection<? extends GrantedAuthority> authorities,
+                                 Boolean enabled) {
+        return new JwtUser(
+                id,
+                username,
+                null,
+                null,
+                null,
+                username,
+                null,
+                authorities,
+                enabled,
+                null
+        );
     }
 }

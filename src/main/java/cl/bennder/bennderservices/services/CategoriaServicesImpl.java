@@ -36,7 +36,6 @@ import org.springframework.core.env.Environment;
  */
 @PropertySource("classpath:bennder.properties")
 @Service
-@Transactional
 public class CategoriaServicesImpl implements CategoriaServices{
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
@@ -53,6 +52,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     private BeneficioMapper beneficioMapper;
 
     @Override
+    @Transactional
     public BeneficiosCargadorResponse getBeneficiosByIdCat(CategoriaByIdRequest request) {
         BeneficiosCargadorResponse response = new BeneficiosCargadorResponse();
         response.setValidacion(new Validacion("0","1","Sin beneficios"));
@@ -71,6 +71,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     }
 
     @Override
+    @Transactional
     public SubCategoriaProveedorResponse getSubCategoriasProveedor(SubCategoriaProveedorRequest request) {
        SubCategoriaProveedorResponse response = new SubCategoriaProveedorResponse();
        response.setValidacion(new Validacion("0","1","Sin sub-categorias para categoria indicada del proveedor"));
@@ -92,6 +93,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     
     @Override
+    @Transactional
     public CategoriasResponse obtenerCategoriasById(CategoriaByIdRequest request) {
        CategoriasResponse response = new CategoriasResponse();
        response.setValidacion(new Validacion("0","1","Sin Categorias"));
@@ -111,6 +113,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     
     @Override
+    @Transactional
     public CategoriasResponse getCategorias(CategoriasRequest request) {
         CategoriasResponse response = new CategoriasResponse();
         try {
@@ -125,6 +128,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     }
 
     @Override
+    @Transactional
     public CategoriasResponse obtenerCategoriasRelacionadas(CategoriasRequest request) {
         CategoriasResponse response = new CategoriasResponse();
 
@@ -163,6 +167,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         return response;
     }
 
+    @Transactional
     public CategoriaResponse cargarCategoria(CategoriasRequest request) {
         CategoriaResponse response = new CategoriaResponse();
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
@@ -218,6 +223,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     }
 
     @Override
+    @Transactional
     public List<Categoria> getCategorias() {
         
         List<Categoria> response = new ArrayList<>();

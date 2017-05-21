@@ -7,6 +7,7 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
+import cl.bennder.bennderservices.multitenancy.TenantContext;
 import cl.bennder.entitybennderwebrest.model.Usuario;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.GuardarPreferenciasRequest;
@@ -38,20 +39,6 @@ public class UsuarioServicesImpl implements UsuarioServices{
     public void registraAccesoUsuario(Integer idUsuario) {
         usuarioMapper.registraAccesoUsuario(idUsuario);
     }
-    
-    
-
-//    @Override
-//    public void listarUsuarios() {
-//        log.info("INICIO");
-//        List<Integer> users = usuarioMapper.getUsers();
-//        if(users!= null){
-//            for(Integer user:users){
-//                log.info("usuario ->{}",user);
-//            }
-//        }
-//        log.info("FIN");
-//    }
 
     @Override
     public LoginResponse validacionUsuario(LoginRequest request) {
@@ -67,6 +54,7 @@ public class UsuarioServicesImpl implements UsuarioServices{
                 log.info("Validando usuario ->{}",request.getUser());
                 //usuario existe?
 //                validacion = usuarioMapper.validaUsuario(request.getUser(), request.getPassword());
+                String tenantId = TenantContext.getCurrentTenant();
                 usuario = usuarioMapper.getUsuarioValidacion(request.getUser(), request.getPassword());
                 
                 if(usuario != null){

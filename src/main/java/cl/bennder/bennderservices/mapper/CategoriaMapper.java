@@ -18,10 +18,10 @@ import org.apache.ibatis.annotations.*;
 public interface CategoriaMapper {
 
     @Select( "SELECT c.id_categoria, c.nombre" +
-            " FROM categoria c " +
-            " INNER JOIN categoria c2 on c.id_categoria = c2.id_categoria_padre" +
-            " INNER JOIN beneficio b ON b.id_categoria = c2.id_categoria " +
-            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor " +
+            " FROM proveedor.categoria c " +
+            " INNER JOIN proveedor.categoria c2 on c.id_categoria = c2.id_categoria_padre" +
+            " INNER JOIN proveedor.beneficio b ON b.id_categoria = c2.id_categoria " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor " +
             " WHERE c.id_categoria_padre = -1 AND p.habilitado = true AND b.habilitado = true" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.stock > 0" +
@@ -36,9 +36,9 @@ public interface CategoriaMapper {
     @Select("SELECT c1.id_categoria AS idCategoria, c1.nombre, c1.id_categoria_padre AS idCategoriaPadre " +
             "FROM categoria c1 WHERE c1.id_categoria in( " +
             "SELECT distinct c.id_categoria " +
-            "FROM categoria c " +
-            "INNER JOIN beneficio b ON b.id_categoria = c.id_categoria " +
-            "INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor " +
+            "FROM proveedor.categoria c " +
+            "INNER JOIN proveedor.beneficio b ON b.id_categoria = c.id_categoria " +
+            "INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor " +
             "WHERE id_categoria_padre =#{idCategoriaPadre} " +
             "AND p.habilitado = true " +
             "AND b.habilitado = true" +
@@ -48,9 +48,9 @@ public interface CategoriaMapper {
     List<Categoria> obtenerSubCategorias(Integer idCategoriaPadre);
 
     @Select(" SELECT c.id_categoria AS idCategoria, c.nombre, c.id_categoria_padre AS idCategoriaPadre, COUNT(b.id_beneficio) as cantidadBeneficios" +
-            " FROM categoria c" +
-            " INNER JOIN beneficio b ON b.id_categoria = c.id_categoria" +
-            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " FROM proveedor.categoria c" +
+            " INNER JOIN proveedor.beneficio b ON b.id_categoria = c.id_categoria" +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
             " WHERE id_categoria_padre = #{idCategoriaPadre}" +
             " AND p.habilitado = true" +
             " AND b.habilitado = true" +
@@ -59,7 +59,8 @@ public interface CategoriaMapper {
             " GROUP BY c.id_categoria")
     List<Categoria> obtenerSubCategoriasConCantidadBeneficios(Integer idCategoriaPadre);
 
-    @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM categoria WHERE nombre = #{nombreCategoria}")
+    @Select(" SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre " +
+            " FROM proveedor.categoria WHERE nombre = #{nombreCategoria}")
     Categoria obtenerCategoriaPorNombre(String nombreCategoria);
 
     /***
@@ -68,7 +69,7 @@ public interface CategoriaMapper {
     * @return
     */
 
-    @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria_padre = #{idCategoria}")
+    @Select("SELECT id_categoria as idCategoria, nombre FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoria}")
     List<Categoria> obtenerCategoriasById(Integer idCategoria);
     
     /***
@@ -77,12 +78,12 @@ public interface CategoriaMapper {
      * @param idProveedor identificadr de proveedor
      * @return 
      */
-    @Select("SELECT c.id_categoria as idCategoria, c.nombre FROM categoria c " +
+    @Select("SELECT c.id_categoria as idCategoria, c.nombre FROM proveedor.categoria c " +
             "WHERE id_categoria_padre = #{idCat} and id_categoria in(select distinct id_categoria from beneficio where id_proveedor = #{idProv})")
     List<Categoria> obtenerSubCategoriasByIdCatProveedor(@Param("idCat") Integer idCategoria,@Param("idProv") Integer idProveedor);
     
 
-    @Select("SELECT id_categoria as idCategoria, nombre FROM categoria WHERE id_categoria = #{idCategoria}")
+    @Select("SELECT id_categoria as idCategoria, nombre FROM proveedor.categoria WHERE id_categoria = #{idCategoria}")
     Categoria obtenerCategoriaPorId(Integer idCategoria);
 
 

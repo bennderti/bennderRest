@@ -82,24 +82,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.headers().cacheControl();
 	}
 
-	/*@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-				.csrf().disable()
-				.exceptionHandling()
-				.authenticationEntryPoint(restAuthenticationEntryPoint)
-				.and()
-				// don't create session
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
-				.authorizeRequests()
-				.antMatchers("/login").permitAll()
-				.anyRequest().authenticated();
-
-		// Custom JWT based security filter
-		http
-				.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-	}*/
-
 }

@@ -4,11 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,8 @@ public class JwtTokenUtil implements Serializable {
     static final String CLAIM_KEY_AUDIENCE = "audience";
     static final String CLAIM_KEY_CREATED = "created";
     static final String CLAIM_KEY_ID_USUARIO = "idUsuario";
+    static final String CLAIM_KEY_AUTHORITIES = "authorities";
+    static final String CLAIM_KEY_USER_ENABLED = "usuarioHabilitado";
 
     private static final String AUDIENCE_UNKNOWN = "unknown";
     private static final String AUDIENCE_WEB = "web";
@@ -117,6 +121,8 @@ public class JwtTokenUtil implements Serializable {
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_CREATED, new Date());
         claims.put(CLAIM_KEY_ID_USUARIO, ((JwtUser) userDetails).getId());
+        claims.put(CLAIM_KEY_AUTHORITIES, ((JwtUser) userDetails).getAuthorities());
+        claims.put(CLAIM_KEY_USER_ENABLED, userDetails.isEnabled());
         return generateToken(claims);
     }
 
@@ -146,13 +152,12 @@ public class JwtTokenUtil implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        JwtUser user = (JwtUser) userDetails;
+    public Boolean validateToken(String token, String usernameToken) {
         final String username = getUsernameFromToken(token);
         final Date created = getCreatedDateFromToken(token);
         //final Date expiration = getExpirationDateFromToken(token);
         return (
-                username.equals(user.getUsername())
+                username.equals(usernameToken)
                         && !isTokenExpired(token));
     }
 
@@ -174,5 +179,21 @@ public class JwtTokenUtil implements Serializable {
      */
     public Integer getIdUsuarioDesdeRequest(HttpServletRequest request){
         return getIdUsuarioFromToken(request.getHeader(this.tokenHeader));
+    }
+
+    public UserDetails obtenerUserDetailsDesdeToken(String token){
+        UserDetails user;
+        try {
+            final Claims claims = getClaimsFromToken(token);
+            Integer id = (Integer) claims.get(CLAIM_KEY_ID_USUARIO);
+            String username = (String) claims.get(CLAIM_KEY_USERNAME);
+            Collection<? extends GrantedAuthority> authorities = (Collection<? extends GrantedAuthority>) claims.get(CLAIM_KEY_AUTHORITIES);
+            Boolean enabled = (Boolean) claims.get(CLAIM_KEY_USER_ENABLED);
+
+            user = JwtUserFactory.create(id, username, authorities, enabled);
+        } catch (Exception e) {
+            user = null;
+        }
+        return user;
     }
 }

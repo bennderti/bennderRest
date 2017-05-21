@@ -19,13 +19,13 @@ public interface BeneficioMapper {
      * @return Lista de sucursales de proveedor
      */
     @Select("select sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal  " +
-            "from sucursal_proveedor sp inner join direccion d on sp.id_direccion=d.id_direccion  " +
-            "inner join comuna c on c.id_comuna=d.id_comuna  " +
+            "from proveedor.sucursal_proveedor sp inner join proveedor.direccion d on sp.id_direccion=d.id_direccion  " +
+            "inner join proveedor.comuna c on c.id_comuna=d.id_comuna  " +
             "where sp.id_proveedor =(select id_proveedor from beneficio where id_beneficio = #{idBeneficio}  and habilitado=true) and habilitado=true ")
     public List<SucursalProveedor> getSucursalesProveedorByBeneficio(Integer idBeneficio);
     
     @Select(  " select b.id_beneficio as idBeneficio,b.titulo,p.nombre as nombreProveedor,b.id_proveedor as idProveedor "
-            + " from beneficio b inner join proveedor p on b.id_proveedor=p.id_proveedor " +
+            + " from proveedor.beneficio b inner join proveedor.proveedor p on b.id_proveedor=p.id_proveedor " +
               " where b.id_beneficio = #{idBeneficio}")
     public Beneficio getInfoGeneralBeneficio(Integer idBeneficio);
     
@@ -39,7 +39,7 @@ public interface BeneficioMapper {
      * @author dyanez
      * @return 
      */
-    @Select("select titulo from beneficio where id_beneficio=#{idBeneficio}")
+    @Select("select titulo from proveedor.beneficio where id_beneficio=#{idBeneficio}")
     public String getTituloBeneficioAsuntoEnvioCorreo(Integer idBeneficio);
     
     /***
@@ -48,7 +48,7 @@ public interface BeneficioMapper {
      * @param idBeneficio identificador de beneficio
      * @return Stock beneficio
      */
-    @Select("select stock from beneficio where id_beneficio= #{idBeneficio}")
+    @Select("select stock from proveedor.beneficio where id_beneficio= #{idBeneficio}")
     public Integer getStockBeneficio(Integer idBeneficio);
     
     /***
@@ -65,7 +65,7 @@ public interface BeneficioMapper {
      * Descuenta X cantidad de stock a beneficio seleccionado/obtenido
      * @param uBeneficio informacion de beneficio
      */
-    @Update("UPDATE BENEFICIO SET STOCK = (SELECT STOCK FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) - #{cantidad} WHERE ID_BENEFICIO = #{idBeneficio}")
+    @Update("UPDATE BENEFICIO SET STOCK = (SELECT STOCK FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) - #{cantidad} WHERE ID_BENEFICIO = #{idBeneficio}")
     public void descuentaStockBeneficio(UsuarioBeneficio uBeneficio);
     
     /***
@@ -128,7 +128,7 @@ public interface BeneficioMapper {
      * @param idBeneficio Identificador de beneficio
      * @return 
      */
-    @Select("SELECT COUNT(1) FROM BENEFICIO B INNER JOIN USUARIO_BENEFICIO UB ON UB.ID_BENEFICIO = B.ID_BENEFICIO " +
+    @Select("SELECT COUNT(1) FROM proveedor.BENEFICIO B INNER JOIN USUARIO_BENEFICIO UB ON UB.ID_BENEFICIO = B.ID_BENEFICIO " +
             "WHERE current_date <=  B.fecha_expiracion AND UB.ID_BENEFICIO = #{b} AND UB.ID_USUARIO = #{u} AND UB.ID_ACCION_BENEFICIO <> 0")
     public Integer usuarioHaObtenidoCuponbeneficio(@Param("u") Integer idUsuario,@Param("b") Integer idBeneficio);
     
@@ -138,7 +138,7 @@ public interface BeneficioMapper {
      * @param idCategoria Identificador de la categoria
      * @return 
      */
-    @Select("SELECT ID_BENEFICIO AS idBeneficio,TITULO as titulo FROM BENEFICIO WHERE ID_CATEGORIA = #{idCategoria}")
+    @Select("SELECT ID_BENEFICIO AS idBeneficio,TITULO as titulo FROM proveedor.BENEFICIO WHERE ID_CATEGORIA = #{idCategoria}")
     List<BeneficioCargador> getBeneficiosCargadorByIdCat(Integer idCategoria);
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
@@ -152,11 +152,11 @@ public interface BeneficioMapper {
             " bp.precio_normal as precioNormal," +
             " bp.precio_oferta as precioOferta," +
             " p.nombre as nombreProveedor" +
-            " FROM beneficio b" +
-            " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
             " WHERE b.id_categoria = #{idCategoria}" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
@@ -186,11 +186,11 @@ public interface BeneficioMapper {
             " bp.precio_normal as precioNormal," +
             " bp.precio_oferta as precioOferta," +
             " p.nombre as nombreProveedor" +
-            " FROM beneficio b" +
-            " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
             " WHERE b.id_categoria in (SELECT id_categoria FROM categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
@@ -228,13 +228,13 @@ public interface BeneficioMapper {
             " bg.gancho," +
             " p.nombre as nombreProveedor," +
             " c.nombre as nombreCategoria" +
-            " FROM beneficio b" +
-            " INNER JOIN categoria c ON c.id_categoria = b.id_categoria" +
-            " INNER JOIN tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
-            " LEFT JOIN beneficio_gancho bg ON b.id_beneficio = bg.id_beneficio " +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.categoria c ON c.id_categoria = b.id_categoria" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_gancho bg ON b.id_beneficio = bg.id_beneficio " +
             " WHERE b.id_beneficio = #{idBeneficio}")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
@@ -253,19 +253,19 @@ public interface BeneficioMapper {
 
     //@Select(" SELECT imagen " +
     @Select(" SELECT path " +
-            " FROM beneficio_imagen" +
+            " FROM proveedor.beneficio_imagen" +
             " WHERE id_beneficio = #{idBeneficio}")
     List<BeneficioImagen> obtenerImagenesBeneficio(Integer idBeneficio);
 
     @Select(" SELECT condicion " +
-            " FROM condicion_beneficio" +
+            " FROM proveedor.condicion_beneficio" +
             " WHERE id_beneficio = #{idBeneficio}")
     List<String> obtenerCondicionesBeneficio(Integer idBeneficio);
 
 
     //@Select(" SELECT imagen " +
     @Select(" SELECT path " +
-            " FROM beneficio_imagen" +
+            " FROM proveedor.beneficio_imagen" +
             " WHERE id_beneficio = #{idBeneficio}" +
             " AND orden in (1,2)")
     List<BeneficioImagen> obtenerImagenesBeneficioPreview(Integer idBeneficio);
@@ -288,12 +288,12 @@ public interface BeneficioMapper {
                 + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
                 + "BG.GANCHO, "
                 + "P.NOMBRE AS nombreProveedor " +
-            "FROM BENEFICIO B " +
+            "FROM proveedor.BENEFICIO B " +
             "INNER JOIN INTERES_USUARIO IU ON B.ID_CATEGORIA = IU.ID_CATEGORIA AND IU.ID_USUARIO = #{idUsuario} " +
-            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
-            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
-            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
-            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.CALIFICACION DESC, B.FECHA_EXPIRACION)" +
             "UNION" +
@@ -309,11 +309,11 @@ public interface BeneficioMapper {
                 + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
                 + "BG.GANCHO, "
                 + "P.NOMBRE AS nombreProveedor " +
-            "FROM BENEFICIO B " +
-            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
-            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
-            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
-            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "FROM proveedor.BENEFICIO B " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.CALIFICACION DESC, B.FECHA_EXPIRACION)" +
             "LIMIT 9")
@@ -352,14 +352,14 @@ public interface BeneficioMapper {
                 + "BG.GANCHO, "
                 + "C.NOMBRE AS nombreCategoria, "
                 + "P.NOMBRE AS nombreProveedor " +
-            "FROM BENEFICIO B " +
-            "INNER JOIN CATEGORIA C ON C.ID_CATEGORIA = B.ID_CATEGORIA " +
-            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "FROM proveedor.BENEFICIO B " +
+            "INNER JOIN proveedor.CATEGORIA C ON C.ID_CATEGORIA = B.ID_CATEGORIA " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
             "INNER JOIN USUARIO_BENEFICIO UB ON B.ID_BENEFICIO = UB.ID_BENEFICIO AND UB.ID_USUARIO = #{idUsuario} AND UB.ID_ACCION_BENEFICIO = 0 " +
             "INNER JOIN FECHA_ACCION_BENEFICIO FAB ON UB.ID_BENEFICIO = FAB.ID_BENEFICIO AND UB.ID_USUARIO = FAB.ID_USUARIO " +
-            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
-            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
-            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY FAB.FECHA DESC)" +
             "UNION" +
@@ -379,12 +379,12 @@ public interface BeneficioMapper {
                 + "BG.GANCHO, "
                 + "C.NOMBRE AS nombreCategoria, "
                 + "P.NOMBRE AS nombreProveedor " +
-            "FROM BENEFICIO B " +
-            "INNER JOIN CATEGORIA C ON C.ID_CATEGORIA = B.ID_CATEGORIA " +
-            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
-            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
-            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
-            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "FROM proveedor.BENEFICIO B " +
+            "INNER JOIN proveedor.CATEGORIA C ON C.ID_CATEGORIA = B.ID_CATEGORIA " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY VISITAS_GENERAL DESC)" +
             "LIMIT 9")
@@ -420,12 +420,12 @@ public interface BeneficioMapper {
                 + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
                 + "BG.GANCHO, "
                 + "P.NOMBRE AS nombreProveedor " +
-            "FROM BENEFICIO B " +
+            "FROM proveedor.BENEFICIO B " +
             "INNER JOIN INTERES_USUARIO IU ON B.ID_CATEGORIA = IU.ID_CATEGORIA AND IU.ID_USUARIO = #{idUsuario} " +
-            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
-            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
-            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
-            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.FECHA_CREACION DESC)" +
             "UNION" +
@@ -441,11 +441,11 @@ public interface BeneficioMapper {
                 + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
                 + "BG.GANCHO, "
                 + "P.NOMBRE AS nombreProveedor " +
-            "FROM BENEFICIO B " +
-            "INNER JOIN PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
-            "LEFT JOIN BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
-            "LEFT JOIN BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " + 
-            "LEFT JOIN BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "FROM proveedor.BENEFICIO B " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
             "WHERE NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION AND B.HABILITADO = TRUE AND B.STOCK > 0 " +
             "ORDER BY B.FECHA_CREACION DESC)" +
             "LIMIT 9")
@@ -467,13 +467,13 @@ public interface BeneficioMapper {
      * @param idBeneficio identificador de beneficio
      * @return 
      */
-    @Select("SELECT PATH_LOGO FROM PROVEEDOR WHERE ID_PROVEEDOR =( " +
-            "SELECT ID_PROVEEDOR FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio} )")
+    @Select("SELECT PATH_LOGO FROM proveedor.PROVEEDOR WHERE ID_PROVEEDOR =( " +
+            "SELECT ID_PROVEEDOR FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio} )")
     public String getPathLogoProveedorByBeneficio(Integer idBeneficio);
     
     
     
-    @Update("UPDATE BENEFICIO SET VISITAS_GENERAL = (SELECT COALESCE(VISITAS_GENERAL,0) + 1 FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) " +
+    @Update("UPDATE proveedor.BENEFICIO SET VISITAS_GENERAL = (SELECT COALESCE(VISITAS_GENERAL,0) + 1 FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) " +
             "WHERE ID_BENEFICIO = #{idBeneficio} ")
     public void actualizarVisitasBeneficio(Integer idBeneficio);
     
