@@ -1,5 +1,6 @@
 package cl.bennder.bennderservices.security;
 
+import cl.bennder.bennderservices.multitenancy.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -29,6 +31,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Value("${jwt.header}")
     private String tokenHeader;
+    private static final String TENANT_HEADER_NAME = "X-TENANT-ID";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -43,8 +46,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
             // It is not compelling necessary to load the use details from the database. You could also store the information
             // in the token and read it from it. It's up to you ;)
-            //UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            UserDetails userDetails = jwtTokenUtil.obtenerUserDetailsDesdeToken(authToken);
+
+            String tenantId = request.getHeader(TENANT_HEADER_NAME);
+            if(StringUtils.isEmpty(tenantId)) {
+                return;
+            }
+            TenantContext.setCurrentTenant(tenantId);
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+//            UserDetails userDetails = jwtTokenUtil.obtenerUserDetailsDesdeToken(authToken);
 
             // For simple validation it is completely sufficient to just check the token integrity. You don't have to call
             // the database compellingly. Again it's up to you ;)
