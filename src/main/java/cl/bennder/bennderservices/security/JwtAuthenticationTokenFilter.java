@@ -31,7 +31,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Value("${jwt.header}")
     private String tokenHeader;
-    private static final String TENANT_HEADER_NAME = "X-TENANT-ID";
+
+    @Value("${tenant.id]")
+    private String TENANT_HEADER_NAME;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -47,7 +49,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             // It is not compelling necessary to load the use details from the database. You could also store the information
             // in the token and read it from it. It's up to you ;)
 
-            String tenantId = request.getHeader(TENANT_HEADER_NAME);
+            String tenantId = jwtTokenUtil.getTenantFromToken(authToken);
             if(StringUtils.isEmpty(tenantId)) {
                 return;
             }

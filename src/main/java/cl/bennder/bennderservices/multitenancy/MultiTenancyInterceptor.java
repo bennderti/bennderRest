@@ -1,5 +1,8 @@
 package cl.bennder.bennderservices.multitenancy;
 
+import cl.bennder.bennderservices.security.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -14,13 +17,27 @@ import java.util.Map;
 @Component
 public class MultiTenancyInterceptor extends HandlerInterceptorAdapter {
 
-    private static final String TENANT_HEADER_NAME = "X-TENANT-ID";
+    @Value("${jwt.header}")
+    private String tokenHeader;
+
+    @Value("${tenant.id}")
+    private String tenant;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler)
             throws Exception {
 
-        String tenantId = req.getHeader(TENANT_HEADER_NAME);
+        String token = req.getHeader(this.tokenHeader);
+        String tenantId;
+        if (StringUtils.isEmpty(token)){
+            tenantId = req.getHeader(tenant);
+        }
+        else {
+            tenantId = jwtTokenUtil.getTenantFromToken(token);
+        }
 
         if(StringUtils.isEmpty(tenantId)) {
             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);

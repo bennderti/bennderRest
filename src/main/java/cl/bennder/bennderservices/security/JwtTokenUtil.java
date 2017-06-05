@@ -1,5 +1,6 @@
 package cl.bennder.bennderservices.security;
 
+import cl.bennder.bennderservices.multitenancy.TenantContext;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,6 +27,7 @@ public class JwtTokenUtil implements Serializable {
     static final String CLAIM_KEY_ID_USUARIO = "idUsuario";
     static final String CLAIM_KEY_AUTHORITIES = "authorities";
     static final String CLAIM_KEY_USER_ENABLED = "usuarioHabilitado";
+    static final String CLAIM_KEY_TENANT_ID = "tenantId";
 
     private static final String AUDIENCE_UNKNOWN = "unknown";
     private static final String AUDIENCE_WEB = "web";
@@ -123,6 +125,7 @@ public class JwtTokenUtil implements Serializable {
         claims.put(CLAIM_KEY_ID_USUARIO, ((JwtUser) userDetails).getId());
         claims.put(CLAIM_KEY_AUTHORITIES, ((JwtUser) userDetails).getAuthorities());
         claims.put(CLAIM_KEY_USER_ENABLED, userDetails.isEnabled());
+        claims.put(CLAIM_KEY_TENANT_ID, TenantContext.getCurrentTenant());
         return generateToken(claims);
     }
 
@@ -195,5 +198,17 @@ public class JwtTokenUtil implements Serializable {
             user = null;
         }
         return user;
+    }
+
+    public String getTenantFromToken(String token) {
+
+        String tenant;
+        try {
+            final Claims claims = getClaimsFromToken(token);
+            tenant = (String) claims.get(CLAIM_KEY_TENANT_ID);
+        } catch (Exception e) {
+            tenant = null;
+        }
+        return tenant;
     }
 }

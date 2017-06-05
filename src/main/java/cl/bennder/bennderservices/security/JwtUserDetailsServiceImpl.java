@@ -25,12 +25,14 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         String tenantId = TenantContext.getCurrentTenant();
 
         empresaMapper.cambiarEsquema(tenantId);
-        Usuario usuario = usuarioMapper.getUsuarioByUsername(username);
+        Usuario usuario = usuarioMapper.getUsuarioByUsername(username, TenantContext.getCurrentTenant());
 
+//        empresaMapper.cambiarEsquema(TenantContext.DEFAULT_TENANT);
         if (usuario == null) {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         } else {
             return JwtUserFactory.create(usuario);
         }
+
     }
 }

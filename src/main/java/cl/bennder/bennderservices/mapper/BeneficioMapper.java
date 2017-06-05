@@ -473,7 +473,7 @@ public interface BeneficioMapper {
     
     
     
-    @Update("UPDATE proveedor.BENEFICIO SET VISITAS_GENERAL = (SELECT COALESCE(VISITAS_GENERAL,0) + 1 FROM BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) " +
+    @Update("UPDATE proveedor.BENEFICIO SET VISITAS_GENERAL = (SELECT COALESCE(VISITAS_GENERAL,0) + 1 FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) " +
             "WHERE ID_BENEFICIO = #{idBeneficio} ")
     public void actualizarVisitasBeneficio(Integer idBeneficio);
     

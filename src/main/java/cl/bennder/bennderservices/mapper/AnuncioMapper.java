@@ -21,11 +21,11 @@ public interface AnuncioMapper {
      * @return Lista de Anuncios
      */
     @Select("(SELECT ID_ANUNCIO as idAnuncio, TITULO, DESCRIPCION, LINK, IMAGEN "
-            + "FROM ANUNCIO "
+            + "FROM ${empresa}.ANUNCIO "
             + "WHERE HABILITADO = TRUE AND NOW() BETWEEN FECHA_INICIAL AND FECHA_TERMINO ORDER BY ORDEN)"
             + "UNION "
             + "(SELECT ID_ANUNCIO, TITULO, DESCRIPCION, LINK, IMAGEN "
-            + "FROM ANUNCIO_EMPRESA "
+            + "FROM ${empresa}.ANUNCIO_EMPRESA "
             + "WHERE HABILITADO = TRUE AND NOW() BETWEEN FECHA_INICIAL AND FECHA_TERMINO ORDER BY ORDEN)")
-    public List<Anuncio> obtenerAnuncios();
+    public List<Anuncio> obtenerAnuncios(@Param("empresa") String empresa);
 }

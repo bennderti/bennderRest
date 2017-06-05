@@ -34,7 +34,7 @@ public interface CategoriaMapper {
     List<Categoria> getCategorias();
 
     @Select("SELECT c1.id_categoria AS idCategoria, c1.nombre, c1.id_categoria_padre AS idCategoriaPadre " +
-            "FROM categoria c1 WHERE c1.id_categoria in( " +
+            "FROM proveedor.categoria c1 WHERE c1.id_categoria in( " +
             "SELECT distinct c.id_categoria " +
             "FROM proveedor.categoria c " +
             "INNER JOIN proveedor.beneficio b ON b.id_categoria = c.id_categoria " +

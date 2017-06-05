@@ -8,6 +8,7 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.controller.HomeController;
 import cl.bennder.bennderservices.mapper.AnuncioMapper;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
+import cl.bennder.bennderservices.multitenancy.TenantContext;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.entitybennderwebrest.request.CargarHomeRequest;
 import cl.bennder.entitybennderwebrest.response.CargarHomeResponse;
@@ -61,7 +62,7 @@ public class HomeServicesImpl implements HomeServices{
         log.info("cargarHome-> Cantidad de Categorías{}",response.getCategorias().size());
         
         /*Obtener Anuncios*/        
-        response.setAnuncios(anuncioMapper.obtenerAnuncios());
+        response.setAnuncios(anuncioMapper.obtenerAnuncios(TenantContext.getCurrentTenant()));
         
         log.info("cargarHome-> Cantidad de Anuncios{}",response.getAnuncios().size());
         
