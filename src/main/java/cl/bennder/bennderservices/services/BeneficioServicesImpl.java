@@ -53,15 +53,17 @@ public class BeneficioServicesImpl implements BeneficioServices {
         BeneficioResponse response = new BeneficioResponse();
         response.setValidacion(new Validacion("0","1","No existe beneficio seleccionado"));
         log.info("INICIO");
-
+        log.info("request.getIdBeneficio ->{}",request.getIdBeneficio());
         try {
-            if (request == null)
-                return response;
+//            if (request == null)
+//                return response;
 
             Beneficio beneficio = beneficioMapper.obtenerDetalleBeneficio(request.getIdBeneficio());
+            
             //.- setean ruta http de imagen de servidor
             log.info("obteniendo ruta http de imagen publicada en servidor...");
             if(beneficio!=null && beneficio.getImagenesBeneficio()!=null && beneficio.getImagenesBeneficio().size() > 0){
+                beneficio.setIdBeneficio(request.getIdBeneficio());
                 String server = env.getProperty("server");
                 ImagenUtil.setUrlImagenesBenecio(server, beneficio);
                 

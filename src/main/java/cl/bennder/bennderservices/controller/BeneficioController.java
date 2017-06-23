@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Created by Diego on 26-03-2017.
@@ -48,7 +49,7 @@ public class BeneficioController {
      * @return Validación de cupón de de beneficio en POS
      */
     @RequestMapping(value = "beneficio/validacionCuponPOS",method = RequestMethod.POST)
-    public ValidacionCuponPOSResponse validacionCuponPOS(@RequestBody ValidacionCuponPOSRequest request){
+    public @ResponseBody ValidacionCuponPOSResponse validacionCuponPOS(@RequestBody ValidacionCuponPOSRequest request){
         log.info("INICIO");
         ValidacionCuponPOSResponse response = cuponBeneficioServices.validacionCuponPOS(request);
         log.info("FIN");
@@ -60,7 +61,7 @@ public class BeneficioController {
      * @return Validación de canje cupón
      */
     @RequestMapping(value = "beneficio/validaCanjeCupon",method = RequestMethod.POST)
-    public CanjeaCuponResponse validaCanjeCupon(@RequestBody CanjeaCuponRequest request){
+    public @ResponseBody CanjeaCuponResponse validaCanjeCupon(@RequestBody CanjeaCuponRequest request){
         log.info("INICIO");
         CanjeaCuponResponse response = cuponBeneficioServices.validaCanjeCuponBeneficio(request);
         log.info("FIN");
@@ -73,7 +74,7 @@ public class BeneficioController {
      * @return Archivo pdf en formato byte
      */
     @RequestMapping(value = "beneficio/generaCuponQR",method = RequestMethod.POST)
-    public GeneraCuponQrResponse generaCuponQR(@RequestBody GeneraCuponQrRequest request){
+    public @ResponseBody GeneraCuponQrResponse generaCuponQR(@RequestBody GeneraCuponQrRequest request){
         log.info("INICIO");
         GeneraCuponQrResponse response = cuponBeneficioServices.generaCuponQR(request);
         log.info("FIN");
@@ -86,7 +87,7 @@ public class BeneficioController {
      * @return 
      */
     @RequestMapping(value = "beneficio/getCuponBeneficio",method = RequestMethod.POST)
-    public GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request) {
+    public @ResponseBody GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request) {
         log.info("INICIO");
         GetCuponBeneficioResponse response = cuponBeneficioServices.getCuponBeneficio(request);
         log.info("FIN");
@@ -95,17 +96,17 @@ public class BeneficioController {
 
     /**
      * @author Diego Riveros
+     * @param beneficioRequest
      * @param request
      * @return informaction detallada para un beneficio BeneficioResponse
      */
     @RequestMapping(value = "obtenerDetalleBeneficio",method = RequestMethod.POST)
-    public BeneficioResponse obtenerDetalleBeneficio(@RequestBody BeneficioRequest beneficioRequest, HttpServletRequest request) {
+    public @ResponseBody BeneficioResponse obtenerDetalleBeneficio(@RequestBody BeneficioRequest beneficioRequest, HttpServletRequest request) {
         log.info("INICIO");
 
         //obteniendo idUsuario desde token
         beneficioRequest.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(request));
         log.debug("idUsuario -> " + beneficioRequest.getIdUsuario());
-
         BeneficioResponse response = beneficioServices.obtenerDetalleBeneficio(beneficioRequest);
         log.info("response ->{}",response.toString());
         log.info("FIN");

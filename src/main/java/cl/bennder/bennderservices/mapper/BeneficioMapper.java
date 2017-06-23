@@ -208,39 +208,37 @@ public interface BeneficioMapper {
     })
     List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
 
-    @Select(" SELECT b.id_beneficio AS idBeneficio," +
-            " b.id_beneficio as idBeneficioParaCondiciones," +
-            " b.id_beneficio as idBeneficioParaImagenes," +
-            " b.titulo, " +
-            " b.descripcion," +
-            " b.fecha_inicial as fechaInicial," +
-            " b.fecha_expiracion as fechaExpiracion," +
-            " b.fecha_creacion as fechaCreacion," +
-            " b.stock," +
-            " b.limite_stock as limiteStock," +
-            " b.calificacion," +
-            " b.visitas_general as visitasGeneral," +
-            " tb.id_tipo_beneficio," +
-            " tb.nombre," +
-            " bd.porcentaje_descuento as porcentajeDescuento," +
-            " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta," +
-            " bg.gancho," +
-            " p.nombre as nombreProveedor," +
-            " c.nombre as nombreCategoria" +
-            " FROM proveedor.beneficio b" +
-            " INNER JOIN proveedor.categoria c ON c.id_categoria = b.id_categoria" +
-            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_gancho bg ON b.id_beneficio = bg.id_beneficio " +
-            " WHERE b.id_beneficio = #{idBeneficio}")
+    @Select("SELECT b.id_beneficio AS idBeneficio, " +
+            "b.id_beneficio as idBeneficioParaCondiciones, " +
+            "b.id_beneficio as idBeneficioParaImagenes, " +
+            "b.titulo,  " +
+            "b.descripcion, " +
+            "b.fecha_inicial as fechaInicial, " +
+            "b.fecha_expiracion as fechaExpiracion, " +
+            "b.fecha_creacion as fechaCreacion, " +
+            "b.stock, " +
+            "b.limite_stock as limiteStock, " +
+            "b.calificacion, " +
+            "b.visitas_general as visitasGeneral, " +
+            "tb.id_tipo_beneficio, " +
+            "tb.nombre, " +
+            "bd.porcentaje_descuento as porcentajeDescuento, " +
+            "bp.precio_normal as precioNormal, " +
+            "bp.precio_oferta as precioOferta," +
+            "p.nombre as nombreProveedor, " +
+            "c.nombre as nombreCategoria " +
+            "FROM proveedor.beneficio b " +
+            "INNER JOIN proveedor.categoria c ON c.id_categoria = b.id_categoria " +
+            "INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio  " +
+            "INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor " +
+            "LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio " +
+            "LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio " +
+            "WHERE b.id_beneficio = #{idBeneficio}")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
                     @Case(value = "1", type = Descuento.class),
-                    @Case(value = "2", type = Producto.class)
-
+                    @Case(value = "2", type = Producto.class),
+                    @Case(value = "3", type = Adicional.class, results = {@Result(property = "descripciones",javaType = List.class,column = "idBeneficio",many =  @Many(select = "getAdicionales"))})
             })
     @Results({
             @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
@@ -250,6 +248,9 @@ public interface BeneficioMapper {
 
     })
     Beneficio obtenerDetalleBeneficio(Integer idBeneficio);
+    
+    @Select("select gancho from proveedor.beneficio_gancho where id_beneficio = #{idBeneficio}")
+    public List<String> getAdicionales(Integer idBeneficio);
 
     //@Select(" SELECT imagen " +
     @Select(" SELECT path " +
