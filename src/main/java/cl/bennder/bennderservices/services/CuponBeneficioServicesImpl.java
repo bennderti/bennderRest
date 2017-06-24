@@ -432,8 +432,15 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
             //.- Validamos que usuario no haya seleccionado beneficio previamente - OK
             //.- Generamos código encriptado de beneficio - OK
             //.- Guardamos accion de  beneficio de usuario como estado "obtenido" - OK
-            //.- Enviamos correo con url para que cliente pinche y generar cupón beneficion QR            
-            if (request != null && request.getIdUsuario() != null && request.getIdBeneficio() != null) {
+            //.- Enviamos correo con url para que cliente pinche y generar cupón beneficion QR   
+            
+            if(request.getTenantUser() == null){                
+                response.setValidacion(new Validacion("1", "1", "Sitio no indentificado para usuario."));
+                log.info("sin tenant encontrado para usuario");
+                log.info("fin");
+                return response;
+            }
+            if (request.getIdUsuario() != null && request.getIdBeneficio() != null) {
                 mensajeLog = "[idUsuario -> " + request.getIdUsuario() + "] ";
                 log.info("Datos de entrada ->{}", request.toString());
                 Integer beneficioSeleccionado = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), request.getIdBeneficio());
@@ -459,7 +466,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         log.info("{} Generando URL a enviar a usuario.", mensajeLog);
                         ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_DOWNLOAD);
                         if (paramUrlCupon != null) {
-                            String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
+                            //String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
+                            String urlDownloadCupon =  env.getProperty("server")+"/"+request.getTenantUser()+"/index.html?c="+ codEncriptado;                            
                             log.info("{} urlDownloadCupon ->{}", mensajeLog, urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.", mensajeLog);
                             Integer stockBeneficio = beneficioMapper.getStockBeneficio(request.getIdBeneficio());

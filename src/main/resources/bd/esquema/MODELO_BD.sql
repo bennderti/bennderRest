@@ -462,7 +462,8 @@ CREATE TABLE parametro_sistema
   tipo_parametro varchar(30) NOT NULL,
   clave varchar(30) NOT NULL,
   valor_a varchar(100) NOT NULL,
-  valor_b varchar(100) NOT NULL
+  valor_b varchar(100) NOT NULL,
+  CONSTRAINT pk_param_sistema PRIMARY KEY (tipo_parametro, clave)
 );
 
 alter table ACCESO_USUARIO

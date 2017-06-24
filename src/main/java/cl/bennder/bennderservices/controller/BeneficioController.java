@@ -3,6 +3,7 @@ package cl.bennder.bennderservices.controller;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.services.BeneficioServices;
 import cl.bennder.bennderservices.services.CuponBeneficioServices;
+import cl.bennder.bennderservices.util.UtilBennderRest;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
 import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
@@ -90,6 +91,7 @@ public class BeneficioController {
     public @ResponseBody GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request,HttpServletRequest req) {
         log.info("INICIO");
         request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(req));
+        //request.setTenantUser(UtilBennderRest.getTenantId(req));
         GetCuponBeneficioResponse response = cuponBeneficioServices.getCuponBeneficio(request);
         log.info("FIN");
         return response;
