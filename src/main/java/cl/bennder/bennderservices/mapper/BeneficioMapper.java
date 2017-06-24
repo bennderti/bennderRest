@@ -65,7 +65,7 @@ public interface BeneficioMapper {
      * Descuenta X cantidad de stock a beneficio seleccionado/obtenido
      * @param uBeneficio informacion de beneficio
      */
-    @Update("UPDATE BENEFICIO SET STOCK = (SELECT STOCK FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) - #{cantidad} WHERE ID_BENEFICIO = #{idBeneficio}")
+    @Update("UPDATE proveedor.BENEFICIO SET STOCK = (SELECT STOCK FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) - #{cantidad} WHERE ID_BENEFICIO = #{idBeneficio}")
     public void descuentaStockBeneficio(UsuarioBeneficio uBeneficio);
     
     /***

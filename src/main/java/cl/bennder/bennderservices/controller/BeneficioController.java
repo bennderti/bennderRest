@@ -87,8 +87,9 @@ public class BeneficioController {
      * @return 
      */
     @RequestMapping(value = "beneficio/getCuponBeneficio",method = RequestMethod.POST)
-    public @ResponseBody GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request) {
+    public @ResponseBody GetCuponBeneficioResponse getCuponBeneficio(@RequestBody GetCuponBeneficioRequest request,HttpServletRequest req) {
         log.info("INICIO");
+        request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(req));
         GetCuponBeneficioResponse response = cuponBeneficioServices.getCuponBeneficio(request);
         log.info("FIN");
         return response;
