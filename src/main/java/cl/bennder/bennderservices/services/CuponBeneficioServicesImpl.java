@@ -467,7 +467,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_DOWNLOAD);
                         if (paramUrlCupon != null) {
                             //String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
-                            String urlDownloadCupon =  env.getProperty("server")+"/"+request.getTenantUser()+"/index.html?c="+ codEncriptado;                            
+                            String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;                            
                             log.info("{} urlDownloadCupon ->{}", mensajeLog, urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.", mensajeLog);
                             Integer stockBeneficio = beneficioMapper.getStockBeneficio(request.getIdBeneficio());
