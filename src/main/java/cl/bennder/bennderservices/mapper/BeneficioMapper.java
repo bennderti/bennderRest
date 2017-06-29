@@ -30,7 +30,7 @@ public interface BeneficioMapper {
     public Beneficio getInfoGeneralBeneficio(Integer idBeneficio);
     
     
-    @Select("select count(1) from proveedor.sucursal_proveedor where id_direccion= #{idDireccion} and password = #{password} and id_proveedor =#{idProveedor}")
+    @Select("select count(1) from proveedor.sucursal_proveedor where id_direccion= #{idDireccion} and password_pos = #{password} and id_proveedor =#{idProveedor}")
     public Integer esPasswordSucursalValida(@Param("password") String password,@Param("idDireccion") Integer idDireccion, @Param("idProveedor") Integer idProveedor);
     
     /***
