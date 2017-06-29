@@ -29,7 +29,7 @@ public class UtilBennderRest {
                log.info("tenantId encontrado ->{}",tenantId);
             }
             else{
-                log.info("tenantId encontrado");
+                log.info("tenantId NO encontrado!!");
             }     
         } catch (Exception e) {
             log.error("Exception en getTenantId.",e);

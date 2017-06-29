@@ -8,6 +8,7 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
 import cl.bennder.bennderservices.constantes.Fuente;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
+import cl.bennder.bennderservices.mapper.EmpresaMapper;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.UsuarioBeneficio;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
@@ -120,6 +121,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         String mensajeLog = "[idUsuario(cupón) -> " + uBeneficio.getIdUsuario() + "] ";
                         //                    if( uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0){
                         //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
+                        log.info("esquema usuario ->{}",request.getTenantId());
+                        empresaMapper.cambiarEsquema(request.getTenantId());
                         UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
                         if (uBeneficioCanjeado != null) {
                             //.- validando si cupón ya ha sido canjeado
@@ -185,6 +188,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
         return response;
     }
 
+    @Autowired
+    EmpresaMapper empresaMapper;
 
     @Override
     public CanjeaCuponResponse validaCanjeCuponBeneficio(CanjeaCuponRequest request) {
@@ -199,7 +204,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
         try {
 
             if (request != null && request.getCodigoBeneficioEncriptado() != null) {
-                log.info("descriptando datos");
+                log.info("descriptando datos, esquema ->{}",request.getTenantId());
+                empresaMapper.cambiarEsquema(request.getTenantId());
                 UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoBeneficioEncriptado());
                 if (uBeneficio != null) {
                     String mensajeLog = "[idUsuario(cupón) -> " + uBeneficio.getIdUsuario() + "] ";
@@ -229,6 +235,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
 //                                }
 
                             //.- Obteniendo surcusales del proveedor de beneficio
+                            log.info("cambiando esquema a proveedor...");
+                            //empresaMapper.cambiarEsquema("proveedor");
                             response.setSucursales(beneficioMapper.getSucursalesProveedorByBeneficio(uBeneficio.getIdBeneficio()));
                             String server = env.getProperty("server");
                             String urlLogo = server + beneficioMapper.getPathLogoProveedorByBeneficio(uBeneficio.getIdBeneficio());
@@ -616,9 +624,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                 response.getValidacion().setMensaje("Este beneficio ya habia sido canjeado en punto de venta.");
                             } else {
                                 //.-
-                                ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_CANJE);
-                                if (paramUrlCupon != null) {
-                                    String urlCanje = paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
+//                                ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_CANJE);
+//                                if (paramUrlCupon != null) {
+                                    //String urlCanje = ,,,paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
+                                    String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
                                     String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 250, 250, uBeneficio.getCodigoBeneficio());
                                     if (rutaImagenQR != null && !"".equals(rutaImagenQR)) {
 
@@ -637,9 +646,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                     } else {
                                         log.info("{} Problemas al generar imagen de beneficio formato QR", mensajeLog);
                                     }
-                                } else {
-                                    log.info("{} Sin datos de url base para canejo de cupón", mensajeLog);
-                                }
+//                                } else {
+//                                    log.info("{} Sin datos de url base para canejo de cupón", mensajeLog);
+//                                }
                             }
 
                         } else {
