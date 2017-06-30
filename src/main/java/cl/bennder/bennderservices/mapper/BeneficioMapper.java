@@ -18,7 +18,7 @@ public interface BeneficioMapper {
      * @param idBeneficio Identificador de beneficio
      * @return Lista de sucursales de proveedor
      */
-    @Select("select sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal  " +
+    @Select("select sp.id_sucursal as idSucursal,sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal  " +
             "from proveedor.sucursal_proveedor sp inner join proveedor.direccion d on sp.id_direccion=d.id_direccion  " +
             "inner join proveedor.comuna c on c.id_comuna=d.id_comuna  " +
             "where sp.id_proveedor =(select id_proveedor from proveedor.beneficio where id_beneficio = #{idBeneficio}  and habilitado=true) and habilitado=true ")
@@ -30,8 +30,8 @@ public interface BeneficioMapper {
     public Beneficio getInfoGeneralBeneficio(Integer idBeneficio);
     
     
-    @Select("select count(1) from proveedor.sucursal_proveedor where id_direccion= #{idDireccion} and password_pos = #{password} and id_proveedor =#{idProveedor}")
-    public Integer esPasswordSucursalValida(@Param("password") String password,@Param("idDireccion") Integer idDireccion, @Param("idProveedor") Integer idProveedor);
+    @Select("select count(1) from proveedor.sucursal_proveedor where id_sucursal= #{idSucursal} and password_pos = #{password} and id_proveedor =#{idProveedor}")
+    public Integer esPasswordSucursalValida(@Param("password") String password,@Param("idSucursal") Integer idSucursal, @Param("idProveedor") Integer idProveedor);
     
     /***
      * Obtiene el título del beneficio para completar asunto cuando se envia correo de beneficio seleccionado
@@ -93,7 +93,8 @@ public interface BeneficioMapper {
     
     @Update("UPDATE fecha_accion_beneficio " +
     "   SET  FECHA = now(),"
-      + "id_vendedor_pos = #{idVendedorPOS, jdbcType = NULL} " +
+      + "id_vendedor_pos = #{idVendedorPOS, jdbcType = NULL}, "
+      + " ID_SUCURSAL_CANJE = #{idSucursalcanje, jdbcType = NULL}" +
     " WHERE id_usuario = #{idUsuario} AND id_beneficio = #{idBeneficio} AND id_accion_beneficio = #{idAccionBeneficio}")
     public void actualizaFechaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
     
@@ -102,8 +103,8 @@ public interface BeneficioMapper {
      * @param uBeneficio 
      */
     @Insert("INSERT INTO fecha_accion_beneficio( " +
-"            id_usuario, id_beneficio, id_accion_beneficio, fecha,id_vendedor_pos) " +
-"    VALUES (#{idUsuario}, #{idBeneficio}, #{idAccionBeneficio}, now(),#{idVendedorPOS, jdbcType = NULL})")
+"            id_usuario, id_beneficio, id_accion_beneficio, fecha,id_vendedor_pos,ID_SUCURSAL_CANJE) " +
+"    VALUES (#{idUsuario}, #{idBeneficio}, #{idAccionBeneficio}, now(),#{idVendedorPOS, jdbcType = NULL},#{idSucursalcanje, jdbcType = NULL})")
     public void insertaFechaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
     
     /***

@@ -136,7 +136,8 @@ create table FECHA_ACCION_BENEFICIO (
   ID_BENEFICIO         INT4                 not null,
   ID_ACCION_BENEFICIO  INT4                 not null,
   FECHA                timestamp                 not null,
-  ID_VENDEDOR_POS INT4
+  ID_VENDEDOR_POS INT4,
+  ID_SUCURSAL_CANJE INT4
 );
 
 /*==============================================================*/

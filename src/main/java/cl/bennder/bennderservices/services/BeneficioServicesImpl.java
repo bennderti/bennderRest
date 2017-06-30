@@ -71,7 +71,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
                 //.- Registrando visitas y accion de usuario
                 //Integer ,String , Integer ,String ,Integer 
                 log.info("Registrando estado de visitas");
-                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.VISITADO, null, 0, null, null);
+                cuponBeneficioServices.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.VISITADO, null, 0, null,null,null);
                 
                 
             }

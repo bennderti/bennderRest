@@ -114,7 +114,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
         log.info("inicio");
         try {
             if (request != null && request.getCodigoCuponEncriptado() != null) {
-                if (request.getIdVendedor() != null && request.getIdDireccionSucursal() != null && request.getPasswordSucursal() != null) {
+                if (request.getIdVendedor() != null && request.getIdSucursal()!= null && request.getPasswordSucursal() != null) {
+                    log.info("datos de entrada ->{}",request.toString());
                     log.info("descriptando datos");
                     UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoCuponEncriptado());
                     if (uBeneficio != null) {
@@ -134,9 +135,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                 //.- validamos si password es de surcusal seleccionada
                                 log.info("{} validamos si password es de surcusal seleccionada", mensajeLog);
                                 Beneficio b = this.beneficioMapper.getInfoGeneralBeneficio(uBeneficio.getIdBeneficio());
-                                Integer passSucusalValida = beneficioMapper.esPasswordSucursalValida(request.getPasswordSucursal(), request.getIdDireccionSucursal(), b.getIdProveedor());
+                                Integer passSucusalValida = beneficioMapper.esPasswordSucursalValida(request.getPasswordSucursal(), request.getIdSucursal(), b.getIdProveedor());
                                 if (passSucusalValida > 0) {
-                                    Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "", request.getIdVendedor());
+                                    Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "", request.getIdVendedor(),request.getIdSucursal());
                                     if (vRegistro != null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())) {
                                         log.info("{} Cupon válido correctamente para ser canjeado", mensajeLog);
                                         vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
@@ -329,8 +330,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
     }
 
 
-    @Override
-    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion, String codigoBeneficio, Integer cantidad, String codigoBeneficioEncriptado, Integer idVendedor) {
+    @Override 
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion, String codigoBeneficio, Integer cantidad, String codigoBeneficioEncriptado, Integer idVendedor,Integer idSucusalCanje) {
         log.info("inicio");
         log.info("Datos  -> idBeneficio:{},idUsuario:{},accion:{}", idBeneficio, idUsuario, accion);
         //.- reducir stock
@@ -348,8 +349,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                 beneficioMapper.actualizarVisitasBeneficio(idBeneficio);
             }
             if (accion.equals(AccionBeneficioUsuario.CANJEADO)) {
-                log.info("seteando vendedor que validó cupon de beneficio en POS ->{}", idVendedor);
+                log.info("seteando vendedor que validó cupon de beneficio en POS ->{} y sucurcal canje->{}", idVendedor,idSucusalCanje);
                 uBeneficio.setIdVendedorPOS(idVendedor);
+                uBeneficio.setIdSucursalcanje(idSucusalCanje);
             }
 
             //.- Existe
@@ -489,7 +491,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                     log.info("{} Sotck Actual->{} de beneficio ->{} es inferior al seleccionado por usuario, el cual es de ->{}. Por tanto se actualizará con stock actual", mensajeLog, stockBeneficio, request.getIdBeneficio(), request.getCantidad());
                                     request.setCantidad(stockBeneficio);
                                 }
-                                Validacion validacion = this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(), codEncriptado, null);
+                                Validacion validacion = this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(), codEncriptado, null,null);
                                 if (validacion != null && "0".equals(validacion.getCodigo()) && "0".equals(validacion.getCodigoNegocio())) {
                                     log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog);
                                     ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(request.getIdUsuario(), request.getIdBeneficio(), urlDownloadCupon);
@@ -634,7 +636,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
 
                                         byte[] bytePdf = this.generaCuponPdf(uBeneficio, rutaImagenQR, uBeneficio.getCodigoBeneficio());
                                         if (bytePdf != null && bytePdf.length > 0) {
-                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "", null);
+                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "", null,null);
                                             if (vRegistro != null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())) {
                                                 log.info("{} Cupon pdf generado correctamente", mensajeLog);
                                                 vRegistro.setMensaje("Cupon pdf generado correctamente");

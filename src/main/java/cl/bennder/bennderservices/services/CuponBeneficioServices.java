@@ -81,10 +81,11 @@ public interface CuponBeneficioServices {
      * @param cantidad Cantidad de la unidades de beneficio seleccionada por usuario
      * @param codigoBeneficioEncriptado código beneficio encriptado en AES
      * @param idVendedor rut sin dv de vendedor que validó cupón de beneficio en POS
+     * @param idSucursalCanje Sucursal de canje de cupón
      * @return 
      * @author dyanez
      */
-    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado,Integer idVendedor);
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion,String codigoBeneficio, Integer cantidad,String codigoBeneficioEncriptado,Integer idVendedor,Integer idSucursalCanje);
     
     /***
      * Método que entrega la ruta de la imangen .png de codigo QR de url de canje
