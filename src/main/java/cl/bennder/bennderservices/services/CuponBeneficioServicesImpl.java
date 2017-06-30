@@ -627,7 +627,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
 //                                ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_CANJE);
 //                                if (paramUrlCupon != null) {
                                     //String urlCanje = ,,,paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
-                                    String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
+                                    String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
+                                    log.info("{} url canje ->{}", mensajeLog,urlCanje);
                                     String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 250, 250, uBeneficio.getCodigoBeneficio());
                                     if (rutaImagenQR != null && !"".equals(rutaImagenQR)) {
 

@@ -75,8 +75,9 @@ public class BeneficioController {
      * @return Archivo pdf en formato byte
      */
     @RequestMapping(value = "beneficio/generaCuponQR",method = RequestMethod.POST)
-    public @ResponseBody GeneraCuponQrResponse generaCuponQR(@RequestBody GeneraCuponQrRequest request){
-        log.info("INICIO");        
+    public @ResponseBody GeneraCuponQrResponse generaCuponQR(@RequestBody GeneraCuponQrRequest request,HttpServletRequest req){
+        log.info("INICIO");
+        request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(req));
         GeneraCuponQrResponse response = cuponBeneficioServices.generaCuponQR(request);
         log.info("FIN");
         return response;
