@@ -117,13 +117,14 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                 if (request.getIdVendedor() != null && request.getIdSucursal()!= null && request.getPasswordSucursal() != null) {
                     log.info("datos de entrada ->{}",request.toString());
                     log.info("descriptando datos");
+                    log.info("esquema usuario ->{}",request.getTenantId());
+                    empresaMapper.cambiarEsquema(request.getTenantId());
                     UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoCuponEncriptado());
                     if (uBeneficio != null) {
                         String mensajeLog = "[idUsuario(cupón) -> " + uBeneficio.getIdUsuario() + "] ";
                         //                    if( uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0){
                         //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
-                        log.info("esquema usuario ->{}",request.getTenantId());
-                        empresaMapper.cambiarEsquema(request.getTenantId());
+                        
                         UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
                         if (uBeneficioCanjeado != null) {
                             //.- validando si cupón ya ha sido canjeado
