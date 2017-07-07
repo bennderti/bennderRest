@@ -7,6 +7,7 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.EmailMapper;
+import cl.bennder.bennderservices.mapper.EmpresaMapper;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
 import cl.bennder.bennderservices.model.EmailTemplate;
 import cl.bennder.bennderservices.model.ParametroSistema;
@@ -16,6 +17,7 @@ import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.RecuperacionPasswordRequest;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
+import javax.annotation.Resource;
 import org.apache.velocity.VelocityContext;
 //import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
@@ -26,7 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 
 /**
  *  EmailNotificationService para la notificación de correo electrónico 
@@ -36,6 +40,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 //fuente: http://www.technicalkeeda.com/spring-tutorials/spring-email-velocity-template-example,
 //http://www.codingpedia.org/ama/how-to-compose-html-emails-in-java-with-spring-and-velocity/
+@PropertySource("classpath:bennder.properties")
 @Service
 public class EmailServicesImpl implements EmailServices{
     
@@ -59,7 +64,16 @@ public class EmailServicesImpl implements EmailServices{
     private BeneficioMapper beneficioMapper; 
     
     @Autowired
+    private EmpresaMapper empresaMapper;
+    
+    @Autowired
     private ParametroSistemaServices parametroSistemaServices;
+    
+    @Autowired
+    private EncriptacionSpringService encriptacionSpringService;
+    
+    @Resource
+    private Environment env;
 
     @Override
     public void sendEmail(String to) {
@@ -279,27 +293,45 @@ public class EmailServicesImpl implements EmailServices{
             if(request != null && request.getUsuarioCorreo()!=null 
                 && !request.getUsuarioCorreo().isEmpty() && !request.getUsuarioCorreo().trim().equals("")){
                 log.info("Datos request ->{}",request.toString());
-                String mensajeLog = "[usuario -> "+request.getUsuarioCorreo()+"] ";
-                Integer existeCorreo = emailMapper.existeUsuarioCorreo(request.getUsuarioCorreo());
-                if(existeCorreo > 0){
-                    if(existeCorreo.equals(1)){
-                        //.- se busca contraseña
-                        log.info("{} obtiendo contraseña para comenzar con la creación de correo",existeCorreo);
-                        String password = emailMapper.getPasswordByUsuario(request.getUsuarioCorreo());
-                        Validacion v = this.completarEnviarCorreoPassWord(password, request.getUsuarioCorreo());
-                        response.setValidacion(v);
+                String mensajeLog = "[usuario -> "+request.getUsuarioCorreo()+"] ";                
+                if(request.getTenantId()!=null){
+                    log.info("{} Esquema de usuario->{}",request.toString(),request.getTenantId());
+                    empresaMapper.cambiarEsquema(request.getTenantId());
+                    Integer existeCorreo = emailMapper.existeUsuarioCorreo(request.getUsuarioCorreo());
+                    if(existeCorreo > 0){
+                        if(existeCorreo.equals(1)){
+                            //.- se busca contraseña
+//                            log.info("{} obtiendo contraseña para comenzar con la creación de correo",existeCorreo);
+//                            String password = emailMapper.getPasswordByUsuario(request.getUsuarioCorreo());
+                            log.info("{} genenrando la contraseña temporal...",existeCorreo);
+                            String passTemp = encriptacionSpringService.generarPasswordTemporal(60);
+                            String passEncode = encriptacionSpringService.passEncoderGenerator(passTemp);
+                            Integer idUsuario = usuarioMapper.getIdUsuarioByUsuarioCorreo(request.getUsuarioCorreo());
+                            log.info("actualizando password temporal para usuario ->{}",idUsuario);
+                            String urlBennderUsuario = env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/index.html";
+                            log.info("{} urlBennderUsuario ->{}",mensajeLog,urlBennderUsuario);
+                            usuarioMapper.updatePassword(passEncode, idUsuario, true);
+                           Validacion v = this.completarEnviarCorreoPassWord(passTemp, request.getUsuarioCorreo(),urlBennderUsuario);
+                            response.setValidacion(v);
+                        }
+                        else{
+                            response.getValidacion().setCodigoNegocio("3");
+                            response.getValidacion().setMensaje("Existe mas de un usuario registrado con su correo, favor contactar a soporte");
+                            log.info("{} Existe mas de un usuario registrado con su correo, favor contactar a soporte",mensajeLog);
+                        }
                     }
                     else{
-                        response.getValidacion().setCodigoNegocio("3");
-                        response.getValidacion().setMensaje("Existe mas de un usuario registrado con su correo, favor contactar a soporte");
-                        log.info("{} Existe mas de un usuario registrado con su correo, favor contactar a soporte",mensajeLog);
+                        response.getValidacion().setCodigoNegocio("2");
+                        response.getValidacion().setMensaje("No existe usuario registrado");
+                        log.info("{} No existe usuario registrado",mensajeLog);
                     }
                 }
                 else{
-                    response.getValidacion().setCodigoNegocio("2");
-                    response.getValidacion().setMensaje("No existe usuario registrado");
-                    log.info("{} No existe usuario registrado",mensajeLog);
+                        response.getValidacion().setCodigoNegocio("4");
+                        response.getValidacion().setMensaje("Dominio no identificado para usuario");
+                        log.info("{} Dominio no identificado para usuario",mensajeLog);
                 }
+
             }
             else{
                response.getValidacion().setCodigoNegocio("1");
@@ -318,7 +350,7 @@ public class EmailServicesImpl implements EmailServices{
     }
 
     @Override
-    public Validacion completarEnviarCorreoPassWord(String password, String usuario) {
+    public Validacion completarEnviarCorreoPassWord(String password, String usuario, String urlBennderUsuario) {
         Validacion response = new Validacion("0", "1", "Problemas al completar correo");
         log.info("inicio");
         try {
@@ -341,26 +373,27 @@ public class EmailServicesImpl implements EmailServices{
                     datosEmailTemplate.setNombreTemplate(plantillaCorreo.getNombre());
                     datosEmailTemplate.setMailTo(usuario);
                     
-                    ParametroSistema paramUrlBennder = this.parametroSistemaServices.getDatosParametroSistema(TP_BENNDER_USUARIO, C_URL_PLATAFORMA);
-                    if(paramUrlBennder != null){
-                        log.info("Url acceso plataforma bennder ->{}, para  usuario->{}",paramUrlBennder.getValorA(),usuario);
+//                    ParametroSistema paramUrlBennder = this.parametroSistemaServices.getDatosParametroSistema(TP_BENNDER_USUARIO, C_URL_PLATAFORMA);
+//                    if(paramUrlBennder != null){
+                        //log.info("Url acceso plataforma bennder ->{}, para  usuario->{}",paramUrlBennder.getValorA(),usuario);
                        //Completando datos de contexto
+                       log.info("Completando datos de contexto de template...");
                         VelocityContext velocityContext = new VelocityContext();
                         velocityContext.put("user", usuario);
                         velocityContext.put("password", password);
-                        velocityContext.put("urlBennderUsuario", paramUrlBennder.getValorA());
+                        velocityContext.put("urlBennderUsuario", urlBennderUsuario);
 
                         datosEmailTemplate.setContext(velocityContext);
                         log.info("obteniendo beans de email...");
                         ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
                         Mailer mailer = (Mailer) context.getBean("mailer");
                         response = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
-                    }
-                    else{  
-                        response.setCodigoNegocio("3");
-                        response.setMensaje("Sin plataforma configurada para usuario, favor contactar a soporte.");
-                        log.info("Sin plataforma configurada para usuario->{}",usuario);
-                    }
+//                    }
+//                    else{  
+//                        response.setCodigoNegocio("3");
+//                        response.setMensaje("Sin plataforma configurada para usuario, favor contactar a soporte.");
+//                        log.info("Sin plataforma configurada para usuario->{}",usuario);
+//                    }
                   
                 }
                 else{

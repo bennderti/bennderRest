@@ -20,7 +20,13 @@ import org.apache.ibatis.type.StringTypeHandler;
  * @author dyanez
  */
 public interface UsuarioMapper {
+    
+    @Update("update usuario set password=#{newPassword},es_password_temp = #{esPasswordTemp} where id_usuario = #{idUsuario}")
+    public void updatePassword(@Param("newPassword") String newPassword,@Param("idUsuario") Integer idUsuario,@Param("esPasswordTemp") boolean  esPasswordTemp);
 
+    @Select("select id_usuario from usuario where usuario = #{usuarioCorreo}")
+    public Integer getIdUsuarioByUsuarioCorreo(String usuarioCorreo);
+    
     /***
      * Método que registra acceso de usuario
      * @param idUsuario identificador de usuario

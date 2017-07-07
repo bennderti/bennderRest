@@ -265,7 +265,7 @@
 	@section Footer Style
 	*/
 		#templateFooter{
-			/*@editable*/background-color:#222222;
+			/*@editable*/background-color:#transparent;
 			/*@editable*/background-image:none;
 			/*@editable*/background-repeat:no-repeat;
 			/*@editable*/background-position:center;
@@ -555,7 +555,7 @@
                         
                         <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px;color: #00ADE5;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, Verdana, sans-serif;font-size: 24px;line-height: 100%;text-align: center;">
                         
-                            <h1><span style="font-size:30px"><span style="color:#0099CC"><span style="font-family:helvetica neue,helvetica,arial,verdana,sans-serif">Bienvenido/a a Bennder</span></span></span></h1>
+                            <h1><span style="font-size:30px"><span style="color:#0099CC"><span style="font-family:helvetica neue,helvetica,arial,verdana,sans-serif">Obtención de Beneficio</span></span></span></h1>
 
                         </td>
                     </tr>
@@ -598,7 +598,7 @@
                             <td class="mcnImageContent" valign="top" style="padding-right: 0px; padding-left: 0px; padding-top: 0; padding-bottom: 0; text-align:center;">
                                 
                                     
-                                        <img align="center" alt="BIENVENIDO/A A BENNDER B2B" src="https://gallery.mailchimp.com/25a1bb8a25b273a7a0581497a/images/526cc14a-9bd3-432c-a4eb-13a0f91081b1.jpg" width="600" style="max-width:600px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
+                                        <img align="center" alt="BIENVENIDO/A A BENNDER B2B" src="https://gallery.mailchimp.com/25a1bb8a25b273a7a0581497a/images/54634744-dc73-4a0d-a61c-927b387b8e51.png" width="200" style="max-width:200px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
                                     
                                 
                             </td>
@@ -624,7 +624,7 @@
                         
                         <td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
                         
-                            <p style="text-align: center;"><span style="color:#000000">Estimado&nbsp;</span><strong><span style="color:#0099CC">&nbsp;${user}</span></strong><span style="color:#000000">, a continuación el link para la generación de beneficio&nbsp;</span><strong><span style="color:#0099CC">${nombreBeneficio}</span></strong><span style="color:#000000">.&nbsp;<br>
+                            <p style="text-align: center;"><span style="color:#000000">Estimado&nbsp;</span><strong><span style="color:#0099CC">&nbsp;${user}</span></strong><span style="color:#000000">, a continuación el link para la generación de beneficio </span><strong><span style="color:#0099CC">${nombreBeneficio}</span></strong><span style="color:#000000">.&nbsp;<br>
 Favor presione <a href="${linkUrlDownloadCupon}" target="_blank">aquí </a>para descargar su cupón de descuento.<br>
 Ahora puede dirigirse a punto de venta para hacer efectivo su beneficio, presentando su codigo QR en caja.</span><br>
 <br>
@@ -736,39 +736,7 @@ Saludos,<br>
 									<![endif]-->
 									<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" class="templateContainer">
 										<tr>
-                                			<td valign="top" class="footerContainer"><table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width:100%;">
-    <tbody class="mcnTextBlockOuter">
-        <tr>
-            <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
-              	<!--[if mso]>
-				<table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%;">
-				<tr>
-				<![endif]-->
-			    
-				<!--[if mso]>
-				<td valign="top" width="600" style="width:600px;">
-				<![endif]-->
-                <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width:100%; min-width:100%;" width="100%" class="mcnTextContentContainer">
-                    <tbody><tr>
-                        
-                        <td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                        
-                            
-                        </td>
-                    </tr>
-                </tbody></table>
-				<!--[if mso]>
-				</td>
-				<![endif]-->
-                
-				<!--[if mso]>
-				</tr>
-				</table>
-				<![endif]-->
-            </td>
-        </tr>
-    </tbody>
-</table></td>
+                                			<td valign="top" class="footerContainer"></td>
 										</tr>
 									</table>
 									<!--[if gte mso 9]>
