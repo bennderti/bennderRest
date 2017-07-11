@@ -23,4 +23,6 @@ public interface EncriptacionSpringService {
      * @return 
      */
     public String generarPasswordTemporal(int nBits);
+    
+    
 }
