@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.multitenancy.TenantContext;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.security.JwtUser;
 import cl.bennder.bennderservices.services.UsuarioServices;
@@ -96,11 +97,17 @@ public class HomeController {
         // Reload password post-security so we can generate token
         final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(authenticationRequest.getUser());
         final String token = jwtTokenUtil.generateToken(userDetails);
+        
+        //authenticationRequest.setPassword(userDetails.getPassword());
+        log.info("[login] - validando usuario");
+        //log.info("[login] - TenantContext.getCurrentTenant()->{}",TenantContext.getCurrentTenant());
+        //loginResponse = usuarioServices.validacionUsuario(authenticationRequest);
 
         // Return the token
         loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
         loginResponse.setToken(token);
-        loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
+        //loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
+        log.info("[login] - fin ");
         return ResponseEntity.ok(loginResponse);
     }
 
