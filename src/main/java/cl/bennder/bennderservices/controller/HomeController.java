@@ -106,7 +106,7 @@ public class HomeController {
         // Return the token
         loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
         loginResponse.setToken(token);
-        //loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
+        loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
         log.info("[login] - fin ");
         return ResponseEntity.ok(loginResponse);
     }
