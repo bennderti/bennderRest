@@ -100,7 +100,7 @@ public class HomeController {
         
         //authenticationRequest.setPassword(userDetails.getPassword());
         log.info("[login] - validando usuario");
-        //log.info("[login] - TenantContext.getCurrentTenant()->{}",TenantContext.getCurrentTenant());
+        log.info("[login] - TenantContext.getCurrentTenant()->{}",TenantContext.getCurrentTenant());
         //loginResponse = usuarioServices.validacionUsuario(authenticationRequest);
 
         // Return the token
