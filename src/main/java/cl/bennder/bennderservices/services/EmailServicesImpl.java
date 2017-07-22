@@ -308,7 +308,8 @@ public class EmailServicesImpl implements EmailServices{
                             String passEncode = encriptacionSpringService.passEncoderGenerator(passTemp);
                             Integer idUsuario = usuarioMapper.getIdUsuarioByUsuarioCorreo(request.getUsuarioCorreo());
                             log.info("actualizando password temporal para usuario ->{}",idUsuario);
-                            String urlBennderUsuario = env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/index.html";
+                            String urlBennderUsuario = env.getProperty("http")+request.getTenantId()+"."+env.getProperty("dns");
+                            //String urlBennderUsuario = env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/index.html";
                             log.info("{} urlBennderUsuario ->{}",mensajeLog,urlBennderUsuario);
                             usuarioMapper.updatePassword(passEncode, idUsuario, true);
                            Validacion v = this.completarEnviarCorreoPassWord(passTemp, request.getUsuarioCorreo(),urlBennderUsuario);
