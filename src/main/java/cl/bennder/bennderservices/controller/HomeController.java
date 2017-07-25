@@ -97,14 +97,14 @@ public class HomeController {
         // Reload password post-security so we can generate token
         final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(authenticationRequest.getUser());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        
+        authenticationRequest.setPassword(userDetails.getPassword());
         //authenticationRequest.setPassword(userDetails.getPassword());
         log.info("[login] - validando usuario");
         log.info("[login] - TenantContext.getCurrentTenant()->{}",TenantContext.getCurrentTenant());
-        //loginResponse = usuarioServices.validacionUsuario(authenticationRequest);
+        loginResponse = usuarioServices.validacionUsuario(authenticationRequest);
 
         // Return the token
-        loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
+        //loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
         loginResponse.setToken(token);
         loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
         log.info("[login] - fin ");
