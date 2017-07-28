@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *  EmailNotificationService para la notificación de correo electrónico 
@@ -42,6 +43,7 @@ import org.springframework.core.env.Environment;
 //http://www.codingpedia.org/ama/how-to-compose-html-emails-in-java-with-spring-and-velocity/
 @PropertySource("classpath:bennder.properties")
 @Service
+@Transactional
 public class EmailServicesImpl implements EmailServices{
     
     private static final Logger log = LoggerFactory.getLogger(EmailServicesImpl.class);
