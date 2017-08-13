@@ -81,7 +81,7 @@ drop table if exists parametro_sistema;
 /*==============================================================*/
 create table ACCESO_USUARIO (
    id_usuario integer,
-   fecha_acceso timestamp  DEFAULT NOW()
+   fecha_acceso timestamp without time zone NOT NULL DEFAULT now()
 );
 
 /*==============================================================*/

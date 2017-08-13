@@ -20,12 +20,19 @@ import org.apache.ibatis.type.StringTypeHandler;
  * @author dyanez
  */
 public interface UsuarioMapper {
+    
+    
+    @Update("update usuario set password=#{newPassword},es_password_temp = #{esPasswordTemp} where id_usuario = #{idUsuario}")
+    public void updatePassword(@Param("newPassword") String newPassword,@Param("idUsuario") Integer idUsuario,@Param("esPasswordTemp") boolean  esPasswordTemp);
 
+    @Select("select id_usuario from usuario where usuario = #{usuarioCorreo}")
+    public Integer getIdUsuarioByUsuarioCorreo(String usuarioCorreo);
+    
     /***
      * Método que registra acceso de usuario
      * @param idUsuario identificador de usuario
      */
-    @Insert("insert into acceso_usuario(id_usuario) values(#{idUsuario});")
+    @Insert("insert into acceso_usuario(id_usuario) values(#{idUsuario})")
     public void registraAccesoUsuario(Integer idUsuario);
 
     /***
@@ -93,15 +100,24 @@ public interface UsuarioMapper {
     })
     public Usuario getDatosUsuario(@Param("idUsuario") Integer idUsuario);
 
-    /**
-     * Método que valida si existe el usuario con el password indicado. Retorna un idUsuario con su estado
-     *
-     * @param usuario, password
-     * @return Usuario
-     * @author mgutierrez
-     */
-    @Select("SELECT ID_USUARIO AS IDUSUARIO, ID_ESTADO_USUARIO AS IDESTADO  FROM USUARIO WHERE USUARIO = #{usuario} AND PASSWORD =#{pass}")
-    public Usuario getUsuarioValidacion(@Param("usuario") String usuario, @Param("pass") String password);
+//    /**
+//     * Método que valida si existe el usuario con el password indicado. Retorna un idUsuario con su estado
+//     *
+//     * @param usuario, password
+//     * @return Usuario
+//     * @author mgutierrez
+//     */
+//    @Select("SELECT ID_USUARIO AS IDUSUARIO, ID_ESTADO_USUARIO AS IDESTADO  FROM USUARIO WHERE USUARIO = #{usuario} AND PASSWORD =#{pass}")
+//    public Usuario getUsuarioValidacion(@Param("usuario") String usuario, @Param("pass") String password);
+       /**
+    * Método que valida si existe el usuario con el password indicado. Retorna un idUsuario con su estado
+    * @param password Contraseña de usuario 
+    * @param usuario Usuario correo
+    * @return Usuario 
+    * @author mgutierrez
+    */
+   @Select("SELECT ID_USUARIO AS IDUSUARIO,HABILITADO AS HABILITADO,es_password_temp AS esPasswordTemporal FROM USUARIO WHERE USUARIO = #{usuario} AND PASSWORD =#{pass}")
+   public Usuario getUsuarioValidacion(@Param("usuario") String usuario,@Param("pass") String password);
 
     /**
      * Metodo para realizar la autenticacion de usuarios a traves de spring security con Jwt

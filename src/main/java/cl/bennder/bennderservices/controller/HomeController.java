@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.multitenancy.TenantContext;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.security.JwtUser;
 import cl.bennder.bennderservices.services.UsuarioServices;
@@ -30,9 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import cl.bennder.bennderservices.services.EmailServices;
 import cl.bennder.bennderservices.services.HomeServices;
+import cl.bennder.entitybennderwebrest.request.CambioPasswordRequest;
 import cl.bennder.entitybennderwebrest.request.CargarHomeRequest;
 import cl.bennder.entitybennderwebrest.request.LoginRequest;
 import cl.bennder.entitybennderwebrest.request.RecuperacionPasswordRequest;
+import cl.bennder.entitybennderwebrest.response.CambioPasswordResponse;
 import cl.bennder.entitybennderwebrest.response.CargarHomeResponse;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
@@ -94,11 +97,17 @@ public class HomeController {
         // Reload password post-security so we can generate token
         final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(authenticationRequest.getUser());
         final String token = jwtTokenUtil.generateToken(userDetails);
+        authenticationRequest.setPassword(userDetails.getPassword());
+        //authenticationRequest.setPassword(userDetails.getPassword());
+        log.info("[login] - validando usuario");
+        log.info("[login] - TenantContext.getCurrentTenant()->{}",TenantContext.getCurrentTenant());
+        loginResponse = usuarioServices.validacionUsuario(authenticationRequest);
 
         // Return the token
-        loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
+        //loginResponse.setValidacion(new Validacion("0","0","login exitoso"));
         loginResponse.setToken(token);
         loginResponse.setIdEstadoUsuario(userDetails.getIdEstado());
+        log.info("[login] - fin ");
         return ResponseEntity.ok(loginResponse);
     }
 
@@ -146,6 +155,15 @@ public class HomeController {
 //        log.info("response ->{}", response.toString());
         log.info("[home/cargarHome] - fin ");
         
+        return response;
+    }
+    
+    @RequestMapping(value = "login/cambioPassword", method = RequestMethod.POST)
+    public CambioPasswordResponse cambioPassword(@RequestBody CambioPasswordRequest request,HttpServletRequest req) {
+        log.info("[login/cambioPassword] - inicio ");
+        //request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(req));
+        CambioPasswordResponse response = usuarioServices.cambioPassword(request);
+        log.info("[login/cambioPassword] - fin ");
         return response;
     }
 }

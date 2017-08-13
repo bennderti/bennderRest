@@ -478,7 +478,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_DOWNLOAD);
                         if (paramUrlCupon != null) {
                             //String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
-                            String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;                            
+                            //String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;                            
+                            String urlDownloadCupon = env.getProperty("http")+request.getTenantUser()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/downloadCupon.html?c="+ codEncriptado; 
+                            
                             log.info("{} urlDownloadCupon ->{}", mensajeLog, urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.", mensajeLog);
                             Integer stockBeneficio = beneficioMapper.getStockBeneficio(request.getIdBeneficio());
@@ -630,9 +632,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
 //                                ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_CANJE);
 //                                if (paramUrlCupon != null) {
                                     //String urlCanje = ,,,paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
-                                    String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
+                                    //String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
+                                    String urlCanje = env.getProperty("http")+request.getTenantId()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado(); 
                                     log.info("{} url canje ->{}", mensajeLog,urlCanje);
-                                    String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 250, 250, uBeneficio.getCodigoBeneficio());
+                                    String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 200, 200, uBeneficio.getCodigoBeneficio());
                                     if (rutaImagenQR != null && !"".equals(rutaImagenQR)) {
 
                                         byte[] bytePdf = this.generaCuponPdf(uBeneficio, rutaImagenQR, uBeneficio.getCodigoBeneficio());
@@ -764,7 +767,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         table.setHorizontalAlignment(Element.ALIGN_CENTER);
                         int i = 0;
                         for (BeneficioImagen bImagen : infoBeneficio.getImagenesBeneficio()) {
-                            if (i == 2) {
+                            //if (i == 2) {
+                            if (i == 1) {
                                 break;
                             } else {
                                 log.info("agregando imagen a celda...");
