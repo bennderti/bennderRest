@@ -5,11 +5,17 @@ import cl.bennder.bennderservices.services.BeneficioServices;
 import cl.bennder.bennderservices.services.CuponBeneficioServices;
 import cl.bennder.bennderservices.util.UtilBennderRest;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.BeneficiosRequest;
+import cl.bennder.entitybennderwebrest.request.BusquedaRequest;
 import cl.bennder.entitybennderwebrest.request.CanjeaCuponRequest;
+import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.GeneraCuponQrRequest;
 import cl.bennder.entitybennderwebrest.request.GetCuponBeneficioRequest;
 import cl.bennder.entitybennderwebrest.request.ValidacionCuponPOSRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
+import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
+import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
+import cl.bennder.entitybennderwebrest.response.BusquedaResponse;
 import cl.bennder.entitybennderwebrest.response.CanjeaCuponResponse;
 import cl.bennder.entitybennderwebrest.response.GeneraCuponQrResponse;
 import cl.bennder.entitybennderwebrest.response.GetCuponBeneficioResponse;
@@ -116,4 +122,12 @@ public class BeneficioController {
         log.info("FIN");
         return response;
     }
+    
+    @RequestMapping(value = "obtenerBeneficiosPorBusqueda",method = RequestMethod.POST)
+    public BusquedaResponse obtenerBeneficiosPorBusqueda(@RequestBody BusquedaRequest request){
+        log.info("INICIO");
+        BusquedaResponse response = beneficioServices.obtenerBeneficiosPorBusqueda(request);
+        log.info("FIN");
+        return response;
+    }    
 }

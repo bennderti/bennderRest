@@ -3,12 +3,15 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
+import cl.bennder.bennderservices.util.BusquedaUtil;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
+import cl.bennder.entitybennderwebrest.request.BusquedaRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
+import cl.bennder.entitybennderwebrest.response.BusquedaResponse;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +109,50 @@ public class BeneficioServicesImpl implements BeneficioServices {
             }
         }
     }
-    
-    
+
+    @Override
+    public BusquedaResponse obtenerBeneficiosPorBusqueda(BusquedaRequest request) {
+        
+        BusquedaResponse response = new BusquedaResponse();
+        
+        if(request.getBusqueda()!=null || !request.getBusqueda().isEmpty())
+        {
+            /*Separar busqueda*/
+            String palabrasBusquedaCompleta[] = request.getBusqueda().trim().split(" ");
+
+            /*Eliminar StopWords*/  
+            BusquedaUtil busquedaUtil = new BusquedaUtil();
+
+            String palabrasBusqueda = busquedaUtil.eliminacionStopWords(palabrasBusquedaCompleta);
+
+            if(palabrasBusqueda!=null)
+            {
+               log.info("Palabras de busqueda sin stopwords: {}", palabrasBusqueda);  
+
+               /*Buscar palabras claves en titulos y descripciones*/  
+               response.setBeneficios(beneficioMapper.obtenerBeneficiosPorBusqueda(palabrasBusqueda));   
+
+               response.getValidacion().setCodigo("0");
+               response.getValidacion().setCodigoNegocio("0");
+               response.getValidacion().setMensaje("Se encontraron " + response.getBeneficios().size() + "beneficios ");
+
+            }
+            else
+            {
+               response.getValidacion().setCodigo("0");
+               response.getValidacion().setCodigoNegocio("1");
+               response.getValidacion().setMensaje("No se econtraron palabras claves para realizar la búsqueda");                
+            }
+        }
+        else
+        {
+            response.getValidacion().setCodigo("0");
+            response.getValidacion().setCodigoNegocio("2");
+            response.getValidacion().setMensaje("La busqueda es nula o vacía");
+        }
+        
+        log.info(response.getValidacion().getMensaje());     
+        
+        return response;
+    }
 }
