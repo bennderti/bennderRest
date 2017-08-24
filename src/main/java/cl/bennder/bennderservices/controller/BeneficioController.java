@@ -123,10 +123,10 @@ public class BeneficioController {
         return response;
     }
     
-    @RequestMapping(value = "obtenerBeneficiosPorBusqueda",method = RequestMethod.POST)
-    public BusquedaResponse obtenerBeneficiosPorBusqueda(@RequestBody BusquedaRequest request){
+    @RequestMapping(value = "beneficio/buscarBeneficios",method = RequestMethod.POST)
+    public BusquedaResponse buscarBeneficios(@RequestBody BusquedaRequest request){
         log.info("INICIO");
-        BusquedaResponse response = beneficioServices.obtenerBeneficiosPorBusqueda(request);
+        BusquedaResponse response = beneficioServices.buscarBeneficios(request);
         log.info("FIN");
         return response;
     }    

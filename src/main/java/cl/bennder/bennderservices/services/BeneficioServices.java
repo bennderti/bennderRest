@@ -16,5 +16,5 @@ public interface BeneficioServices {
     
     void agrearUrlImagenListaBeneficios(List<Beneficio> beneficios);
     
-    BusquedaResponse obtenerBeneficiosPorBusqueda(BusquedaRequest request);
+    BusquedaResponse buscarBeneficios(BusquedaRequest request);
 }

@@ -111,7 +111,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
     }
 
     @Override
-    public BusquedaResponse obtenerBeneficiosPorBusqueda(BusquedaRequest request) {
+    public BusquedaResponse buscarBeneficios(BusquedaRequest request) {
         
         BusquedaResponse response = new BusquedaResponse();
         
