@@ -479,4 +479,44 @@ public interface BeneficioMapper {
             "WHERE ID_BENEFICIO = #{idBeneficio} ")
     public void actualizarVisitasBeneficio(Integer idBeneficio);
     
+    /**
+     * Obtiene una lista de beneficios dado una busqueda de texto en el título y descripción del beneficio
+     * @param busqueda string con texto a buscar (las palabras deben ir separadas por espacio
+     * @return lista de beneficios List<Beneficio>
+     */
+    @Select("SELECT "
+            + "B.ID_BENEFICIO AS idBeneficio, "
+            + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+            + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+            + "B.TITULO, B.CALIFICACION, "
+            + "B.ID_TIPO_BENEFICIO, "
+            + "BP.PRECIO_NORMAL AS precioNormal, "
+            + "BP.PRECIO_OFERTA AS precioOferta, "
+            + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+            + "BG.GANCHO, "
+            + "P.NOMBRE AS nombreProveedor " +
+            "FROM proveedor.BENEFICIO B " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE "
+            + "NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION "
+            + "AND B.HABILITADO = TRUE "
+            + "AND B.STOCK > 0 "
+            + "AND to_tsvector(B.titulo || B.descripcion) @@ plainto_tsquery(#{busqueda}) " +
+            "ORDER BY B.FECHA_CREACION DESC")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "idBeneficioParaImagenes", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "condiciones", column = "idBeneficioParaCondiciones", javaType=List.class, many = @Many(select = "obtenerCondicionesBeneficio"))  
+            })
+    List<Beneficio> obtenerBeneficiosPorBusqueda(String busqueda);
+    
 }
