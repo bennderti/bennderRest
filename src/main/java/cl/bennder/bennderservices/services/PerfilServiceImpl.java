@@ -7,11 +7,13 @@ package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.mapper.EmpresaMapper;
 import cl.bennder.bennderservices.mapper.PerfilMapper;
+import cl.bennder.entitybennderwebrest.model.Usuario;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.DatosPerfilRequest;
 import cl.bennder.entitybennderwebrest.request.InfoDatosPerfilRequest;
 import cl.bennder.entitybennderwebrest.response.DatosPerfilResponse;
 import cl.bennder.entitybennderwebrest.response.InfoDatosPerfilResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,53 +39,142 @@ public class PerfilServiceImpl implements PerfilService{
     private static final Logger log = LoggerFactory.getLogger(PerfilServiceImpl.class);
 
     @Override
-    public InfoDatosPerfilResponse guardarDatosPerfil(InfoDatosPerfilRequest request){
+    public ValidacionResponse validaDatosUsuario(Usuario usuario) {
         InfoDatosPerfilResponse response = new InfoDatosPerfilResponse();
-        response.setValidacion(new Validacion("0","1","Problemas al guardar sucursal"));
+        response.setValidacion(new Validacion("0","1","Problemas al guardar datos de perfil"));
         log.info("inicio");
         try {
-//            
-//            if(request!=null && request.getIdUsuario()!=null){
-//                response.setRegiones(perfilMapper.getRegiones());
-//                response.setComunas(perfilMapper.getComunas());
-//                String mensajeLog = "[idUsuario -> " + request.getIdUsuario() + "] ";
-//                
-//                
-//                log.info("{} Obteniendo datos generales", mensajeLog);
-//            }
-//            else{
-//                log.info("{} Usuario no encontrado ->{}",request.toString());
-//                response.getValidacion().setCodigoNegocio("2");
-//                response.getValidacion().setMensaje("Usuario no encontrado");
-//            }
             
+            if(usuario == null){                
+                response.getValidacion().setCodigoNegocio("2");
+                response.getValidacion().setMensaje("Favor completar los datos de perfil");
+                log.info("Favor completar los datos de perfil");
+                return response;
+            }
+            log.info("Validando datos generales...");
+            if(usuario.getNombres() == null || usuario.getNombres().trim().equals("")){                
+                response.getValidacion().setCodigoNegocio("3");
+                response.getValidacion().setMensaje("Favor completar nombres");
+                log.info("Favor completar los datos de perfil");
+                return response;
+            }
+            if(usuario.getApellidoM()== null || usuario.getApellidoM().trim().equals("")){                
+                response.getValidacion().setCodigoNegocio("4");
+                response.getValidacion().setMensaje("Favor completar apellido materno");
+                log.info("Favor completar apellido materno");
+                return response;
+            }
+            if(usuario.getApellidoP()== null || usuario.getApellidoP().trim().equals("")){                
+                response.getValidacion().setCodigoNegocio("5");
+                response.getValidacion().setMensaje("Favor completar apellido paterno");
+                log.info("Favor completar apellido paterno");
+                return response;
+            }   
+            log.info("Validando datos dirección..."); 
+            if(usuario.getDireccion() == null){                
+                response.getValidacion().setCodigoNegocio("6");
+                response.getValidacion().setMensaje("Favor completar los datos de dirección");
+                log.info("Favor completar los datos de dirección");
+                return response;
+            }            
+            if(usuario.getDireccion().getComuna()== null || usuario.getDireccion().getComuna().getIdComuna() == null){                
+                response.getValidacion().setCodigoNegocio("7");
+                response.getValidacion().setMensaje("Favor completar datos de comuna");
+                log.info("Favor completar datos de comuna");
+                return response;
+            }            
+            if(usuario.getDireccion().getComuna().getRegion()== null || usuario.getDireccion().getComuna().getRegion().getIdRegion() == null){                
+                response.getValidacion().setCodigoNegocio("8");
+                response.getValidacion().setMensaje("Favor completar región");
+                log.info("Favor completar región");
+                return response;
+            } 
+            if(usuario.getDireccion().getCalle() == null || usuario.getDireccion().getCalle().trim().equals("")){                
+                response.getValidacion().setCodigoNegocio("9");
+                response.getValidacion().setMensaje("Favor completar calle");
+                log.info("Favor completar calle");
+                return response;
+            }
+            if(usuario.getDireccion().getNumero()== null || usuario.getDireccion().getNumero().trim().equals("")){                
+                response.getValidacion().setCodigoNegocio("10");
+                response.getValidacion().setMensaje("Favor completar número");
+                log.info("Favor completar calle");
+                return response;
+            }
+            log.info("Validando datos contacto..."); 
+            if(usuario.getContacto() == null){                
+                response.getValidacion().setCodigoNegocio("11");
+                response.getValidacion().setMensaje("Favor datos de contacto");
+                log.info("Favor completar calle");
+                return response;
+            }             
+            if(usuario.getContacto().getCelular() == null){                
+                response.getValidacion().setCodigoNegocio("12");
+                response.getValidacion().setMensaje("Favor completar celular");
+                log.info("Favor completar celular");
+                return response;
+            }            
+            log.info("Datos de entrada ->{}",usuario.toString());
+            response.getValidacion().setCodigoNegocio("0");
+            response.getValidacion().setMensaje("Datos OK");
+            log.info("Datos OK");
             
-//            if(request.getSucursal().getIdSucursal() == null){
-//                log.info("creando sucursal...");
-//                Integer idDireccion= sucursalMapper.getSeqIdDireccion();
-//                log.info("idDireccion ->{}",idDireccion);
-//                log.info("guardando direccion...");
-//                request.getSucursal().getDireccion().setIdDireccion(idDireccion);
-//                sucursalMapper.insertDireccion(request.getSucursal().getDireccion());                
-//                Integer idProveedor = proveedorMapper.getIdProveedorByUser(request.getIdUsuario());
-//                log.info("guardando datos sucursal para proveedor ->{}",idProveedor);
-//                sucursalMapper.insertSucursal(idProveedor, request.getSucursal());
-//                response.setValidacion(new Validacion("0","0","Datos sucursal guardados OK."));
-//            }
-//            else{
-//                log.info("editando sucursal...");
-//                log.info("actualizando direccion...");
-//                sucursalMapper.updateDireccion(request.getSucursal().getDireccion());
-//                log.info("actualizando datos sucursal...");
-//                sucursalMapper.updateSucursal(request.getSucursal());
-//                response.setValidacion(new Validacion("0","0","Datos sucursal actualizado OK."));
-//            }            
-            log.info("descriptando datos, esquema ->{}",request.getTenantId());
-            empresaMapper.cambiarEsquema(request.getTenantId());
             
         } catch (Exception e) {
-            response.setValidacion(new Validacion("1","1","Error al guardar sucursal"));
-            log.error("Exception guardarSucursal,",e);
+            response.setValidacion(new Validacion("1","1","Error al guardar datos de perfil"));
+            log.error("Exception guardarDatosPerfil,",e);
+        }
+        log.info("fin");
+        return response;
+    }
+    
+    
+
+    @Override
+    public InfoDatosPerfilResponse guardarDatosPerfil(InfoDatosPerfilRequest request){
+        InfoDatosPerfilResponse response = new InfoDatosPerfilResponse();
+        response.setValidacion(new Validacion("0","1","Problemas al guardar datos de perfil"));
+        log.info("inicio");
+        try {
+            
+            if(request!=null && request.getIdUsuario()!=null){
+                //log.info("datos de entrada ->{}",request.toString());
+                String mensajeLog = "[idUsuario -> " + request.getIdUsuario() + "] ";
+                
+                if(request.getTenantId()!=null){
+                    
+                    ValidacionResponse val = this.validaDatosUsuario(request.getUsuario());
+                    if(val!=null && val.getValidacion()!=null && val.getValidacion().getCodigo()!=null &&
+                       val.getValidacion().getCodigo().equals("0") && val.getValidacion().getCodigoNegocio()!=null &&
+                       val.getValidacion().getCodigoNegocio().equals("0")){
+                        log.info("buscando datos en empresa esquema ->{}",request.getTenantId());
+                        empresaMapper.cambiarEsquema(request.getTenantId());
+                        log.info("{} Obteniendo datos generales", mensajeLog);
+                        
+                        log.info("{} Datos de perfil actualizados correctamente...", mensajeLog);
+                        response.getValidacion().setCodigoNegocio("0");
+                        response.getValidacion().setMensaje("Datos de perfil actualizados correctamente...");
+                    }
+                    else{
+                        response.setValidacion(val.getValidacion());
+                    }
+                }
+                else{
+                    log.info("{} Empresa no encontrada para usuario", mensajeLog);
+                    response.getValidacion().setCodigoNegocio("3");
+                    response.getValidacion().setMensaje("Empresa no encontrada para usuario");
+                }         
+            }
+            else{
+                log.info("{} Usuario no encontrado ->{}",request.toString());
+                log.info("{} Usuario no encontrado ->{}",request.toString());
+                response.getValidacion().setCodigoNegocio("2");
+                response.getValidacion().setMensaje("Usuario no encontrado");
+            }
+            
+        } catch (Exception e) {
+            response.setValidacion(new Validacion("1","1","Error al guardar datos de perfil"));
+            log.error("Exception guardarDatosPerfil,",e);
         }
         
         log.info("fin");

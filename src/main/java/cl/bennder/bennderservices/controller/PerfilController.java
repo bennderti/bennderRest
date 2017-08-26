@@ -9,14 +9,8 @@ import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.services.PerfilService;
 import cl.bennder.entitybennderwebrest.request.DatosPerfilRequest;
 import cl.bennder.entitybennderwebrest.request.InfoDatosPerfilRequest;
-import cl.bennder.entitybennderwebrest.request.InfoInicioSucursalRequest;
-import cl.bennder.entitybennderwebrest.request.InfoSucursalRequest;
-import cl.bennder.entitybennderwebrest.request.SucursalesRequest;
 import cl.bennder.entitybennderwebrest.response.DatosPerfilResponse;
 import cl.bennder.entitybennderwebrest.response.InfoDatosPerfilResponse;
-import cl.bennder.entitybennderwebrest.response.InfoInicioSucursalResponse;
-import cl.bennder.entitybennderwebrest.response.InfoSucursalResponse;
-import cl.bennder.entitybennderwebrest.response.SucursalesResponse;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +58,9 @@ public class PerfilController {
      * @return 
      */
     @RequestMapping(value = "perfil/guardarDatos",method = RequestMethod.POST)
-    public InfoDatosPerfilResponse guardarDatosPerfil(@RequestBody InfoDatosPerfilRequest request){
+    public InfoDatosPerfilResponse guardarDatosPerfil(@RequestBody InfoDatosPerfilRequest request,HttpServletRequest req){
         log.info("INICIO");
+        request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(req));
         InfoDatosPerfilResponse response = perfilService.guardarDatosPerfil(request);
         log.info("response ->{}",response.toString());
         log.info("FIN");

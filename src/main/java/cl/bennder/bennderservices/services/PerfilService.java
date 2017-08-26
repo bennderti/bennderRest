@@ -5,10 +5,12 @@
  */
 package cl.bennder.bennderservices.services;
 
+import cl.bennder.entitybennderwebrest.model.Usuario;
 import cl.bennder.entitybennderwebrest.request.DatosPerfilRequest;
 import cl.bennder.entitybennderwebrest.request.InfoDatosPerfilRequest;
 import cl.bennder.entitybennderwebrest.response.DatosPerfilResponse;
 import cl.bennder.entitybennderwebrest.response.InfoDatosPerfilResponse;
+import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 
 /**
  *
@@ -29,4 +31,12 @@ public interface PerfilService {
      * @return 
      */
     public InfoDatosPerfilResponse guardarDatosPerfil(InfoDatosPerfilRequest request);
+    
+    
+    /***
+     * Validación de datos de usuarios
+     * @param usuario
+     * @return 
+     */ 
+    public ValidacionResponse validaDatosUsuario(Usuario usuario);
 }
