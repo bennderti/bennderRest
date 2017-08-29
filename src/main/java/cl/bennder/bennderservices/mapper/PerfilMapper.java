@@ -61,18 +61,41 @@ public interface PerfilMapper {
     public Contacto getContacto(Integer idContacto);
     
     
-    @Update("update sucursal_proveedor set nombre=#{nombre},horario_atencion=#{horarioAtencion,jdbcType = NULL},"
-            + "password_pos = #{passwordPOS}, oficina = #{oficina,jdbcType = NULL},habilitado=#{habilitado} where id_sucursal = #{idSucursal}")
-    public void updateDatosPerfil(Sucursal sucursal);
+    @Select("SELECT nextval('contacto_id_contacto_seq')")
+    public Integer getSeqIdContacto();
     
-    @Insert("insert into direccion(id_direccion,id_comuna,calle,numero) " +
-            "values(#{idDireccion},#{comuna.idComuna},#{calle},#{numero,jdbcType = NULL})")
+    
+    @Update("update contacto set celular=#{celular},telefono_fijo = #{fonoFijo,jdbcType = NULL},"
+            + "correo = #{correo,jdbcType = NULL} where id_contacto = #{idContacto}")
+    public void updateContacto(Contacto contacto);
+    
+      @Insert("insert into direccion(id_contacto,celular,telefono_fijo,correo) " +
+            "values(#{idContacto},#{celular},#{fonoFijo,jdbcType = NULL},#{correo,jdbcType = NULL})")
+    public void insertContacto(Contacto contacto);
+    
+    @Select("SELECT nextval('direccion_id_direccion_seq')")
+    public Integer getSeqIdDireccion();
+    
+    @Insert("insert into direccion(id_direccion,id_comuna,calle,numero,departamento,villa) " +
+            "values(#{idDireccion},#{comuna.idComuna},#{calle},#{numero,jdbcType = NULL},#{departamento,jdbcType = NULL},#{villa,jdbcType = NULL})")
     public void insertDireccion(Direccion direccion);
     
     
     @Update("update direccion set id_comuna = #{comuna.idComuna},calle = #{calle}, numero = #{numero,jdbcType = NULL} "
+            + ", departamento = #{departamento,jdbcType = NULL}, villa = #{villa,jdbcType = NULL}"
             + "where id_direccion = #{idDireccion}")
     public void updateDireccion(Direccion direccion);
+    
+    
+    @Update("update usuario set id_contacto=#{contacto.idContacto},id_direccion=#{direccion.idDireccion},"
+            + " nombres=#{nombres},apellido_p=#{apellidoP},apellido_m=#{apellidoM}, "
+            + "fecha_nacimiento = #{fechaNacimiento} where id_usuario = #{idUsuario}")
+    public void updateDatosPerfil(Usuario usuario);
+    
+
+    
+    
+    
     
     
     

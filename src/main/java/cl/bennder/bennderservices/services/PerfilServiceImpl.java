@@ -14,6 +14,7 @@ import cl.bennder.entitybennderwebrest.request.InfoDatosPerfilRequest;
 import cl.bennder.entitybennderwebrest.response.DatosPerfilResponse;
 import cl.bennder.entitybennderwebrest.response.InfoDatosPerfilResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
+import javax.servlet.DispatcherType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,13 @@ public class PerfilServiceImpl implements PerfilService{
                 response.getValidacion().setMensaje("Favor completar celular");
                 log.info("Favor completar celular");
                 return response;
-            }            
+            } 
+            if(usuario.getFechaNacimiento() == null){                
+                response.getValidacion().setCodigoNegocio("13");
+                response.getValidacion().setMensaje("Favor completar fecha de nacimiento");
+                log.info("Favor completar fecha de nacimiento");
+                return response;
+            } 
             log.info("Datos de entrada ->{}",usuario.toString());
             response.getValidacion().setCodigoNegocio("0");
             response.getValidacion().setMensaje("Datos OK");
@@ -147,10 +154,35 @@ public class PerfilServiceImpl implements PerfilService{
                     if(val!=null && val.getValidacion()!=null && val.getValidacion().getCodigo()!=null &&
                        val.getValidacion().getCodigo().equals("0") && val.getValidacion().getCodigoNegocio()!=null &&
                        val.getValidacion().getCodigoNegocio().equals("0")){
+                        request.getUsuario().setIdUsuario(request.getIdUsuario());
                         log.info("buscando datos en empresa esquema ->{}",request.getTenantId());
                         empresaMapper.cambiarEsquema(request.getTenantId());
-                        log.info("{} Obteniendo datos generales", mensajeLog);
-                        
+                        log.info("{} datos contacto->{}",mensajeLog,request.getUsuario().getContacto().toString());
+                        if(request.getUsuario().getContacto().getIdContacto() == null){
+                            log.info("{} insertando contacto->{}",mensajeLog);
+                            Integer id = perfilMapper.getSeqIdContacto();
+                            request.getUsuario().getContacto().setIdContacto(id);
+                            log.info("{} id contacto->{}",mensajeLog,id);
+                            perfilMapper.insertContacto(request.getUsuario().getContacto());
+                        }
+                        else{
+                            log.info("{} actualizando contacto->{}",mensajeLog);
+                            perfilMapper.updateContacto(request.getUsuario().getContacto());
+                        }
+                        log.info("{} datos dirección->{}",mensajeLog,request.getUsuario().getDireccion().toString());
+                        if(request.getUsuario().getDireccion().getIdDireccion()== null){
+                            log.info("{} insertando dirección->{}",mensajeLog);
+                            Integer id = perfilMapper.getSeqIdDireccion();
+                            request.getUsuario().getDireccion().setIdDireccion(id);
+                            log.info("{} id dirección->{}",mensajeLog,id);
+                            perfilMapper.insertDireccion(request.getUsuario().getDireccion());
+                        }
+                        else{
+                            log.info("{} actualizando dirección...",mensajeLog);
+                            perfilMapper.updateDireccion(request.getUsuario().getDireccion());
+                        }
+                        log.info("{} actualizando datos personales, usuario ->{}", mensajeLog,request.getUsuario().toString());
+                        perfilMapper.updateDatosPerfil(request.getUsuario());                        
                         log.info("{} Datos de perfil actualizados correctamente...", mensajeLog);
                         response.getValidacion().setCodigoNegocio("0");
                         response.getValidacion().setMensaje("Datos de perfil actualizados correctamente...");
@@ -202,16 +234,17 @@ public class PerfilServiceImpl implements PerfilService{
                     response.setRegiones(perfilMapper.getRegiones());
                     response.setComunas(perfilMapper.getComunas());
                     response.setUsuario(perfilMapper.getDatosPerfil(request.getIdUsuario()));
+                    log.info("{} Obteniendo datos perfil->{}", mensajeLog,response.getUsuario().toString());
                     if(response.getUsuario() != null){
                         if(response.getUsuario().getDireccion()!=null && response.getUsuario().getDireccion().getIdDireccion()!=null){
-                            log.info("{} Obteniendo datos dirección...", mensajeLog);
+                            log.info("{} Obteniendo datos dirección(id:{})", mensajeLog,response.getUsuario().getDireccion().getIdDireccion());
                             response.getUsuario().setDireccion(perfilMapper.getDireccion(response.getUsuario().getDireccion().getIdDireccion()));
                         }
                         else{
                             log.info("{} Sin datos dirección!!", mensajeLog);
                         }
                         if(response.getUsuario().getContacto()!=null && response.getUsuario().getContacto().getIdContacto()!=null){
-                            log.info("{} Obteniendo datos contacto...", mensajeLog);
+                            log.info("{} Obteniendo datos contacto(id:{})", mensajeLog,response.getUsuario().getContacto().getIdContacto());
                             response.getUsuario().setContacto(perfilMapper.getContacto(response.getUsuario().getContacto().getIdContacto()));
                         }
                         else{
