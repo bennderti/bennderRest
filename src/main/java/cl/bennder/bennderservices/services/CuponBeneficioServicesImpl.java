@@ -478,8 +478,19 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_DOWNLOAD);
                         if (paramUrlCupon != null) {
                             //String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
-                            //String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;                            
-                            String urlDownloadCupon = env.getProperty("http")+request.getTenantUser()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/downloadCupon.html?c="+ codEncriptado; 
+                            //String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;
+                            String server = env.getProperty("server");
+                            String urlDownloadCupon = "";
+                            if(server!=null && server.contains("54.245.54.42")){
+                                log.info("{} Es servidor de desarrollo, por ende se modifica url", mensajeLog);
+                                urlDownloadCupon = "http://ec2-54-245-54-42.us-west-2.compute.amazonaws.com:8080/"+env.getProperty("dominio")+"/downloadCupon.html?c="+ codEncriptado; 
+                            
+                            }
+                            else{
+                                log.info("{} No es servidor de desarrollo", mensajeLog);
+                                urlDownloadCupon = env.getProperty("http")+request.getTenantUser()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/downloadCupon.html?c="+ codEncriptado; 
+                            
+                            }
                             
                             log.info("{} urlDownloadCupon ->{}", mensajeLog, urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.", mensajeLog);
@@ -633,7 +644,16 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
 //                                if (paramUrlCupon != null) {
                                     //String urlCanje = ,,,paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
                                     //String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
-                                    String urlCanje = env.getProperty("http")+request.getTenantId()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado(); 
+                                    String urlCanje = "";
+                                    String server = env.getProperty("server");
+                                    if(server!=null && server.contains("54.245.54.42")){
+                                        log.info("{} Es servidor de desarrollo, por ende se modifica url", mensajeLog);
+                                        urlCanje = "http://ec2-54-245-54-42.us-west-2.compute.amazonaws.com:8080/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado(); 
+                                    }
+                                    else{
+                                        log.info("{} No es servidor de desarrollo", mensajeLog);
+                                        urlCanje = env.getProperty("http")+request.getTenantId()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado(); 
+                                    }
                                     log.info("{} url canje ->{}", mensajeLog,urlCanje);
                                     String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 200, 200, uBeneficio.getCodigoBeneficio());
                                     if (rutaImagenQR != null && !"".equals(rutaImagenQR)) {
