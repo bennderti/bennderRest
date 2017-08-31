@@ -10,6 +10,6 @@ package cl.bennder.bennderservices.constantes;
  * @author dyanez
  */
 public abstract class Fuente {
-    public static final String OPENSANS_SEMIBOLD_TTF = "fonts/openSans/OpenSans-Semibold.ttf";
-    public static final String OPENSANS_LIGHT_ITALIC_TTF = "fonts/openSans/OpenSans-LightItalic.ttf";
+    public static final String OPENSANS_SEMIBOLD_TTF = "OpenSans-Semibold.ttf";
+    public static final String OPENSANS_LIGHT_ITALIC_TTF = "OpenSans-LightItalic.ttf";
 }
