@@ -12,10 +12,7 @@ import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
-import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
-import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
-import cl.bennder.entitybennderwebrest.request.FiltrarBeneficiosRangoRequest;
-import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
+import cl.bennder.entitybennderwebrest.request.*;
 import cl.bennder.entitybennderwebrest.response.*;
 
 import java.awt.print.Pageable;
@@ -141,6 +138,32 @@ public class CategoriaServicesImpl implements CategoriaServices{
             return  response;
 
         response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosCategoriaPorDescuento OK"));
+        log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
+
+        return response;
+    }
+
+    @Override
+    public BeneficiosResponse filtrarBeneficiosPorProveedor(FiltrarBeneficiosRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+        log.info("INICIO");
+        response.setValidacion(new Validacion("0", "1", "No existen beneficios con esta criteria"));
+        log.info("Datos de entrada ->{}", request.toString());
+        String proveedor = request.getCampoAFiltrar();
+
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(request.getNombreCategoria().trim());
+        switch (categoria.getIdCategoriaPadre()) {
+            case -1:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosProveedor(categoria.getIdCategoriaPadre(), proveedor));
+                break;
+            default:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatFiltradosPorProveedor(categoria.getIdCategoria(), proveedor));
+                break;
+        }
+        if (response == null || response.getBeneficios().isEmpty())
+            return  response;
+
+        response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosPorProveedor OK"));
         log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
 
         return response;
@@ -282,7 +305,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     private void agregarFiltros(List<Beneficio> beneficios, CategoriaResponse response) {
         Map<String,Set<String>> filtros = new HashMap<>();
         Set<String> proveedores = new HashSet<>();
-        beneficios.stream().forEach(beneficio -> proveedores.add(beneficio.getNombreProveedor()));
+        beneficios.forEach(beneficio -> proveedores.add(beneficio.getNombreProveedor()));
         log.info("filtro proveedores size->{}", proveedores.size());
         filtros.put("proveedores", proveedores);
         log.info("filtros cargados para esta categoria ->{}", filtros.size());

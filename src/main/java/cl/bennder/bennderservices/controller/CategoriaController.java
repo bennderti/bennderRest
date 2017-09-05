@@ -5,6 +5,7 @@
  */
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.services.BeneficioServices;
 import cl.bennder.bennderservices.services.CategoriaServices;
 import cl.bennder.entitybennderwebrest.request.*;
 import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
@@ -27,6 +28,8 @@ public class CategoriaController {
 
     @Autowired
     private CategoriaServices categoriaServices;
+    @Autowired
+    private BeneficioServices beneficioServices;
 
     @RequestMapping(value = "obtenerCategoriasById", method = RequestMethod.POST)
     public CategoriasResponse obtenerCategoriasById(@RequestBody CategoriaByIdRequest request) {
@@ -67,9 +70,9 @@ public class CategoriaController {
     }
 
     @RequestMapping(value = "obtenerBeneficiosPorCategoria", method = RequestMethod.POST)
-    public BeneficiosResponse obtenerBeneficiosPorCategoria(@RequestBody BeneficiosRequest request) {
+    public BeneficiosResponse obtenerBeneficiosPorCategoria(@RequestBody CategoriasRequest request) {
         log.info("INICIO");
-        BeneficiosResponse response = null;
+        BeneficiosResponse response = beneficioServices.obtenerBeneficiosPorCategoria(request.getNombreCategoria());
         log.info("FIN");
         return response;
     }
@@ -102,6 +105,14 @@ public class CategoriaController {
     public BeneficiosResponse obtenerBeneficiosCategoriaFiltradosPorDescuento(@RequestBody FiltrarBeneficiosRangoRequest request) {
         log.info("INICIO");
         BeneficiosResponse response = categoriaServices.filtrarBeneficiosCategoriaPorDescuento(request);
+        log.info("FIN");
+        return response;
+    }
+
+    @RequestMapping(value = "/categoria/filtrarBeneficiosPorProveedor", method = RequestMethod.POST)
+    public BeneficiosResponse filtrarBeneficiosPorProveedor(@RequestBody FiltrarBeneficiosRequest request) {
+        log.info("INICIO");
+        BeneficiosResponse response = categoriaServices.filtrarBeneficiosPorProveedor(request);
         log.info("FIN");
         return response;
     }
