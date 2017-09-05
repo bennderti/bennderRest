@@ -1,0 +1,51 @@
+<html>
+	<head>
+		<style>
+		.content{
+		}
+		.pie{
+			font-size: 13px;
+		}
+		.center-text{
+			text-align: center;
+		}
+		.recovery{
+			    width: 400px;
+				margin: 0 auto;
+		}
+		.content{
+			    background-color: #F3F3F3;
+                            width: 400px;
+                            margin: auto;
+                            padding: 29px;
+                            border-radius: 23px;
+		}
+
+		</style>
+	</head>
+
+	<body>
+		<div class = "content">
+			<div class="text">
+				
+				<p class = "center-text">
+					Validación y canje de <strong>Beneficio.</strong> 
+				</p>
+				<p class = "center-text recovery">
+					Estimado <strong>${user}</strong> ud ha validado y canjeado su beneficio <strong>${nombreBeneficio}</strong>, 
+                                        otorgado por: <strong>${proveedor}</strong>				   
+				</p>
+				<p class = "center-text">
+					 <strong>Gracias</strong> por preferirnos.
+				</p>
+				<p class = "center-text">
+					<img src="https://s3.amazonaws.com/mailmunch/widgets/1489519089.png" data-pin-nopin="true">
+				</p>
+				</div>
+				<div class="pie center-text">
+					Copyright © 2017 Bennder. Todos los derechos reservados.
+				</div>
+			</div>
+		</body>
+
+	</html>

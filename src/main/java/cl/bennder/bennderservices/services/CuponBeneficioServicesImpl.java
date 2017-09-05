@@ -12,6 +12,7 @@ import cl.bennder.bennderservices.mapper.EmpresaMapper;
 import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.model.UsuarioBeneficio;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
+import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
 import cl.bennder.entitybennderwebrest.model.Validacion;
@@ -63,11 +64,13 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import java.net.URISyntaxException;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -114,15 +117,17 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
         log.info("inicio");
         try {
             if (request != null && request.getCodigoCuponEncriptado() != null) {
-                if (request.getIdVendedor() != null && request.getIdDireccionSucursal() != null && request.getPasswordSucursal() != null) {
+                if (request.getIdVendedor() != null && request.getIdSucursal()!= null && request.getPasswordSucursal() != null) {
+                    log.info("datos de entrada ->{}",request.toString());
                     log.info("descriptando datos");
+                    log.info("esquema usuario ->{}",request.getTenantId());
+                    empresaMapper.cambiarEsquema(request.getTenantId());
                     UsuarioBeneficio uBeneficio = this.desencriptaCodigoBeneficio(request.getCodigoCuponEncriptado());
                     if (uBeneficio != null) {
                         String mensajeLog = "[idUsuario(cupón) -> " + uBeneficio.getIdUsuario() + "] ";
                         //                    if( uBeneficio.getIdUsuario().compareTo(request.getIdUsuario()) == 0){
                         //Integer beneficioVigente = beneficioMapper.usuarioHaObtenidoCuponbeneficio(request.getIdUsuario(), uBeneficio.getIdBeneficio());
-                        log.info("esquema usuario ->{}",request.getTenantId());
-                        empresaMapper.cambiarEsquema(request.getTenantId());
+                        
                         UsuarioBeneficio uBeneficioCanjeado = beneficioMapper.getUsuarioBeneficio(uBeneficio);
                         if (uBeneficioCanjeado != null) {
                             //.- validando si cupón ya ha sido canjeado
@@ -134,9 +139,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                 //.- validamos si password es de surcusal seleccionada
                                 log.info("{} validamos si password es de surcusal seleccionada", mensajeLog);
                                 Beneficio b = this.beneficioMapper.getInfoGeneralBeneficio(uBeneficio.getIdBeneficio());
-                                Integer passSucusalValida = beneficioMapper.esPasswordSucursalValida(request.getPasswordSucursal(), request.getIdDireccionSucursal(), b.getIdProveedor());
+                                Integer passSucusalValida = beneficioMapper.esPasswordSucursalValida(request.getPasswordSucursal(), request.getIdSucursal(), b.getIdProveedor());
                                 if (passSucusalValida > 0) {
-                                    Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "", request.getIdVendedor());
+                                    Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.CANJEADO, "", 1, "", request.getIdVendedor(),request.getIdSucursal());
                                     if (vRegistro != null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())) {
                                         log.info("{} Cupon válido correctamente para ser canjeado", mensajeLog);
                                         vRegistro.setMensaje("Cupon válido correctamente para ser canjeado");
@@ -329,8 +334,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
     }
 
 
-    @Override
-    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion, String codigoBeneficio, Integer cantidad, String codigoBeneficioEncriptado, Integer idVendedor) {
+    @Override 
+    public Validacion registraAccionBeneficioUsuario(Integer idBeneficio, Integer idUsuario, Integer accion, String codigoBeneficio, Integer cantidad, String codigoBeneficioEncriptado, Integer idVendedor,Integer idSucusalCanje) {
         log.info("inicio");
         log.info("Datos  -> idBeneficio:{},idUsuario:{},accion:{}", idBeneficio, idUsuario, accion);
         //.- reducir stock
@@ -348,8 +353,9 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                 beneficioMapper.actualizarVisitasBeneficio(idBeneficio);
             }
             if (accion.equals(AccionBeneficioUsuario.CANJEADO)) {
-                log.info("seteando vendedor que validó cupon de beneficio en POS ->{}", idVendedor);
+                log.info("seteando vendedor que validó cupon de beneficio en POS ->{} y sucurcal canje->{}", idVendedor,idSucusalCanje);
                 uBeneficio.setIdVendedorPOS(idVendedor);
+                uBeneficio.setIdSucursalcanje(idSucusalCanje);
             }
 
             //.- Existe
@@ -475,7 +481,20 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_DOWNLOAD);
                         if (paramUrlCupon != null) {
                             //String urlDownloadCupon = paramUrlCupon.getValorA() + codEncriptado;
-                            String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;                            
+                            //String urlDownloadCupon =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantUser()+"/downloadCupon.html?c="+ codEncriptado;
+                            String server = env.getProperty("server");
+                            String urlDownloadCupon = "";
+                            if(server!=null && server.contains("54.245.54.42")){
+                                log.info("{} Es servidor de desarrollo, por ende se modifica url", mensajeLog);
+                                urlDownloadCupon = "http://ec2-54-245-54-42.us-west-2.compute.amazonaws.com:8080/"+env.getProperty("dominio")+"/downloadCupon.html?c="+ codEncriptado; 
+                            
+                            }
+                            else{
+                                log.info("{} No es servidor de desarrollo", mensajeLog);
+                                urlDownloadCupon = env.getProperty("http")+request.getTenantUser()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/downloadCupon.html?c="+ codEncriptado; 
+                            
+                            }
+                            
                             log.info("{} urlDownloadCupon ->{}", mensajeLog, urlDownloadCupon);
                             log.info("{} Registrando estado y accion de usuario sobre beneficio.", mensajeLog);
                             Integer stockBeneficio = beneficioMapper.getStockBeneficio(request.getIdBeneficio());
@@ -489,7 +508,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                                     log.info("{} Sotck Actual->{} de beneficio ->{} es inferior al seleccionado por usuario, el cual es de ->{}. Por tanto se actualizará con stock actual", mensajeLog, stockBeneficio, request.getIdBeneficio(), request.getCantidad());
                                     request.setCantidad(stockBeneficio);
                                 }
-                                Validacion validacion = this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(), codEncriptado, null);
+                                Validacion validacion = this.registraAccionBeneficioUsuario(request.getIdBeneficio(), request.getIdUsuario(), AccionBeneficioUsuario.OBTENIDO, codigo, request.getCantidad(), codEncriptado, null,null);
                                 if (validacion != null && "0".equals(validacion.getCodigo()) && "0".equals(validacion.getCodigoNegocio())) {
                                     log.info("{} Formando correo a enviar a usuario - inicio", mensajeLog);
                                     ValidacionResponse vResponse = emailServices.envioCorreoLinkCuponBeneficio(request.getIdUsuario(), request.getIdBeneficio(), urlDownloadCupon);
@@ -536,7 +555,7 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                             .stream();
 
             String pathTemporal = System.getProperty("java.io.tmpdir");
-            rutaImagenQR = pathTemporal + nombreImagenQR + ".png";
+            rutaImagenQR = pathTemporal + File.separator +nombreImagenQR + ".png";
             File f = new File(rutaImagenQR);
             log.info("rutaImagenQR ->{}", rutaImagenQR);
             log.info("f.getAbsolutePath() ->{}", f.getAbsolutePath());
@@ -627,14 +646,24 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
 //                                ParametroSistema paramUrlCupon = parametroSistemaServices.getDatosParametroSistema(GENERACION_CUPON_QR, URL_CANJE);
 //                                if (paramUrlCupon != null) {
                                     //String urlCanje = ,,,paramUrlCupon.getValorA() + request.getCodigoBeneficioEncriptado();
-                                    String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
+                                    //String urlCanje =  env.getProperty("server")+"/"+env.getProperty("dominio")+"/"+request.getTenantId()+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado();  
+                                    String urlCanje = "";
+                                    String server = env.getProperty("server");
+                                    if(server!=null && server.contains("54.245.54.42")){
+                                        log.info("{} Es servidor de desarrollo, por ende se modifica url", mensajeLog);
+                                        urlCanje = "http://ec2-54-245-54-42.us-west-2.compute.amazonaws.com:8080/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado(); 
+                                    }
+                                    else{
+                                        log.info("{} No es servidor de desarrollo", mensajeLog);
+                                        urlCanje = env.getProperty("http")+request.getTenantId()+"."+env.getProperty("dns")+"/"+env.getProperty("dominio")+"/canjeCupon.html?c="+ request.getCodigoBeneficioEncriptado(); 
+                                    }
                                     log.info("{} url canje ->{}", mensajeLog,urlCanje);
-                                    String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 250, 250, uBeneficio.getCodigoBeneficio());
+                                    String rutaImagenQR = this.generaImagenCodigoQRBeneficio(urlCanje, 200, 200, uBeneficio.getCodigoBeneficio());
                                     if (rutaImagenQR != null && !"".equals(rutaImagenQR)) {
 
                                         byte[] bytePdf = this.generaCuponPdf(uBeneficio, rutaImagenQR, uBeneficio.getCodigoBeneficio());
                                         if (bytePdf != null && bytePdf.length > 0) {
-                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "", null);
+                                            Validacion vRegistro = this.registraAccionBeneficioUsuario(uBeneficio.getIdBeneficio(), uBeneficio.getIdUsuario(), AccionBeneficioUsuario.DESCARGADO, "", 1, "", null,null);
                                             if (vRegistro != null && "0".equals(vRegistro.getCodigo()) && "0".equals(vRegistro.getCodigoNegocio())) {
                                                 log.info("{} Cupon pdf generado correctamente", mensajeLog);
                                                 vRegistro.setMensaje("Cupon pdf generado correctamente");
@@ -710,11 +739,46 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                 try {
                     log.info("Obteniendo información de fuentes titulo/desctipción", rutaImagenQR);
                     //.- fuente título
-                    BaseFont bFontTitulo = BaseFont.createFont(UtilsBennder.getPathAbsolutaResourcesFile(this.getClass(), Fuente.OPENSANS_SEMIBOLD_TTF), BaseFont.WINANSI, BaseFont.EMBEDDED);
+//                    String pathFont = UtilsBennder.getPathAbsolutaResourcesFile(this.getClass(), Fuente.OPENSANS_SEMIBOLD_TTF);
+//                    log.info("pathFont->{}", pathFont);
+//                    String pathFont2 =  new File(getClass().getClassLoader().getResource(Fuente.OPENSANS_SEMIBOLD_TTF).getFile()).getAbsolutePath();
+//                    log.info("pathFont2->{}", pathFont2);
+//                    String pathFont3 =  new File(getClass().getClassLoader().getResource(File.separator + Fuente.OPENSANS_SEMIBOLD_TTF).getFile()).getAbsolutePath();
+//                    log.info("pathFont3->{}", pathFont3);
+                    
+                    //URL resourceUrl = URL.class.getResource("/WEB-INF/classes/"+Fuente.OPENSANS_SEMIBOLD_TTF);
+//                    URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(Fuente.OPENSANS_SEMIBOLD_TTF);
+//                    File resourceFile = null;
+//                    try {
+//                        resourceFile = new File(resourceUrl.toURI());
+//                    } catch (URISyntaxException ex) {
+//                        log.error("Error en URISyntaxException, ",ex);
+//                    }
+                    String rutaFuente = ImagenUtil.getValuePropertieOS(env, "directorio.fonts.cupon") + Fuente.OPENSANS_SEMIBOLD_TTF;//PropertiesDirectorioImagen.DIRECTORIO_IMAGEN_PROVEEDOR;//ImagenUtil.getValuePropertieOS(env, "directorio.imagen.proveedor");// env.getProperty("directorio.imagen.proveedor");
+                    
+                    //pathFont3 =  new File(getClass().getClassLoader().getResource(File.separator + Fuente.OPENSANS_SEMIBOLD_TTF).getFile()).getAbsolutePath();
+                    log.info("rutaFuente->{}", rutaFuente);
+                    BaseFont bFontTitulo = BaseFont.createFont(rutaFuente, BaseFont.WINANSI, BaseFont.EMBEDDED);
                     Font fontTitulo = new Font(bFontTitulo);
                     fontTitulo.setSize(16);
-                    //.- fuente descripción                    
-                    BaseFont bFontDescripcion = BaseFont.createFont(UtilsBennder.getPathAbsolutaResourcesFile(this.getClass(), Fuente.OPENSANS_LIGHT_ITALIC_TTF), BaseFont.WINANSI, BaseFont.EMBEDDED);
+                    //.- fuente descripción    
+//                    pathFont = UtilsBennder.getPathAbsolutaResourcesFile(this.getClass(), Fuente.OPENSANS_LIGHT_ITALIC_TTF);
+//                    log.info("pathFont->{}", pathFont);
+//                    pathFont3 =  new File(getClass().getClassLoader().getResource(File.separator + Fuente.OPENSANS_LIGHT_ITALIC_TTF).getFile()).getAbsolutePath();
+//                    log.info("pathFont3->{}", pathFont3);
+                    //resourceUrl = URL.class.getResource("/WEB-INF/classes/"+Fuente.OPENSANS_LIGHT_ITALIC_TTF);
+//                    resourceUrl = Thread.currentThread().getContextClassLoader().getResource(Fuente.OPENSANS_LIGHT_ITALIC_TTF);
+//                    try {
+//                        resourceFile = new File(resourceUrl.toURI());
+//                    } catch (URISyntaxException ex) {
+//                        log.error("Error en URISyntaxException, ",ex);
+//                    }
+                    rutaFuente = ImagenUtil.getValuePropertieOS(env, "directorio.fonts.cupon") + Fuente.OPENSANS_LIGHT_ITALIC_TTF;//PropertiesDirectorioImagen.DIRECTORIO_IMAGEN_PROVEEDOR;//ImagenUtil.getValuePropertieOS(env, "directorio.imagen.proveedor");// env.getProperty("directorio.imagen.proveedor");
+                    
+                    //pathFont3 =  new File(getClass().getClassLoader().getResource(File.separator + Fuente.OPENSANS_LIGHT_ITALIC_TTF).getFile()).getAbsolutePath();
+                    log.info("rutaFuente->{}", rutaFuente);
+//                    log.info("resourceFile.getAbsolutePath()->{}", resourceFile.getAbsolutePath());
+                    BaseFont bFontDescripcion = BaseFont.createFont(rutaFuente, BaseFont.WINANSI, BaseFont.EMBEDDED);
                     Font fontDescripcion = new Font(bFontDescripcion);
                     //Copy Right
                     Font fontCopyRight = new Font(bFontDescripcion);
@@ -761,7 +825,8 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         table.setHorizontalAlignment(Element.ALIGN_CENTER);
                         int i = 0;
                         for (BeneficioImagen bImagen : infoBeneficio.getImagenesBeneficio()) {
-                            if (i == 2) {
+                            //if (i == 2) {
+                            if (i == 1) {
                                 break;
                             } else {
                                 log.info("agregando imagen a celda...");
@@ -804,7 +869,10 @@ public class CuponBeneficioServicesImpl implements CuponBeneficioServices {
                         Paragraph pCopyRight = new Paragraph("Copyright © 2017 Bennder. Todos los derechos reservados", fontCopyRight);
                         pCopyRight.setAlignment(Element.ALIGN_CENTER);
                         ClassLoader classLoader = getClass().getClassLoader();
-                        File fileLogoBennder = new File(classLoader.getResource("cuponPdf/logo-bennder.png").getFile());
+                        String cuponPdfLog = ImagenUtil.getValuePropertieOS(env, "directorio.cuponpdf.logo"); 
+                        log.info("cuponPdfLog->{}",cuponPdfLog);
+                        //File fileLogoBennder = new File(classLoader.getResource("cuponPdf/logo-bennder.png").getFile());
+                        File fileLogoBennder = new File(cuponPdfLog);
                         log.info("fileLogoBennder.getAbsolutePath()->{}", fileLogoBennder.getAbsolutePath());
                         Image imgLogo = Image.getInstance(fileLogoBennder.getAbsolutePath());
                         imgLogo.setAlignment(Image.ALIGN_CENTER);

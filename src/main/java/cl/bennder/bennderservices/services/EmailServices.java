@@ -30,10 +30,11 @@ public interface EmailServices {
      * Método encargado de completar y enviar correo al usuario
      * @param password contraseña del usuario
      * @param usuario usuario bennder
+     * @param urlBennderUsuario url de portal bennder para usuario
      * @author dyanez
      * @return Validación de envío de correo
      */
-    public Validacion completarEnviarCorreoPassWord(String password, String usuario);
+    public Validacion completarEnviarCorreoPassWord(String password, String usuario, String urlBennderUsuario);
     
     /***
      * Permite genear correo para enviar a usuario para su generación de cupon

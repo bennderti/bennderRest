@@ -71,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 
 				// allow anonymous resource requests
-				.antMatchers("/services/login","/services/beneficio/validaCanjeCupon","/services/beneficio/validacionCuponPOS").permitAll()
+				.antMatchers("/services/login","/services/beneficio/validaCanjeCupon","/services/beneficio/validacionCuponPOS","/index.jsp","/services/mail/recuperacionPassword","/services/login/cambioPassword").permitAll()
                                 
 				.anyRequest().authenticated();
 

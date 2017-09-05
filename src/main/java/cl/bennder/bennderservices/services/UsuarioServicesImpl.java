@@ -6,12 +6,15 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
+import cl.bennder.bennderservices.mapper.EmpresaMapper;
 import cl.bennder.bennderservices.mapper.UsuarioMapper;
 import cl.bennder.bennderservices.multitenancy.TenantContext;
 import cl.bennder.entitybennderwebrest.model.Usuario;
 import cl.bennder.entitybennderwebrest.model.Validacion;
+import cl.bennder.entitybennderwebrest.request.CambioPasswordRequest;
 import cl.bennder.entitybennderwebrest.request.GuardarPreferenciasRequest;
 import cl.bennder.entitybennderwebrest.request.LoginRequest;
+import cl.bennder.entitybennderwebrest.response.CambioPasswordResponse;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
 import java.util.List;
@@ -34,6 +37,12 @@ public class UsuarioServicesImpl implements UsuarioServices{
     
     @Autowired
     private UsuarioMapper usuarioMapper;
+    
+    @Autowired
+    private EncriptacionSpringService encriptacionSpringService;
+    
+    @Autowired
+    private EmpresaMapper empresaMapper;
 
     @Override
     public void registraAccesoUsuario(Integer idUsuario) {
@@ -55,19 +64,38 @@ public class UsuarioServicesImpl implements UsuarioServices{
                 //usuario existe?
 //                validacion = usuarioMapper.validaUsuario(request.getUser(), request.getPassword());
                 String tenantId = TenantContext.getCurrentTenant();
+                log.info("cambio de esquema empresa->{}",tenantId);
+                empresaMapper.cambiarEsquema(tenantId);
                 usuario = usuarioMapper.getUsuarioValidacion(request.getUser(), request.getPassword());
                 
                 if(usuario != null){
-                    //.- obtener idUSuario(rut usuario sin dv) por usuario
-                    response.setIdUsuario(usuario.getIdUsuario());    
-                    response.setIdEstadoUsuario(usuario.getIdEstado());
-                    response.getValidacion().setCodigo(CodigoValidacion.OK);
-                    response.getValidacion().setMensaje("Validación OK");
-                    log.info("registra acceso usuario ->{}",usuario.getIdUsuario());
-                    this.registraAccesoUsuario(usuario.getIdUsuario());
-                    
-                    
-                    log.info("Validación OK");
+//                    //.- obtener idUSuario(rut usuario sin dv) por usuario
+//                    response.setIdUsuario(usuario.getIdUsuario());    
+//                    response.setIdEstadoUsuario(usuario.getIdEstado());
+//                    response.getValidacion().setCodigo(CodigoValidacion.OK);
+//                    response.getValidacion().setMensaje("Validación OK");
+//                    log.info("registra acceso usuario ->{}",usuario.getIdUsuario());
+//                    this.registraAccesoUsuario(usuario.getIdUsuario());
+//                    
+//                    
+//                    log.info("Validación OK");                   
+                    if(Boolean.TRUE.equals(usuario.getHabilitado())){
+                                //.- obtener idUSuario(rut usuario sin dv) por usuario
+                            response.setIdUsuario(usuario.getIdUsuario());    
+                            response.setIdEstadoUsuario(usuario.getIdEstado());
+                            response.setEsPasswordTemporal(usuario.isEsPasswordTemporal());                                                        
+                            response.getValidacion().setCodigo(CodigoValidacion.OK);
+                            response.getValidacion().setCodigoNegocio(CodigoValidacion.OK);
+                            response.getValidacion().setMensaje("Validación OK");
+                            log.info("registra acceso usuario ->{}",usuario.getIdUsuario());
+                            log.info("Validación OK");
+                            this.registraAccesoUsuario(usuario.getIdUsuario());
+                    }
+                    else{
+                        response.getValidacion().setCodigoNegocio("2");
+                        response.getValidacion().setMensaje("Usuario no habilitado");
+                        log.info("Usuario no habilitado ->{}",usuario.getIdUsuario());
+                    }
                 }
                 else{
                     response.getValidacion().setMensaje("Usuario y contraseña incorrectos");
@@ -97,6 +125,42 @@ public class UsuarioServicesImpl implements UsuarioServices{
         //GuardarDatosAdicionalesUsuario
         
         //GuardarPreferenciasCategorias
+        return response;
+    }
+    @Override
+    public CambioPasswordResponse cambioPassword(CambioPasswordRequest request) {
+        CambioPasswordResponse response = new CambioPasswordResponse();
+        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema al cambiar contraseña"));
+        
+        try {
+            if(request!=null && request.getNewPassword()!=null && request.getUsuarioCorreo() != null){
+                log.info("TenantId->{}",request.getTenantId());
+                log.info("cambiando esquema usuario...");
+                empresaMapper.cambiarEsquema(request.getTenantId());                
+                log.info("generando passencoder y actualizando password para usuario ->{}",request.getUsuarioCorreo());
+                Integer idUsuario = usuarioMapper.getIdUsuarioByUsuarioCorreo(request.getUsuarioCorreo());
+                String passEncode = encriptacionSpringService.passEncoderGenerator(request.getNewPassword());
+                log.info("passEncode->{}",request.getNewPassword(),passEncode);
+                log.info("actualizando password encoder...");
+                usuarioMapper.updatePassword(passEncode, idUsuario, false);
+                response.getValidacion().setCodigo("0");
+                response.getValidacion().setCodigoNegocio("0");
+                response.getValidacion().setMensaje("Cambio de clave OK");
+                log.info("Cambio de clave OK");
+            }
+            else{
+                response.getValidacion().setCodigoNegocio("1");
+                response.getValidacion().setMensaje("Favor completar los datos");
+                log.info("Favor completar los datos");
+            }
+            
+            
+        } catch (Exception e) {
+            log.error("Error en Exception:",e);
+            response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "1","Error al cambiar contraseña"));
+        }
+        
+        log.info("fin");
         return response;
     }
     

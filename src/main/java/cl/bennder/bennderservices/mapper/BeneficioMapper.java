@@ -18,7 +18,7 @@ public interface BeneficioMapper {
      * @param idBeneficio Identificador de beneficio
      * @return Lista de sucursales de proveedor
      */
-    @Select("select sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal  " +
+    @Select("select sp.id_sucursal as idSucursal,sp.id_direccion as idDireccion, c.nombre||' - '||d.calle ||' ('||coalesce('Nro. ' ||d.numero,'S/N')||')' as nombreSucursal  " +
             "from proveedor.sucursal_proveedor sp inner join proveedor.direccion d on sp.id_direccion=d.id_direccion  " +
             "inner join proveedor.comuna c on c.id_comuna=d.id_comuna  " +
             "where sp.id_proveedor =(select id_proveedor from proveedor.beneficio where id_beneficio = #{idBeneficio}  and habilitado=true) and habilitado=true ")
@@ -30,8 +30,8 @@ public interface BeneficioMapper {
     public Beneficio getInfoGeneralBeneficio(Integer idBeneficio);
     
     
-    @Select("select count(1) from proveedor.sucursal_proveedor where id_direccion= #{idDireccion} and password_pos = #{password} and id_proveedor =#{idProveedor}")
-    public Integer esPasswordSucursalValida(@Param("password") String password,@Param("idDireccion") Integer idDireccion, @Param("idProveedor") Integer idProveedor);
+    @Select("select count(1) from proveedor.sucursal_proveedor where id_sucursal= #{idSucursal} and password_pos = #{password} and id_proveedor =#{idProveedor}")
+    public Integer esPasswordSucursalValida(@Param("password") String password,@Param("idSucursal") Integer idSucursal, @Param("idProveedor") Integer idProveedor);
     
     /***
      * Obtiene el título del beneficio para completar asunto cuando se envia correo de beneficio seleccionado
@@ -93,7 +93,8 @@ public interface BeneficioMapper {
     
     @Update("UPDATE fecha_accion_beneficio " +
     "   SET  FECHA = now(),"
-      + "id_vendedor_pos = #{idVendedorPOS, jdbcType = NULL} " +
+      + "id_vendedor_pos = #{idVendedorPOS, jdbcType = NULL}, "
+      + " ID_SUCURSAL_CANJE = #{idSucursalcanje, jdbcType = NULL}" +
     " WHERE id_usuario = #{idUsuario} AND id_beneficio = #{idBeneficio} AND id_accion_beneficio = #{idAccionBeneficio}")
     public void actualizaFechaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
     
@@ -102,8 +103,8 @@ public interface BeneficioMapper {
      * @param uBeneficio 
      */
     @Insert("INSERT INTO fecha_accion_beneficio( " +
-"            id_usuario, id_beneficio, id_accion_beneficio, fecha,id_vendedor_pos) " +
-"    VALUES (#{idUsuario}, #{idBeneficio}, #{idAccionBeneficio}, now(),#{idVendedorPOS, jdbcType = NULL})")
+"            id_usuario, id_beneficio, id_accion_beneficio, fecha,id_vendedor_pos,ID_SUCURSAL_CANJE) " +
+"    VALUES (#{idUsuario}, #{idBeneficio}, #{idAccionBeneficio}, now(),#{idVendedorPOS, jdbcType = NULL},#{idSucursalcanje, jdbcType = NULL})")
     public void insertaFechaAccionUsuarioBeneficio(UsuarioBeneficio uBeneficio);
     
     /***
@@ -545,6 +546,47 @@ public interface BeneficioMapper {
     @Update("UPDATE proveedor.BENEFICIO SET VISITAS_GENERAL = (SELECT COALESCE(VISITAS_GENERAL,0) + 1 FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) " +
             "WHERE ID_BENEFICIO = #{idBeneficio} ")
     public void actualizarVisitasBeneficio(Integer idBeneficio);
+
+    /**
+     * Obtiene una lista de beneficios dado una busqueda de texto en el título y descripción del beneficio
+     * @param busqueda string con texto a buscar (las palabras deben ir separadas por espacio
+     * @return lista de beneficios List<Beneficio>
+     */
+    @Select("SELECT "
+            + "B.ID_BENEFICIO AS idBeneficio, "
+            + "B.ID_BENEFICIO AS idBeneficioParaImagenes, "
+            + "B.ID_BENEFICIO AS idBeneficioParaCondiciones, "
+            + "B.TITULO, B.CALIFICACION, "
+            + "B.ID_TIPO_BENEFICIO, "
+            + "BP.PRECIO_NORMAL AS precioNormal, "
+            + "BP.PRECIO_OFERTA AS precioOferta, "
+            + "BD.PORCENTAJE_DESCUENTO AS porcentajeDescuento, "
+            + "BG.GANCHO, "
+            + "P.NOMBRE AS nombreProveedor " +
+            "FROM proveedor.BENEFICIO B " +
+            "INNER JOIN proveedor.PROVEEDOR P ON B.ID_PROVEEDOR = P.ID_PROVEEDOR AND P.HABILITADO = TRUE " +
+            "LEFT JOIN proveedor.BENEFICIO_PRODUCTO BP ON B.ID_BENEFICIO = BP.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_DESCUENTO BD ON B.ID_BENEFICIO = BD.ID_BENEFICIO " +
+            "LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON B.ID_BENEFICIO = BG.ID_BENEFICIO " +
+            "WHERE "
+            + "NOW() BETWEEN B.FECHA_INICIAL AND B.FECHA_EXPIRACION "
+            + "AND B.HABILITADO = TRUE "
+            + "AND B.STOCK > 0 "
+            + "AND to_tsvector(B.titulo || B.descripcion) @@ plainto_tsquery(#{busqueda}) " +
+            "ORDER BY B.FECHA_CREACION DESC")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "idBeneficioParaImagenes", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficio")),
+            @Result(property = "condiciones", column = "idBeneficioParaCondiciones", javaType=List.class, many = @Many(select = "obtenerCondicionesBeneficio"))
+            })
+    List<Beneficio> obtenerBeneficiosPorBusqueda(String busqueda);
+
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +

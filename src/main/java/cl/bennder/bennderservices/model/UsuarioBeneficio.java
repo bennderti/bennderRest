@@ -20,6 +20,7 @@ public class UsuarioBeneficio {
     private String codigoBeneficioEncriptado;
     private Date fecha;
     private Integer idVendedorPOS;
+    private Integer idSucursalcanje;
 
     public UsuarioBeneficio() {
     }
@@ -103,11 +104,19 @@ public class UsuarioBeneficio {
         this.idVendedorPOS = idVendedorPOS;
     }
 
-    @Override
-    public String toString() {
-        return "UsuarioBeneficio{" + "idBeneficio=" + idBeneficio + ", idUsuario=" + idUsuario + ", idAccionBeneficio=" + idAccionBeneficio + ", cantidad=" + cantidad + ", codigoBeneficio=" + codigoBeneficio + ", codigoBeneficioEncriptado=" + codigoBeneficioEncriptado + ", fecha=" + fecha + ", idVendedorPOS=" + idVendedorPOS + '}';
+    public Integer getIdSucursalcanje() {
+        return idSucursalcanje;
     }
 
+    public void setIdSucursalcanje(Integer idSucursalcanje) {
+        this.idSucursalcanje = idSucursalcanje;
+    }
+
+    @Override
+    public String toString() {
+        return "UsuarioBeneficio{" + "idBeneficio=" + idBeneficio + ", idUsuario=" + idUsuario + ", idAccionBeneficio=" + idAccionBeneficio + ", cantidad=" + cantidad + ", codigoBeneficio=" + codigoBeneficio + ", codigoBeneficioEncriptado=" + codigoBeneficioEncriptado + ", fecha=" + fecha + ", idVendedorPOS=" + idVendedorPOS + ", idSucursalcanje=" + idSucursalcanje + '}';
+    }
+    
     
     
     
