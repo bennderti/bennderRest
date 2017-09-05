@@ -6,10 +6,7 @@
 package cl.bennder.bennderservices.controller;
 
 import cl.bennder.bennderservices.services.CategoriaServices;
-import cl.bennder.entitybennderwebrest.request.BeneficiosRequest;
-import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
-import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
-import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
+import cl.bennder.entitybennderwebrest.request.*;
 import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
 import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
@@ -21,74 +18,90 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- *
  * @author dyanez
  */
 @RestController
 public class CategoriaController {
-    
+
     private static final Logger log = LoggerFactory.getLogger(CategoriaController.class);
-    
+
     @Autowired
     private CategoriaServices categoriaServices;
-    
-  @RequestMapping(value = "obtenerCategoriasById",method = RequestMethod.POST)
-    public CategoriasResponse obtenerCategoriasById(@RequestBody CategoriaByIdRequest request){
+
+    @RequestMapping(value = "obtenerCategoriasById", method = RequestMethod.POST)
+    public CategoriasResponse obtenerCategoriasById(@RequestBody CategoriaByIdRequest request) {
         log.info("INICIO");
         CategoriasResponse response = categoriaServices.obtenerCategoriasById(request);
-        log.info("response ->{}",response.toString());
-        log.info("FIN");
-        return response;
-    }
-    @RequestMapping(value = "getBeneficiosByIdCat",method = RequestMethod.POST)
-    public BeneficiosCargadorResponse getBeneficiosByIdCat(@RequestBody CategoriaByIdRequest request){
-        log.info("INICIO");
-        BeneficiosCargadorResponse response = categoriaServices.getBeneficiosByIdCat(request);
-        log.info("response ->{}",response.toString());
-        log.info("FIN");
-        return response;
-    }
-    
-    @RequestMapping(value = "categoria/getSubCategoriasProveedor",method = RequestMethod.POST)
-    public SubCategoriaProveedorResponse getSubCategoriasProveedor(@RequestBody SubCategoriaProveedorRequest request){
-        log.info("INICIO");
-        SubCategoriaProveedorResponse response = categoriaServices.getSubCategoriasProveedor(request);
-        log.info("response ->{}",response.toString());
-        log.info("FIN");
-        return response;
-    }
-    
-    
-    //.- login
-    @RequestMapping(value = "getCategorias",method = RequestMethod.POST)
-    public CategoriasResponse getCategorias(@RequestBody CategoriasRequest request){
-        log.info("INICIO");
-        CategoriasResponse response = categoriaServices.getCategorias(request);
-        log.info("response ->{}",response.toString());
+        log.info("response ->{}", response.toString());
         log.info("FIN");
         return response;
     }
 
-    @RequestMapping(value = "obtenerBeneficiosPorCategoria",method = RequestMethod.POST)
-    public BeneficiosResponse obtenerBeneficiosPorCategoria(@RequestBody BeneficiosRequest request){
+    @RequestMapping(value = "getBeneficiosByIdCat", method = RequestMethod.POST)
+    public BeneficiosCargadorResponse getBeneficiosByIdCat(@RequestBody CategoriaByIdRequest request) {
+        log.info("INICIO");
+        BeneficiosCargadorResponse response = categoriaServices.getBeneficiosByIdCat(request);
+        log.info("response ->{}", response.toString());
+        log.info("FIN");
+        return response;
+    }
+
+    @RequestMapping(value = "categoria/getSubCategoriasProveedor", method = RequestMethod.POST)
+    public SubCategoriaProveedorResponse getSubCategoriasProveedor(@RequestBody SubCategoriaProveedorRequest request) {
+        log.info("INICIO");
+        SubCategoriaProveedorResponse response = categoriaServices.getSubCategoriasProveedor(request);
+        log.info("response ->{}", response.toString());
+        log.info("FIN");
+        return response;
+    }
+
+
+    //.- login
+    @RequestMapping(value = "getCategorias", method = RequestMethod.POST)
+    public CategoriasResponse getCategorias(@RequestBody CategoriasRequest request) {
+        log.info("INICIO");
+        CategoriasResponse response = categoriaServices.getCategorias(request);
+        log.info("response ->{}", response.toString());
+        log.info("FIN");
+        return response;
+    }
+
+    @RequestMapping(value = "obtenerBeneficiosPorCategoria", method = RequestMethod.POST)
+    public BeneficiosResponse obtenerBeneficiosPorCategoria(@RequestBody BeneficiosRequest request) {
         log.info("INICIO");
         BeneficiosResponse response = null;
         log.info("FIN");
         return response;
     }
 
-    @RequestMapping(value = "obtenerCategoriasRelacionadas",method = RequestMethod.POST)
-    public CategoriasResponse obtenerCategoriasRelacionadas(@RequestBody CategoriasRequest request){
+    @RequestMapping(value = "obtenerCategoriasRelacionadas", method = RequestMethod.POST)
+    public CategoriasResponse obtenerCategoriasRelacionadas(@RequestBody CategoriasRequest request) {
         log.info("INICIO");
         CategoriasResponse response = categoriaServices.obtenerCategoriasRelacionadas(request);
         log.info("FIN");
         return response;
     }
 
-    @RequestMapping(value = "cargarCategoria",method = RequestMethod.POST)
-    public CategoriaResponse cargarCategoria(@RequestBody CategoriasRequest request){
+    @RequestMapping(value = "cargarCategoria", method = RequestMethod.POST)
+    public CategoriaResponse cargarCategoria(@RequestBody CategoriasRequest request) {
         log.info("INICIO");
         CategoriaResponse response = categoriaServices.cargarCategoria(request);
+        log.info("FIN");
+        return response;
+    }
+
+    @RequestMapping(value = "/categoria/obtenerBeneficiosCategoriaFiltradosPorPrecio", method = RequestMethod.POST)
+    public BeneficiosResponse obtenerBeneficiosCategoriaFiltradosPorPrecio(@RequestBody FiltrarBeneficiosRangoRequest request) {
+        log.info("INICIO");
+        BeneficiosResponse response = categoriaServices.filtrarBeneficiosCategoriaPorPrecio(request);
+        log.info("FIN");
+        return response;
+    }
+
+    @RequestMapping(value = "/categoria/obtenerBeneficiosCategoriaFiltradosPorDescuento", method = RequestMethod.POST)
+    public BeneficiosResponse obtenerBeneficiosCategoriaFiltradosPorDescuento(@RequestBody FiltrarBeneficiosRangoRequest request) {
+        log.info("INICIO");
+        BeneficiosResponse response = categoriaServices.filtrarBeneficiosCategoriaPorDescuento(request);
         log.info("FIN");
         return response;
     }

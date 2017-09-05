@@ -174,6 +174,39 @@ public interface BeneficioMapper {
     })
     List<Beneficio> obtenerBeneficiosPorCategoria(Integer idCategoria);
 
+    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio," +
+            " b.titulo, " +
+            " b.descripcion," +
+            " b.calificacion," +
+            " tb.id_tipo_beneficio," +
+            " tb.nombre," +
+            " bd.porcentaje_descuento as porcentajeDescuento," +
+            " bp.precio_normal as precioNormal," +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " WHERE b.id_categoria = #{idCategoria}" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0" +
+            " AND bp.precio_oferta BETWEEN #{precioMin} AND #{precioMax}")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+    })
+    List<Beneficio> obtenerBeneficiosCatFiltradosPorPrecio(@Param("idCategoria") Integer idCategoria, @Param("precioMin") Integer precioMin, @Param("precioMax") Integer precioMax);
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +
@@ -191,7 +224,7 @@ public interface BeneficioMapper {
             " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
             " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
-            " WHERE b.id_categoria in (SELECT id_categoria FROM categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
+            " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
             " AND b.stock > 0")
@@ -207,6 +240,41 @@ public interface BeneficioMapper {
             @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
     List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
+
+    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio," +
+            " b.titulo, " +
+            " b.descripcion," +
+            " b.calificacion," +
+            " tb.id_tipo_beneficio," +
+            " tb.nombre," +
+            " bd.porcentaje_descuento as porcentajeDescuento," +
+            " bp.precio_normal as precioNormal," +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0" +
+            " AND bp.precio_oferta BETWEEN #{precioMin} AND #{precioMax}")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+    })
+    List<Beneficio> obtenerBeneficiosCatPadreFiltradosPrecio(@Param("idCategoriaPadre") Integer idCategoriaPadre, @Param("precioMin") Integer precioMin, @Param("precioMax") Integer precioMax);
+
 
     @Select("SELECT b.id_beneficio AS idBeneficio, " +
             "b.id_beneficio as idBeneficioParaCondiciones, " +
@@ -477,5 +545,72 @@ public interface BeneficioMapper {
     @Update("UPDATE proveedor.BENEFICIO SET VISITAS_GENERAL = (SELECT COALESCE(VISITAS_GENERAL,0) + 1 FROM proveedor.BENEFICIO WHERE ID_BENEFICIO = #{idBeneficio}) " +
             "WHERE ID_BENEFICIO = #{idBeneficio} ")
     public void actualizarVisitasBeneficio(Integer idBeneficio);
-    
+
+    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio," +
+            " b.titulo, " +
+            " b.descripcion," +
+            " b.calificacion," +
+            " tb.id_tipo_beneficio," +
+            " tb.nombre," +
+            " bd.porcentaje_descuento as porcentajeDescuento," +
+            " bp.precio_normal as precioNormal," +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0" +
+            " AND bd.porcentaje_descuento BETWEEN #{descuentoMin} AND #{descuentoMax}")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+    })
+    List<Beneficio> obtenerBeneficiosCatPadreFiltradosDescuento(@Param("idCategoriaPadre") Integer idCategoriaPadre, @Param("descuentoMin") Integer descuentoMin, @Param("descuentoMax") Integer descuentoMax);
+
+    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+            " b.id_beneficio," +
+            " b.titulo, " +
+            " b.descripcion," +
+            " b.calificacion," +
+            " tb.id_tipo_beneficio," +
+            " tb.nombre," +
+            " bd.porcentaje_descuento as porcentajeDescuento," +
+            " bp.precio_normal as precioNormal," +
+            " bp.precio_oferta as precioOferta," +
+            " p.nombre as nombreProveedor" +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " WHERE b.id_categoria = #{idCategoria}" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0" +
+            " AND bd.porcentaje_descuento BETWEEN #{descuentoMin} AND #{descuentoMax}")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+    })
+    List<Beneficio> obtenerBeneficiosCatFiltradosPorDescuento(@Param("idCategoria") Integer idCategoria,  @Param("descuentoMin") Integer descuentoMin, @Param("descuentoMax") Integer descuentoMax);
 }

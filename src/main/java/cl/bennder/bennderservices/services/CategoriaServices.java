@@ -8,11 +8,10 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
 import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
+import cl.bennder.entitybennderwebrest.request.FiltrarBeneficiosRangoRequest;
 import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
-import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
-import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
-import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
-import cl.bennder.entitybennderwebrest.response.SubCategoriaProveedorResponse;
+import cl.bennder.entitybennderwebrest.response.*;
+
 import java.util.List;
 
 
@@ -33,5 +32,6 @@ public interface CategoriaServices {
      * @return 
      */
     SubCategoriaProveedorResponse getSubCategoriasProveedor(SubCategoriaProveedorRequest request);
-    
+    BeneficiosResponse filtrarBeneficiosCategoriaPorPrecio(FiltrarBeneficiosRangoRequest request);
+    BeneficiosResponse filtrarBeneficiosCategoriaPorDescuento(FiltrarBeneficiosRangoRequest request);
 }
