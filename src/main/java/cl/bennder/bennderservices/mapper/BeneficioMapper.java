@@ -587,8 +587,7 @@ public interface BeneficioMapper {
             })
     List<Beneficio> obtenerBeneficiosPorBusqueda(String busqueda);
 
-
-    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+    String QUERY_DETALLE_BENEFICIO = " SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +
             " b.titulo, " +
             " b.descripcion," +
@@ -603,7 +602,9 @@ public interface BeneficioMapper {
             " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
             " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio";
+
+    @Select(QUERY_DETALLE_BENEFICIO +
             " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
@@ -622,22 +623,7 @@ public interface BeneficioMapper {
     })
     List<Beneficio> obtenerBeneficiosCatPadreFiltradosDescuento(@Param("idCategoriaPadre") Integer idCategoriaPadre, @Param("descuentoMin") Integer descuentoMin, @Param("descuentoMax") Integer descuentoMax);
 
-    @Select(" SELECT b.id_beneficio AS idBeneficio," +
-            " b.id_beneficio," +
-            " b.titulo, " +
-            " b.descripcion," +
-            " b.calificacion," +
-            " tb.id_tipo_beneficio," +
-            " tb.nombre," +
-            " bd.porcentaje_descuento as porcentajeDescuento," +
-            " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta," +
-            " p.nombre as nombreProveedor" +
-            " FROM proveedor.beneficio b" +
-            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+    @Select(QUERY_DETALLE_BENEFICIO +
             " WHERE b.id_categoria = #{idCategoria}" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
@@ -656,22 +642,7 @@ public interface BeneficioMapper {
     })
     List<Beneficio> obtenerBeneficiosCatFiltradosPorDescuento(@Param("idCategoria") Integer idCategoria,  @Param("descuentoMin") Integer descuentoMin, @Param("descuentoMax") Integer descuentoMax);
 
-    @Select(" SELECT b.id_beneficio AS idBeneficio," +
-            " b.id_beneficio," +
-            " b.titulo, " +
-            " b.descripcion," +
-            " b.calificacion," +
-            " tb.id_tipo_beneficio," +
-            " tb.nombre," +
-            " bd.porcentaje_descuento as porcentajeDescuento," +
-            " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta," +
-            " p.nombre as nombreProveedor" +
-            " FROM proveedor.beneficio b" +
-            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+    @Select(QUERY_DETALLE_BENEFICIO +
             " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
@@ -690,22 +661,7 @@ public interface BeneficioMapper {
     })
     List<Beneficio> obtenerBeneficiosCatPadreFiltradosProveedor(@Param("idCategoriaPadre")Integer idCategoriaPadre, @Param("proveedor") String proveedor);
 
-    @Select(" SELECT b.id_beneficio AS idBeneficio," +
-            " b.id_beneficio," +
-            " b.titulo, " +
-            " b.descripcion," +
-            " b.calificacion," +
-            " tb.id_tipo_beneficio," +
-            " tb.nombre," +
-            " bd.porcentaje_descuento as porcentajeDescuento," +
-            " bp.precio_normal as precioNormal," +
-            " bp.precio_oferta as precioOferta," +
-            " p.nombre as nombreProveedor" +
-            " FROM proveedor.beneficio b" +
-            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
-            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
-            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+    @Select(QUERY_DETALLE_BENEFICIO +
             " WHERE b.id_categoria = #{idCategoria}" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
@@ -723,4 +679,42 @@ public interface BeneficioMapper {
             @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
     List<Beneficio> obtenerBeneficiosCatFiltradosPorProveedor(@Param("idCategoria") Integer idCategoria, @Param("proveedor") String proveedor);
+
+    @Select(QUERY_DETALLE_BENEFICIO +
+            " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0" +
+            " AND b.calificacion = #{calificacion}")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+    })
+    List<Beneficio> obtenerBeneficiosCatPadreFiltradosCalificacion(@Param("idCategoriaPadre") Integer idCategoriaPadre, @Param("calificacion") Integer calificacion);
+
+    @Select(QUERY_DETALLE_BENEFICIO +
+            " WHERE b.id_categoria = #{idCategoria}" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0" +
+            " AND b.calificacion = #{calificacion}")
+    @TypeDiscriminator(column = "id_tipo_beneficio",
+            cases = {
+                    @Case(value = "1", type = Descuento.class),
+                    @Case(value = "2", type = Producto.class)
+
+            })
+    @Results({
+            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+    })
+    List<Beneficio> obtenerBeneficiosCatFiltradosPorCalificacion(@Param("idCategoria") Integer idCategoria, @Param("calificacion") Integer calificacion);
 }

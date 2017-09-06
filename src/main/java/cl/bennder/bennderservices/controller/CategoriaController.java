@@ -116,4 +116,12 @@ public class CategoriaController {
         log.info("FIN");
         return response;
     }
+
+    @RequestMapping(value = "/categoria/filtrarBeneficiosPorCalificacion", method = RequestMethod.POST)
+    public BeneficiosResponse filtrarBeneficiosPorCalificacion(@RequestBody FiltrarBeneficiosRequest request) {
+        log.info("INICIO");
+        BeneficiosResponse response = categoriaServices.filtrarBeneficiosPorCalificacion(request);
+        log.info("FIN");
+        return response;
+    }
 }

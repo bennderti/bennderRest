@@ -169,6 +169,32 @@ public class CategoriaServicesImpl implements CategoriaServices{
         return response;
     }
 
+    @Override
+    public BeneficiosResponse filtrarBeneficiosPorCalificacion(FiltrarBeneficiosRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+        log.info("INICIO");
+        response.setValidacion(new Validacion("0", "1", "No existen beneficios con esta criteria"));
+        log.info("Datos de entrada ->{}", request.toString());
+        Integer calificacion = Integer.parseInt(request.getCampoAFiltrar());
+
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(request.getNombreCategoria().trim());
+        switch (categoria.getIdCategoriaPadre()) {
+            case -1:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosCalificacion(categoria.getIdCategoriaPadre(), calificacion));
+                break;
+            default:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatFiltradosPorCalificacion(categoria.getIdCategoria(), calificacion));
+                break;
+        }
+        if (response == null || response.getBeneficios().isEmpty())
+            return  response;
+
+        response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosPorProveedor OK"));
+        log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
+
+        return response;
+    }
+
 
     @Override
     @Transactional
