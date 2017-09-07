@@ -1,7 +1,6 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.bennderservices.constantes.AccionBeneficioUsuario;
-import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
 import cl.bennder.bennderservices.security.JwtTokenUtil;
@@ -9,18 +8,15 @@ import cl.bennder.bennderservices.util.BusquedaUtil;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.BeneficioImagen;
-import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.BeneficioRequest;
 import cl.bennder.entitybennderwebrest.request.BusquedaRequest;
 import cl.bennder.entitybennderwebrest.response.BeneficioResponse;
-import cl.bennder.entitybennderwebrest.response.BeneficiosResponse;
 import cl.bennder.entitybennderwebrest.response.BusquedaResponse;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -162,35 +158,35 @@ public class BeneficioServicesImpl implements BeneficioServices {
         return response;
     }
 
-    @Override
-    public BeneficiosResponse obtenerBeneficiosPorCategoria(String nombreCategoria) {
-        BeneficiosResponse response = new BeneficiosResponse();
-        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
-        String server = env.getProperty("server");
-        log.info("INICIO");
-        try {
-            if (nombreCategoria == null || nombreCategoria.isEmpty()) {
-                log.error("Campo nombreCategoria esta vacio");
-                response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Campo nombreCategoria esta vacio"));
-            } else {
-                Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(nombreCategoria.trim());
-                if (categoria == null) {
-                    log.error("Objeto categoria esta vacio");
-                    response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
-                } else {
-                    List<Beneficio> beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
-                    beneficios.forEach(beneficio -> ImagenUtil.setUrlImagenesBenecio(server, beneficio));
-                    response.setBeneficios(beneficios);
-
-                    response.setValidacion(new Validacion("0", "0", "Beneficios OK"));
-                    log.info("Beneficios obtenidos: ->{}", response.getBeneficios().size());
-                }
-            }
-        }
-        catch (Exception e) {
-            log.error("Exception en cargarCategoria,",e);
-        }
-        log.info("FIN");
-        return response;
-    }
+//    @Override
+//    public BeneficiosResponse obtenerBeneficiosPorCategoria(String nombreCategoria) {
+//        BeneficiosResponse response = new BeneficiosResponse();
+//        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
+//        String server = env.getProperty("server");
+//        log.info("INICIO");
+//        try {
+//            if (nombreCategoria == null || nombreCategoria.isEmpty()) {
+//                log.error("Campo nombreCategoria esta vacio");
+//                response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Campo nombreCategoria esta vacio"));
+//            } else {
+//                Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(nombreCategoria.trim());
+//                if (categoria == null) {
+//                    log.error("Objeto categoria esta vacio");
+//                    response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
+//                } else {
+//                    List<Beneficio> beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
+//                    beneficios.forEach(beneficio -> ImagenUtil.setUrlImagenesBenecio(server, beneficio));
+//                    response.setBeneficios(beneficios);
+//
+//                    response.setValidacion(new Validacion("0", "0", "Beneficios OK"));
+//                    log.info("Beneficios obtenidos: ->{}", response.getBeneficios().size());
+//                }
+//            }
+//        }
+//        catch (Exception e) {
+//            log.error("Exception en cargarCategoria,",e);
+//        }
+//        log.info("FIN");
+//        return response;
+//    }
 }
