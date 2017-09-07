@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 public class BeneficioServicesImpl implements BeneficioServices {
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
-    
     @Value("${bucketImagenes}")
     String bucketImagenes;
 
