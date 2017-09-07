@@ -21,6 +21,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Created by Diego on 26-03-2017.
@@ -31,6 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class BeneficioServicesImpl implements BeneficioServices {
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
+    
+    @Value("${bucketImagenes}")
+    String bucketImagenes;
 
     @Autowired
     private CuponBeneficioServices cuponBeneficioServices;
@@ -70,8 +74,10 @@ public class BeneficioServicesImpl implements BeneficioServices {
             if(beneficio!=null && beneficio.getImagenesBeneficio()!=null && beneficio.getImagenesBeneficio().size() > 0){
                 beneficio.setIdBeneficio(request.getIdBeneficio());
                 String server = env.getProperty("server");
-                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
-                
+                //Cambio de url de repositorio de imagenes a Amazon s3
+//                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                ImagenUtil.setUrlImagenesBenecio(bucketImagenes, beneficio);
+
                 
                 //.- Registrando visitas y accion de usuario
                 //Integer ,String , Integer ,String ,Integer 
