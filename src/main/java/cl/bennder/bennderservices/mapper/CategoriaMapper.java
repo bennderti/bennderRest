@@ -83,7 +83,7 @@ public interface CategoriaMapper {
     List<Categoria> obtenerSubCategoriasByIdCatProveedor(@Param("idCat") Integer idCategoria,@Param("idProv") Integer idProveedor);
     
 
-    @Select("SELECT id_categoria as idCategoria, nombre FROM proveedor.categoria WHERE id_categoria = #{idCategoria}")
+    @Select("SELECT id_categoria as idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM proveedor.categoria WHERE id_categoria = #{idCategoria}")
     Categoria obtenerCategoriaPorId(Integer idCategoria);
 
 

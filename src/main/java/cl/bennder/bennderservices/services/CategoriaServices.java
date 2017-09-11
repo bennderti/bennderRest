@@ -22,7 +22,7 @@ public interface CategoriaServices {
     CategoriasResponse getCategorias(CategoriasRequest request);
     List<Categoria> getCategorias();
     CategoriasResponse obtenerCategoriasRelacionadas(CategoriasRequest request);
-    CategoriaResponse cargarCategoria(CategoriasRequest request);
+    CategoriaResponse cargarCategoria(CategoriaByIdRequest request);
     /***
      * Servicio que obtiene una lista de categorias (sub-categorias) validas del proveedor, es decir, en las cuales tiene beneficio
      * @param request
