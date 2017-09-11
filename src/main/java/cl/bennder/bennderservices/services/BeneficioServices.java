@@ -16,5 +16,5 @@ public interface BeneficioServices {
     BeneficioResponse obtenerDetalleBeneficio(BeneficioRequest idBeneficio);
     void agrearUrlImagenListaBeneficios(List<Beneficio> beneficios);
     BusquedaResponse buscarBeneficios(BusquedaRequest request);
-    BeneficiosResponse obtenerBeneficiosPorCategoria(String nombreCategoria);
+    //BeneficiosResponse obtenerBeneficiosPorCategoria(String nombreCategoria);
 }

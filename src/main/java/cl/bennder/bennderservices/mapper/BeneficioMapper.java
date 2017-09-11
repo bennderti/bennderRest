@@ -142,6 +142,40 @@ public interface BeneficioMapper {
     @Select("SELECT ID_BENEFICIO AS idBeneficio,TITULO as titulo FROM proveedor.BENEFICIO WHERE ID_CATEGORIA = #{idCategoria}")
     List<BeneficioCargador> getBeneficiosCargadorByIdCat(Integer idCategoria);
 
+//    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+//            " b.id_beneficio," +
+//            " b.titulo, " +
+//            " b.descripcion," +
+//            " b.calificacion," +
+//            " tb.id_tipo_beneficio," +
+//            " tb.nombre," +
+//            " bd.porcentaje_descuento as porcentajeDescuento," +
+//            " bp.precio_normal as precioNormal," +
+//            " bp.precio_oferta as precioOferta," +
+//            " p.nombre as nombreProveedor" +
+//            " FROM proveedor.beneficio b" +
+//            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+//            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+//            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+//            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+//            " WHERE b.id_categoria = #{idCategoria}" +
+//            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+//            " AND b.habilitado = TRUE " +
+//            " AND b.stock > 0")
+//    @TypeDiscriminator(column = "id_tipo_beneficio",
+//            cases = {
+//            @Case(value = "1", type = Descuento.class),
+//            @Case(value = "2", type = Producto.class)
+//
+//    })
+//    @Results({
+//            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+//            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+//            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+//    })
+//    List<Beneficio> obtenerBeneficiosPorCategoria(Integer idCategoria);
+    
+    
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +
             " b.titulo, " +
@@ -161,7 +195,8 @@ public interface BeneficioMapper {
             " WHERE b.id_categoria = #{idCategoria}" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
-            " AND b.stock > 0")
+            " AND b.stock > 0 "
+            + "OFFSET #{paginador.indicePagina}*#{paginador.cantidadPagina} LIMIT #{paginador.cantidadPagina} ")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
             @Case(value = "1", type = Descuento.class),
@@ -173,7 +208,28 @@ public interface BeneficioMapper {
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
             @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
-    List<Beneficio> obtenerBeneficiosPorCategoria(Integer idCategoria);
+    List<Beneficio> obtenerBeneficiosPorCategoriaPaginados(@Param("idCategoria") Integer idCategoria,@Param("paginador")Paginador paginador);
+   
+    
+    /***
+     * Obtiene el total de beneficio por categoria de beneficio
+     * @param idCategoria
+     * @return 
+     */
+    @Select(" SELECT COUNT(1) " +
+            " FROM proveedor.beneficio b" +
+            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " WHERE b.id_categoria = #{idCategoria}" +
+            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+            " AND b.habilitado = TRUE " +
+            " AND b.stock > 0")
+    Integer obtenerTotalBeneficiosPorCategoria(Integer idCategoria);
+    
+    
+    
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +
@@ -209,6 +265,40 @@ public interface BeneficioMapper {
     })
     List<Beneficio> obtenerBeneficiosCatFiltradosPorPrecio(@Param("idCategoria") Integer idCategoria, @Param("precioMin") Integer precioMin, @Param("precioMax") Integer precioMax);
 
+//    @Select(" SELECT b.id_beneficio AS idBeneficio," +
+//            " b.id_beneficio," +
+//            " b.titulo, " +
+//            " b.descripcion," +
+//            " b.calificacion," +
+//            " tb.id_tipo_beneficio," +
+//            " tb.nombre," +
+//            " bd.porcentaje_descuento as porcentajeDescuento," +
+//            " bp.precio_normal as precioNormal," +
+//            " bp.precio_oferta as precioOferta," +
+//            " p.nombre as nombreProveedor" +
+//            " FROM proveedor.beneficio b" +
+//            " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
+//            " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
+//            " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
+//            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+//            " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
+//            " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
+//            " AND b.habilitado = TRUE " +
+//            " AND b.stock > 0")
+//    @TypeDiscriminator(column = "id_tipo_beneficio",
+//            cases = {
+//                    @Case(value = "1", type = Descuento.class),
+//                    @Case(value = "2", type = Producto.class)
+//
+//            })
+//    @Results({
+//            @Result(property = "tipoBeneficio.idTipoBeneficio", column = "id_tipo_beneficio", javaType = TipoBeneficio.class, typeHandler = IntegerTypeHandler.class),
+//            @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
+//            @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
+//    })
+//    List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
+    
+    
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +
             " b.titulo, " +
@@ -228,7 +318,8 @@ public interface BeneficioMapper {
             " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
             " AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion " +
             " AND b.habilitado = TRUE " +
-            " AND b.stock > 0")
+            " AND b.stock > 0 "
+            + "OFFSET #{paginador.indicePagina}*#{paginador.cantidadPagina} LIMIT #{paginador.cantidadPagina} ")
     @TypeDiscriminator(column = "id_tipo_beneficio",
             cases = {
                     @Case(value = "1", type = Descuento.class),
@@ -240,7 +331,25 @@ public interface BeneficioMapper {
             @Result(property = "tipoBeneficio.nombre", column = "nombre", javaType = TipoBeneficio.class, typeHandler = StringTypeHandler.class),
             @Result(property = "imagenesBeneficio", column = "id_beneficio", javaType=List.class, many = @Many(select = "obtenerImagenesBeneficioPreview")),
     })
-    List<Beneficio> obtenerBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
+    List<Beneficio> obtenerBeneficiosPorCategoriaPadrePaginados(@Param("idCategoriaPadre")Integer idCategoriaPadre,@Param("paginador")Paginador paginador);
+    
+    
+    /***
+     * Obtiene el total de beneficios por categoria padre
+     * @param idCategoriaPadre
+     * @return 
+     */
+    @Select("SELECT count(1)" +
+            "FROM proveedor.beneficio b " +
+            "INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio  " +
+            "INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor " +
+            "LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio " +
+            "LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio " +
+            "WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre} )" +
+            "AND NOW() BETWEEN b.fecha_inicial AND b.fecha_expiracion  " +
+            "AND b.habilitado = TRUE  " +
+            "AND b.stock > 0")
+    Integer obtenerTotalBeneficiosPorCategoriaPadre(Integer idCategoriaPadre);
 
     @Select(" SELECT b.id_beneficio AS idBeneficio," +
             " b.id_beneficio," +

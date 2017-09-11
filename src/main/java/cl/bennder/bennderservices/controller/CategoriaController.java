@@ -69,13 +69,13 @@ public class CategoriaController {
         return response;
     }
 
-    @RequestMapping(value = "obtenerBeneficiosPorCategoria", method = RequestMethod.POST)
-    public BeneficiosResponse obtenerBeneficiosPorCategoria(@RequestBody CategoriasRequest request) {
-        log.info("INICIO");
-        BeneficiosResponse response = beneficioServices.obtenerBeneficiosPorCategoria(request.getNombreCategoria());
-        log.info("FIN");
-        return response;
-    }
+//    @RequestMapping(value = "obtenerBeneficiosPorCategoria", method = RequestMethod.POST)
+//    public BeneficiosResponse obtenerBeneficiosPorCategoria(@RequestBody CategoriasRequest request) {
+//        log.info("INICIO");
+//        BeneficiosResponse response = beneficioServices.obtenerBeneficiosPorCategoria(request.getNombreCategoria());
+//        log.info("FIN");
+//        return response;
+//    }
 
     @RequestMapping(value = "obtenerCategoriasRelacionadas", method = RequestMethod.POST)
     public CategoriasResponse obtenerCategoriasRelacionadas(@RequestBody CategoriasRequest request) {

@@ -276,6 +276,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         CategoriaResponse response = new CategoriaResponse();
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
         String server = env.getProperty("server");
+        Integer total = 0;
         try {
             Integer idCategoria = request.getIdCategoria();
             log.info("Cargando categoria: ->{}", idCategoria);
@@ -285,8 +286,9 @@ public class CategoriaServicesImpl implements CategoriaServices{
             }
             else {
                 Categoria categoria = categoriaMapper.obtenerCategoriaPorId(idCategoria);
+                log.info("Buscando por categoria->{}",idCategoria);
                 if (categoria == null) {
-                    log.error("Objeto categoria esta vacio");
+                    log.info("Objeto categoria esta vacio");
                     response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
                 } else {
                     log.info("Datos categoria ->{}", categoria.toString());
@@ -296,7 +298,13 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             log.info("Cargando categoria padre");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
                             response.setCategoriaPadre(categoria);
-                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria padre ->{}",total,categoria.getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(categoria.getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
                                 //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
                                 ImagenUtil.setUrlImagenesBenecio(server, beneficio);
@@ -307,8 +315,13 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             log.info("Cargando subCategoria");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoriaPadre()));
                             response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
-                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
-                            
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoria(categoria.getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria beneficio ->{}",total,categoria.getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(categoria.getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
                                 //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
                                 ImagenUtil.setUrlImagenesBenecio(server, beneficio);
