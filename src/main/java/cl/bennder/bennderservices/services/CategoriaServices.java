@@ -6,13 +6,9 @@
 package cl.bennder.bennderservices.services;
 
 import cl.bennder.entitybennderwebrest.model.Categoria;
-import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
-import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
-import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
-import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
-import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
-import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
-import cl.bennder.entitybennderwebrest.response.SubCategoriaProveedorResponse;
+import cl.bennder.entitybennderwebrest.request.*;
+import cl.bennder.entitybennderwebrest.response.*;
+
 import java.util.List;
 
 
@@ -26,12 +22,15 @@ public interface CategoriaServices {
     CategoriasResponse getCategorias(CategoriasRequest request);
     List<Categoria> getCategorias();
     CategoriasResponse obtenerCategoriasRelacionadas(CategoriasRequest request);
-    CategoriaResponse cargarCategoria(CategoriasRequest request);
+    CategoriaResponse cargarCategoria(CategoriaByIdRequest request);
     /***
      * Servicio que obtiene una lista de categorias (sub-categorias) validas del proveedor, es decir, en las cuales tiene beneficio
      * @param request
      * @return 
      */
     SubCategoriaProveedorResponse getSubCategoriasProveedor(SubCategoriaProveedorRequest request);
-    
+    BeneficiosResponse filtrarBeneficiosCategoriaPorPrecio(FiltrarBeneficiosRangoRequest request);
+    BeneficiosResponse filtrarBeneficiosCategoriaPorDescuento(FiltrarBeneficiosRangoRequest request);
+    BeneficiosResponse filtrarBeneficiosPorProveedor(FiltrarBeneficiosRequest request);
+    BeneficiosResponse filtrarBeneficiosPorCalificacion(FiltrarBeneficiosRequest request);
 }

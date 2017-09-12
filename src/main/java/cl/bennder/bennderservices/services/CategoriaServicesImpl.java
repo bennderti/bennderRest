@@ -12,21 +12,18 @@ import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Categoria;
 import cl.bennder.entitybennderwebrest.model.Validacion;
-import cl.bennder.entitybennderwebrest.request.CategoriaByIdRequest;
-import cl.bennder.entitybennderwebrest.request.CategoriasRequest;
-import cl.bennder.entitybennderwebrest.request.SubCategoriaProveedorRequest;
-import cl.bennder.entitybennderwebrest.response.BeneficiosCargadorResponse;
-import cl.bennder.entitybennderwebrest.response.CategoriaResponse;
-import cl.bennder.entitybennderwebrest.response.CategoriasResponse;
-import cl.bennder.entitybennderwebrest.response.SubCategoriaProveedorResponse;
-import java.util.ArrayList;
+import cl.bennder.entitybennderwebrest.request.*;
+import cl.bennder.entitybennderwebrest.response.*;
+
+import java.awt.print.Pageable;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
@@ -91,7 +88,114 @@ public class CategoriaServicesImpl implements CategoriaServices{
         return response;
     }
 
-    
+    @Override
+    @Transactional
+    public BeneficiosResponse filtrarBeneficiosCategoriaPorPrecio(FiltrarBeneficiosRangoRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+        log.info("INICIO");
+        response.setValidacion(new Validacion("0", "1", "No existen beneficios con esta criteria"));
+        log.info("Datos de entrada ->{}", request.toString());
+        Integer precioMin = request.getRangoMin();
+        Integer precioMax = request.getRangoMax();
+
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
+        switch (categoria.getIdCategoriaPadre()) {
+            case -1:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosPrecio(categoria.getIdCategoriaPadre(), precioMin, precioMax));
+                break;
+            default:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatFiltradosPorPrecio(categoria.getIdCategoria(), precioMin, precioMax));
+                break;
+        }
+        if (response == null || response.getBeneficios().isEmpty())
+            return  response;
+
+        response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosCategoriaPorPrecio OK"));
+        log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
+
+        return response;
+    }
+
+    @Override
+    public BeneficiosResponse filtrarBeneficiosCategoriaPorDescuento(FiltrarBeneficiosRangoRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+        log.info("INICIO");
+        response.setValidacion(new Validacion("0", "1", "No existen beneficios con esta criteria"));
+        log.info("Datos de entrada ->{}", request.toString());
+        Integer descuentoMin = request.getRangoMin();
+        Integer descuentoMax = request.getRangoMax();
+
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
+        switch (categoria.getIdCategoriaPadre()) {
+            case -1:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosDescuento(categoria.getIdCategoriaPadre(), descuentoMin, descuentoMax));
+                break;
+            default:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatFiltradosPorDescuento(categoria.getIdCategoria(), descuentoMin, descuentoMax));
+                break;
+        }
+        if (response == null || response.getBeneficios().isEmpty())
+            return  response;
+
+        response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosCategoriaPorDescuento OK"));
+        log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
+
+        return response;
+    }
+
+    @Override
+    public BeneficiosResponse filtrarBeneficiosPorProveedor(FiltrarBeneficiosRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+        log.info("INICIO");
+        response.setValidacion(new Validacion("0", "1", "No existen beneficios con esta criteria"));
+        log.info("Datos de entrada ->{}", request.toString());
+        String proveedor = request.getCampoAFiltrar();
+
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
+        switch (categoria.getIdCategoriaPadre()) {
+            case -1:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosProveedor(categoria.getIdCategoriaPadre(), proveedor));
+                break;
+            default:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatFiltradosPorProveedor(categoria.getIdCategoria(), proveedor));
+                break;
+        }
+        if (response == null || response.getBeneficios().isEmpty())
+            return  response;
+
+        response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosPorProveedor OK"));
+        log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
+
+        return response;
+    }
+
+    @Override
+    public BeneficiosResponse filtrarBeneficiosPorCalificacion(FiltrarBeneficiosRequest request) {
+        BeneficiosResponse response = new BeneficiosResponse();
+        log.info("INICIO");
+        response.setValidacion(new Validacion("0", "1", "No existen beneficios con esta criteria"));
+        log.info("Datos de entrada ->{}", request.toString());
+        Integer calificacion = Integer.parseInt(request.getCampoAFiltrar());
+
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
+        switch (categoria.getIdCategoriaPadre()) {
+            case -1:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosCalificacion(categoria.getIdCategoriaPadre(), calificacion));
+                break;
+            default:
+                response.setBeneficios(beneficioMapper.obtenerBeneficiosCatFiltradosPorCalificacion(categoria.getIdCategoria(), calificacion));
+                break;
+        }
+        if (response == null || response.getBeneficios().isEmpty())
+            return  response;
+
+        response.setValidacion(new Validacion("0", "0", "filtrarBeneficiosPorProveedor OK"));
+        log.info("cantidad de beneficios filtrados ->{}", response.getBeneficios().size());
+
+        return response;
+    }
+
+
     @Override
     @Transactional
     public CategoriasResponse obtenerCategoriasById(CategoriaByIdRequest request) {
@@ -168,28 +272,39 @@ public class CategoriaServicesImpl implements CategoriaServices{
     }
 
     @Transactional
-    public CategoriaResponse cargarCategoria(CategoriasRequest request) {
+    public CategoriaResponse cargarCategoria(CategoriaByIdRequest request) {
         CategoriaResponse response = new CategoriaResponse();
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
         String server = env.getProperty("server");
+        Integer total = 0;
         try {
-            String nombreCategoria = request.getNombreCategoria();
-            if (nombreCategoria == null || nombreCategoria.isEmpty()){
+            Integer idCategoria = request.getIdCategoria();
+            log.info("Cargando categoria: ->{}", idCategoria);
+            if (idCategoria == null){
                 log.error("Campo nombreCategoria esta vacio");
                 response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Campo nombreCategoria esta vacio"));
             }
             else {
-                Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(nombreCategoria.trim());
+                Categoria categoria = categoriaMapper.obtenerCategoriaPorId(idCategoria);
+                log.info("Buscando por categoria->{}",idCategoria);
                 if (categoria == null) {
-                    log.error("Objeto categoria esta vacio");
+                    log.info("Objeto categoria esta vacio");
                     response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
                 } else {
+                    log.info("Datos categoria ->{}", categoria.toString());
                     List<Beneficio> beneficios;
                     switch (categoria.getIdCategoriaPadre()) {
                         case -1:
+                            log.info("Cargando categoria padre");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
                             response.setCategoriaPadre(categoria);
-                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria padre ->{}",total,categoria.getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(categoria.getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
                                 //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
                                 ImagenUtil.setUrlImagenesBenecio(server, beneficio);
@@ -197,10 +312,16 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             response.setBeneficios(beneficios);
                             break;
                         default:
+                            log.info("Cargando subCategoria");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoriaPadre()));
                             response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
-                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
-                            
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoria(categoria.getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria beneficio ->{}",total,categoria.getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(categoria.getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
                                 //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
                                 ImagenUtil.setUrlImagenesBenecio(server, beneficio);
@@ -208,6 +329,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             response.setBeneficios(beneficios);
                             break;
                     }
+                    agregarFiltros(beneficios, response);
+
                     response.setValidacion(new Validacion("0", "0", "Categorías OK"));
                     log.info("Obtención de categorías->{}", response.getCategoriasRelacionadas().size());
 
@@ -220,6 +343,16 @@ public class CategoriaServicesImpl implements CategoriaServices{
         }
 
         return response;
+    }
+
+    private void agregarFiltros(List<Beneficio> beneficios, CategoriaResponse response) {
+        Map<String,Set<String>> filtros = new HashMap<>();
+        Set<String> proveedores = new HashSet<>();
+        beneficios.forEach(beneficio -> proveedores.add(beneficio.getNombreProveedor()));
+        log.info("filtro proveedores size->{}", proveedores.size());
+        filtros.put("proveedores", proveedores);
+        log.info("filtros cargados para esta categoria ->{}", filtros.size());
+        response.setFiltros(filtros);
     }
 
     @Override
