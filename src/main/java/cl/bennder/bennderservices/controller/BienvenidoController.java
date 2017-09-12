@@ -5,11 +5,17 @@
  */
 package cl.bennder.bennderservices.controller;
 
+import cl.bennder.bennderservices.security.JwtTokenUtil;
+import cl.bennder.bennderservices.services.BienvenidoServices;
 import cl.bennder.bennderservices.services.UsuarioServices;
-import cl.bennder.entitybennderwebrest.request.GuardarPreferenciasRequest;
+import cl.bennder.entitybennderwebrest.request.BienvenidoRequest;
+import cl.bennder.entitybennderwebrest.request.GuardarDatosBienvenidaRequest;
 import cl.bennder.entitybennderwebrest.request.LoginRequest;
+import cl.bennder.entitybennderwebrest.response.BienvenidoResponse;
+import cl.bennder.entitybennderwebrest.response.GuardarDatosBienvenidaResponse;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
 import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +37,30 @@ public class BienvenidoController {
     
     @Autowired
     private UsuarioServices usuarioServices;
+    
+    @Autowired
+    private BienvenidoServices bienvenidoServices;
+    
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
      
-    @RequestMapping(value = "bienvenido/guadarPreferencias", method = RequestMethod.POST)
-    public @ResponseBody
-    ValidacionResponse guardarPreferencias(@RequestBody GuardarPreferenciasRequest request) {
-        log.info("[login] - inicio ");
-        ValidacionResponse response = usuarioServices.guardarDatosBienvenidaUsuario(request);
-        log.info("response ->{}", response.toString());
-        log.info("[login] - fin ");
+    @RequestMapping(value = "bienvenido/obtenerDatosBienvenida",method = RequestMethod.POST)
+    public @ResponseBody BienvenidoResponse obtenerDatosBienvenida(@RequestBody BienvenidoRequest request){
+        log.info("INICIO");
+        BienvenidoResponse response = bienvenidoServices.obtenerDatosBienvenida(request);
+        log.info("FIN");
+        return response;
+    }    
+         
+    @RequestMapping(value = "bienvenido/guardarDatosBienvenida", method = RequestMethod.POST)
+    public @ResponseBody GuardarDatosBienvenidaResponse guardarDatosBienvenida (@RequestBody GuardarDatosBienvenidaRequest request, HttpServletRequest hsRequest) {
+        log.info("INICIO");
+        request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(hsRequest));
+        
+        GuardarDatosBienvenidaResponse response = bienvenidoServices.guardarDatosBienvenida(request);
+                
+        log.info("response ->{}", response.getValidacion().getMensaje());
+        log.info("FIN");
         
         return response;
     } 

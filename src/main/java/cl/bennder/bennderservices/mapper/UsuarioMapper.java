@@ -139,4 +139,13 @@ public interface UsuarioMapper {
             " WHERE pu.id_usuario = #{idUsuario}")
     List<Perfil> obtenerPerfilesUsuario(Integer idUsuario);
 
+    /**
+     * Actualiza el estado de un usuario según el idEstadoUsuario indicado con los siguientes valores 1:Nuevo, 2:Activo, 3:Inactivo
+     *
+     * @param idUsuario
+     * @param idEstadoUsuario
+     * @author mgutierrez
+     */
+    @Update("UPDATE USUARIO SET ID_ESTADO_USUARIO = #{idEstadoUsuario} WHERE ID_USUARIO = #{idUsuario}")
+    public void actualizarEstadoUsuario(@Param("idUsuario") Integer idUsuario, @Param("idEstadoUsuario")Integer idEstadoUsuario);
 }
