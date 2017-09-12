@@ -12,12 +12,9 @@ import cl.bennder.bennderservices.multitenancy.TenantContext;
 import cl.bennder.entitybennderwebrest.model.Usuario;
 import cl.bennder.entitybennderwebrest.model.Validacion;
 import cl.bennder.entitybennderwebrest.request.CambioPasswordRequest;
-import cl.bennder.entitybennderwebrest.request.GuardarPreferenciasRequest;
 import cl.bennder.entitybennderwebrest.request.LoginRequest;
 import cl.bennder.entitybennderwebrest.response.CambioPasswordResponse;
 import cl.bennder.entitybennderwebrest.response.LoginResponse;
-import cl.bennder.entitybennderwebrest.response.ValidacionResponse;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,17 +113,6 @@ public class UsuarioServicesImpl implements UsuarioServices{
         return response;
     }
     
-    @Override
-    public ValidacionResponse guardarDatosBienvenidaUsuario(GuardarPreferenciasRequest request) {
-        ValidacionResponse response = new ValidacionResponse();
-        response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema al guardar datos de la bienvenida del usuario"));
-        log.info("INICIO");
-        
-        //GuardarDatosAdicionalesUsuario
-        
-        //GuardarPreferenciasCategorias
-        return response;
-    }
     @Override
     public CambioPasswordResponse cambioPassword(CambioPasswordRequest request) {
         CambioPasswordResponse response = new CambioPasswordResponse();

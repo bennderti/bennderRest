@@ -86,5 +86,49 @@ public interface CategoriaMapper {
     @Select("SELECT id_categoria as idCategoria, nombre, id_categoria_padre AS idCategoriaPadre FROM proveedor.categoria WHERE id_categoria = #{idCategoria}")
     Categoria obtenerCategoriaPorId(Integer idCategoria);
 
-
+    /**
+     * Obtiene lista de todas las categorías con sus subcategorias
+     * MG - 04/09/2017
+     * @return List<Categoria>
+     */
+    @Select("SELECT c.id_categoria, c.nombre " +
+            "FROM proveedor.categoria c " +
+            "INNER JOIN proveedor.categoria c2 on c.id_categoria = c2.id_categoria_padre " +
+            "WHERE c.id_categoria_padre = -1 " +
+            "GROUP BY c.id_categoria " +
+            "ORDER BY c.nombre")
+    @Results(value = {
+           @Result (property = "idCategoria", column = "id_categoria"),
+           @Result (property = "nombre", column = "nombre"),
+           @Result (property = "subCategorias", column = "id_categoria", javaType=List.class, many = @Many(select = "obtenerTodasSubCategorias"))
+    })
+    List<Categoria> obtenerTodasCategorias();
+    
+    /**
+     * Obtiene lista de todas las subcategorías por id_categoria_padre
+     * MG - 04/09/2017
+     * @return List<Categoria>
+     */
+    @Select("SELECT id_categoria AS idCategoria, nombre, id_categoria_padre AS idCategoriaPadre " +
+            "FROM proveedor.categoria " +
+            "WHERE id_categoria_padre = #{idCategoriaPadre}" +
+            "ORDER BY nombre")
+    List<Categoria> obtenerTodasSubCategorias(Integer idCategoriaPadre);
+    
+    /**
+     * Inserta la categoria preferida de un usuario en específico
+     * MG - 11/09/2017
+     * @param idCategoria
+     * @param idUsuario 
+     */
+    @Insert("INSERT INTO INTERES_USUARIO (ID_CATEGORIA, ID_USUARIO) VALUES (#{idCategoria}, #{idUsuario})")
+    public void guardarInteresUsuario(@Param("idCategoria") Integer idCategoria, @Param("idUsuario")Integer idUsuario);
+    
+    /**
+     * Elimina todas las categorias preferidas de un usuario
+     * MG - 11/09/2017
+     * @param idUsuario 
+     */
+    @Delete("DELETE FROM INTERES_USUARIO WHERE ID_USUARIO = #{idUsuario}")
+    public void eliminarTodosInteresUsuario(Integer idUsuario);
 }

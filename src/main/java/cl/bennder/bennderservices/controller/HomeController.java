@@ -159,7 +159,7 @@ public class HomeController {
     }
     
     @RequestMapping(value = "login/cambioPassword", method = RequestMethod.POST)
-    public CambioPasswordResponse cambioPassword(@RequestBody CambioPasswordRequest request,HttpServletRequest req) {
+    public CambioPasswordResponse cambioPassword(@RequestBody CambioPasswordRequest request, HttpServletRequest req) {
         log.info("[login/cambioPassword] - inicio ");
         //request.setIdUsuario(jwtTokenUtil.getIdUsuarioDesdeRequest(req));
         CambioPasswordResponse response = usuarioServices.cambioPassword(request);
