@@ -33,4 +33,5 @@ public interface CategoriaServices {
     BeneficiosResponse filtrarBeneficiosCategoriaPorDescuento(FiltrarBeneficiosRangoRequest request);
     BeneficiosResponse filtrarBeneficiosPorProveedor(FiltrarBeneficiosRequest request);
     BeneficiosResponse filtrarBeneficiosPorCalificacion(FiltrarBeneficiosRequest request);
+    PaginadorBeneficioResponse obtenerBeneficiosPaginados(PaginadorBeneficioRequest request);
 }

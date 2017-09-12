@@ -50,6 +50,64 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     @Override
     @Transactional
+    public PaginadorBeneficioResponse obtenerBeneficiosPaginados(PaginadorBeneficioRequest request) {
+        PaginadorBeneficioResponse response = new PaginadorBeneficioResponse();
+        response.setValidacion(new Validacion("0","1","Problemas al obtener beneficios"));
+        Integer total = 0;
+        log.info("inicio");
+        try {
+            List<Beneficio> beneficios = new ArrayList<>();
+            String server = env.getProperty("server");
+            switch (request.getPaginador().getCategoria().getIdCategoriaPadre()) { 
+                        case -1:
+                            log.info("es categoría principal...");
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoriaPadre(request.getPaginador().getCategoria().getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria padre ->{}",total,request.getPaginador().getCategoria().getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(request.getPaginador().getCategoria().getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
+                            for (Beneficio beneficio : beneficios){
+                                //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                            }
+                            response.setBeneficios(beneficios);
+                            break;
+                        default:
+                            log.info("es Sub-categoría...");
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoria(request.getPaginador().getCategoria().getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria beneficio ->{}",total,request.getPaginador().getCategoria().getIdCategoria());                            
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(request.getPaginador().getCategoria().getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
+                            for (Beneficio beneficio : beneficios){
+                                //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                            }
+                            response.setBeneficios(beneficios);
+                            break;
+                    }
+                    //agregarFiltros(beneficios, response);       
+            
+            
+        } catch (Exception e) {
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al obtener beneficios");
+            log.error("Exception getBeneficiosByIdCat,",e);
+        }
+        log.info("fin");
+        return response;
+    }
+
+    
+    
+    
+    @Override
+    @Transactional
     public BeneficiosCargadorResponse getBeneficiosByIdCat(CategoriaByIdRequest request) {
         BeneficiosCargadorResponse response = new BeneficiosCargadorResponse();
         response.setValidacion(new Validacion("0","1","Sin beneficios"));
@@ -291,7 +349,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
                     response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
                 } else {
                     List<Beneficio> beneficios;
-                    switch (categoria.getIdCategoriaPadre()) {
+                    switch (categoria.getIdCategoriaPadre()) { 
                         case -1:
                             log.info("es categoría principal...");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
@@ -301,6 +359,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
+                            categoria.setNombre(nombreCategoria.trim());
+                            request.getPaginador().setCategoria(categoria);
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
@@ -318,6 +378,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
+                            categoria.setNombre(nombreCategoria.trim());
+                            request.getPaginador().setCategoria(categoria);
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
