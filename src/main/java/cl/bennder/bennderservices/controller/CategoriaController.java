@@ -86,7 +86,7 @@ public class CategoriaController {
     }
 
     @RequestMapping(value = "cargarCategoria", method = RequestMethod.POST)
-    public CategoriaResponse cargarCategoria(@RequestBody CategoriasRequest request) {
+    public CategoriaResponse cargarCategoria(@RequestBody CategoriaByIdRequest request) {
         log.info("INICIO");
         CategoriaResponse response = categoriaServices.cargarCategoria(request);
         log.info("FIN");

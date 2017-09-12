@@ -156,7 +156,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         Integer precioMin = request.getRangoMin();
         Integer precioMax = request.getRangoMax();
 
-        Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(request.getNombreCategoria().trim());
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
         switch (categoria.getIdCategoriaPadre()) {
             case -1:
                 response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosPrecio(categoria.getIdCategoriaPadre(), precioMin, precioMax));
@@ -183,7 +183,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         Integer descuentoMin = request.getRangoMin();
         Integer descuentoMax = request.getRangoMax();
 
-        Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(request.getNombreCategoria().trim());
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
         switch (categoria.getIdCategoriaPadre()) {
             case -1:
                 response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosDescuento(categoria.getIdCategoriaPadre(), descuentoMin, descuentoMax));
@@ -209,7 +209,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         log.info("Datos de entrada ->{}", request.toString());
         String proveedor = request.getCampoAFiltrar();
 
-        Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(request.getNombreCategoria().trim());
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
         switch (categoria.getIdCategoriaPadre()) {
             case -1:
                 response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosProveedor(categoria.getIdCategoriaPadre(), proveedor));
@@ -235,7 +235,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
         log.info("Datos de entrada ->{}", request.toString());
         Integer calificacion = Integer.parseInt(request.getCampoAFiltrar());
 
-        Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(request.getNombreCategoria().trim());
+        Categoria categoria = categoriaMapper.obtenerCategoriaPorId(request.getIdCategoria());
         switch (categoria.getIdCategoriaPadre()) {
             case -1:
                 response.setBeneficios(beneficioMapper.obtenerBeneficiosCatPadreFiltradosCalificacion(categoria.getIdCategoriaPadre(), calificacion));
@@ -330,28 +330,30 @@ public class CategoriaServicesImpl implements CategoriaServices{
     }
 
     @Transactional
-    public CategoriaResponse cargarCategoria(CategoriasRequest request) {
+    public CategoriaResponse cargarCategoria(CategoriaByIdRequest request) {
         CategoriaResponse response = new CategoriaResponse();
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
         String server = env.getProperty("server");
         Integer total = 0;
         try {
-            String nombreCategoria = request.getNombreCategoria();
-            if (nombreCategoria == null || nombreCategoria.isEmpty()){
+            Integer idCategoria = request.getIdCategoria();
+            log.info("Cargando categoria: ->{}", idCategoria);
+            if (idCategoria == null){
                 log.error("Campo nombreCategoria esta vacio");
                 response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Campo nombreCategoria esta vacio"));
             }
             else {
-                log.info("Buscando por categoria->{}",nombreCategoria.trim());
-                Categoria categoria = categoriaMapper.obtenerCategoriaPorNombre(nombreCategoria.trim());
+                Categoria categoria = categoriaMapper.obtenerCategoriaPorId(idCategoria);
+                log.info("Buscando por categoria->{}",idCategoria);
                 if (categoria == null) {
                     log.info("Objeto categoria esta vacio");
                     response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO, "0", "Objeto categoria esta vacio"));
                 } else {
+                    log.info("Datos categoria ->{}", categoria.toString());
                     List<Beneficio> beneficios;
                     switch (categoria.getIdCategoriaPadre()) { 
                         case -1:
-                            log.info("es categoría principal...");
+                            log.info("Cargando categoria padre");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoria()));
                             response.setCategoriaPadre(categoria);
                             total = beneficioMapper.obtenerTotalBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
@@ -370,11 +372,11 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             response.setBeneficios(beneficios);
                             break;
                         default:
-                            log.info("es Sub-categoría...");
+                            log.info("Cargando subCategoria");
                             response.setCategoriasRelacionadas(categoriaMapper.obtenerSubCategoriasConCantidadBeneficios(categoria.getIdCategoriaPadre()));
                             response.setCategoriaPadre(categoriaMapper.obtenerCategoriaPorId(categoria.getIdCategoriaPadre()));
                             total = beneficioMapper.obtenerTotalBeneficiosPorCategoria(categoria.getIdCategoria());
-                            log.info("Total beneficios ->{} para categoria beneficio ->{}",total,categoria.getIdCategoria());                            
+                            log.info("Total beneficios ->{} para categoria beneficio ->{}",total,categoria.getIdCategoria());
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);

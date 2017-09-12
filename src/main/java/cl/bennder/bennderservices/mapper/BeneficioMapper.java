@@ -706,12 +706,14 @@ public interface BeneficioMapper {
             " bd.porcentaje_descuento as porcentajeDescuento," +
             " bp.precio_normal as precioNormal," +
             " bp.precio_oferta as precioOferta," +
+            " BG.GANCHO, " +
             " p.nombre as nombreProveedor" +
             " FROM proveedor.beneficio b" +
             " INNER JOIN proveedor.tipo_beneficio tb ON tb.id_tipo_beneficio = b.id_tipo_beneficio " +
             " INNER JOIN proveedor.proveedor p ON p.id_proveedor = b.id_proveedor" +
             " LEFT JOIN proveedor.beneficio_descuento bd ON b.id_beneficio = bd.id_beneficio" +
-            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio";
+            " LEFT JOIN proveedor.beneficio_producto bp ON b.id_beneficio = bp.id_beneficio" +
+            " LEFT JOIN proveedor.BENEFICIO_GANCHO BG ON b.ID_BENEFICIO = BG.ID_BENEFICIO " ;
 
     @Select(QUERY_DETALLE_BENEFICIO +
             " WHERE b.id_categoria in (SELECT id_categoria FROM proveedor.categoria WHERE id_categoria_padre = #{idCategoriaPadre})" +
