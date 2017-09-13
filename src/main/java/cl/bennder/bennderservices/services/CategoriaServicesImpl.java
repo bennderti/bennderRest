@@ -361,7 +361,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
-                            categoria.setNombre(nombreCategoria.trim());
+                            //categoria.setNombre(nombreCategoria.trim());
                             request.getPaginador().setCategoria(categoria);
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
@@ -380,7 +380,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
-                            categoria.setNombre(nombreCategoria.trim());
+                           // categoria.setNombre(nombreCategoria.trim());
                             request.getPaginador().setCategoria(categoria);
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
