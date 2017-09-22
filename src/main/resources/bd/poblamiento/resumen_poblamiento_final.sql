@@ -562,3 +562,10 @@ INSERT INTO CATEGORIA (ID_CATEGORIA_PADRE, NOMBRE, DESCRIPCION, ID_CATEGORIA) VA
 INSERT INTO TIPO_BENEFICIO VALUES(1, 'DESCUENTO');
 INSERT INTO TIPO_BENEFICIO VALUES(2, 'PRODUCTO');
 INSERT INTO TIPO_BENEFICIO VALUES(3, 'GANCHO');
+
+
+/*==============================================================*/
+/*Parámetros para beneficios por página */
+/*==============================================================*/
+INSERT INTO PARAMETRO_SISTEMA(TIPO_PARAMETRO,CLAVE,VALOR_A,VALOR_B)
+VALUES('PAGINACION','ITEMS_POR_PAGINA','10','');

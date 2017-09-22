@@ -8,6 +8,7 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
+import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Categoria;
@@ -37,6 +38,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
     
+    private static final String PAGINACION = "PAGINACION";
+    private static final String ITEMS_POR_PAGINA = "ITEMS_POR_PAGINA";
     
     @Autowired
     private Environment env;
@@ -47,6 +50,9 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     @Autowired
     private BeneficioMapper beneficioMapper;
+             
+    @Autowired
+    private ParametroSistemaServices parametroSistemaServices;
 
     @Override
     @Transactional
@@ -58,6 +64,11 @@ public class CategoriaServicesImpl implements CategoriaServices{
         try {
             List<Beneficio> beneficios = new ArrayList<>();
             String server = env.getProperty("server");
+            ParametroSistema pItemsPagina = parametroSistemaServices.getDatosParametroSistema(PAGINACION, ITEMS_POR_PAGINA);
+            if(pItemsPagina!=null && pItemsPagina.getValorA()!=null&&!pItemsPagina.getValorA().equals("")){
+                log.info("items por página ->{}",pItemsPagina.getValorA());
+                request.getPaginador().setCantidadPagina(Integer.parseInt(pItemsPagina.getValorA()));
+            }
             switch (request.getPaginador().getCategoria().getIdCategoriaPadre()) { 
                         case -1:
                             log.info("es categoría principal...");
@@ -66,6 +77,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(request.getPaginador().getCategoria().getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
+                            
+                            
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
@@ -338,6 +351,11 @@ public class CategoriaServicesImpl implements CategoriaServices{
         try {
             Integer idCategoria = request.getIdCategoria();
             log.info("Cargando categoria: ->{}", idCategoria);
+            ParametroSistema pItemsPagina = parametroSistemaServices.getDatosParametroSistema(PAGINACION, ITEMS_POR_PAGINA);
+            if(pItemsPagina!=null && pItemsPagina.getValorA()!=null&&!pItemsPagina.getValorA().equals("")){
+                log.info("items por página ->{}",pItemsPagina.getValorA());
+                request.getPaginador().setCantidadPagina(Integer.parseInt(pItemsPagina.getValorA()));
+            }
             if (idCategoria == null){
                 log.error("Campo nombreCategoria esta vacio");
                 response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Campo nombreCategoria esta vacio"));
