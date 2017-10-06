@@ -242,6 +242,7 @@ create table USUARIO (
   APELLIDO_M           VARCHAR(50)          not null,
   FECHA_NACIMIENTO     DATE                 not null,
   HABILITADO           BOOLEAN              not null DEFAULT false,
+  ES_PASSWORD_TEMP           BOOLEAN        not null DEFAULT true,
   constraint PK_USUARIO primary key (ID_USUARIO)
 );
 
