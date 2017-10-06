@@ -35,6 +35,9 @@ public class BeneficioServicesImpl implements BeneficioServices {
     @Value("${bucketImagenes}")
     String bucketImagenes;
 
+    @Value("${environment}")
+    private String environment;
+
     @Autowired
     private CuponBeneficioServices cuponBeneficioServices;
     
@@ -75,7 +78,7 @@ public class BeneficioServicesImpl implements BeneficioServices {
                 String server = env.getProperty("server");
                 //Cambio de url de repositorio de imagenes a Amazon s3
 //                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
-                ImagenUtil.setUrlImagenesBenecio(bucketImagenes, beneficio);
+                ImagenUtil.setUrlImagenesBenecio(bucketImagenes + environment , beneficio);
 
                 
                 //.- Registrando visitas y accion de usuario

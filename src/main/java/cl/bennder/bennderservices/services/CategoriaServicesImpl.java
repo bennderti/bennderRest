@@ -21,6 +21,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,12 @@ public class CategoriaServicesImpl implements CategoriaServices{
     
     @Autowired
     private Environment env;
-            
+
+    @Value("${bucketImagenes}")
+    private String bucketImagenes;
+
+    @Value("${environment}")
+    private String environment;
             
     @Autowired
     private CategoriaMapper categoriaMapper;
@@ -275,7 +281,7 @@ public class CategoriaServicesImpl implements CategoriaServices{
     public CategoriaResponse cargarCategoria(CategoriaByIdRequest request) {
         CategoriaResponse response = new CategoriaResponse();
         response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Problema en validación de usuario"));
-        String server = env.getProperty("server");
+//        String server = env.getProperty("server");
         Integer total = 0;
         try {
             Integer idCategoria = request.getIdCategoria();
@@ -303,11 +309,12 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
+
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
                                 //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
-                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(bucketImagenes + environment, beneficio);
                             }
                             response.setBeneficios(beneficios);
                             break;
@@ -324,11 +331,12 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
                                 //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
-                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(bucketImagenes + environment, beneficio);
                             }
                             response.setBeneficios(beneficios);
                             break;
                     }
+                    request.getPaginador().setCategoria(categoria);
                     agregarFiltros(beneficios, response);
 
                     response.setValidacion(new Validacion("0", "0", "Categorías OK"));
