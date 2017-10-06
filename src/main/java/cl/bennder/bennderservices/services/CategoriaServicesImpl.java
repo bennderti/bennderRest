@@ -8,6 +8,7 @@ package cl.bennder.bennderservices.services;
 import cl.bennder.bennderservices.constantes.CodigoValidacion;
 import cl.bennder.bennderservices.mapper.BeneficioMapper;
 import cl.bennder.bennderservices.mapper.CategoriaMapper;
+import cl.bennder.bennderservices.model.ParametroSistema;
 import cl.bennder.bennderservices.util.ImagenUtil;
 import cl.bennder.entitybennderwebrest.model.Beneficio;
 import cl.bennder.entitybennderwebrest.model.Categoria;
@@ -38,7 +39,9 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     private static final Logger log = LoggerFactory.getLogger(CategoriaServicesImpl.class);
     
-    
+    private static final String PAGINACION = "PAGINACION";
+    private static final String ITEMS_POR_PAGINA = "ITEMS_POR_PAGINA";
+
     @Autowired
     private Environment env;
 
@@ -53,6 +56,74 @@ public class CategoriaServicesImpl implements CategoriaServices{
 
     @Autowired
     private BeneficioMapper beneficioMapper;
+
+    @Autowired
+    private ParametroSistemaServices parametroSistemaServices;
+
+    @Override
+    @Transactional
+    public PaginadorBeneficioResponse obtenerBeneficiosPaginados(PaginadorBeneficioRequest request) {
+        PaginadorBeneficioResponse response = new PaginadorBeneficioResponse();
+        response.setValidacion(new Validacion("0","1","Problemas al obtener beneficios"));
+        Integer total = 0;
+        log.info("inicio");
+        try {
+            List<Beneficio> beneficios = new ArrayList<>();
+            String server = env.getProperty("server");
+            ParametroSistema pItemsPagina = parametroSistemaServices.getDatosParametroSistema(PAGINACION, ITEMS_POR_PAGINA);
+            if(pItemsPagina!=null && pItemsPagina.getValorA()!=null&&!pItemsPagina.getValorA().equals("")){
+                log.info("items por página ->{}",pItemsPagina.getValorA());
+                request.getPaginador().setCantidadPagina(Integer.parseInt(pItemsPagina.getValorA()));
+            }
+            switch (request.getPaginador().getCategoria().getIdCategoriaPadre()) {
+                        case -1:
+                            log.info("es categoría principal...");
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoriaPadre(request.getPaginador().getCategoria().getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria padre ->{}",total,request.getPaginador().getCategoria().getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(request.getPaginador().getCategoria().getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+
+
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
+                            for (Beneficio beneficio : beneficios){
+                                //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                            }
+                            response.setBeneficios(beneficios);
+                            break;
+                        default:
+                            log.info("es Sub-categoría...");
+                            total = beneficioMapper.obtenerTotalBeneficiosPorCategoria(request.getPaginador().getCategoria().getIdCategoria());
+                            log.info("Total beneficios ->{} para categoria beneficio ->{}",total,request.getPaginador().getCategoria().getIdCategoria());
+                            //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
+                            beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(request.getPaginador().getCategoria().getIdCategoria(),request.getPaginador());
+                            request.getPaginador().setTotal(total);
+                            response.setPaginador(request.getPaginador());
+                            log.info("Información paginador->{}",request.getPaginador().toString());
+                            for (Beneficio beneficio : beneficios){
+                                //ImagenUtil.convertirImagenesBeneficiosABase64(beneficio);
+                                ImagenUtil.setUrlImagenesBenecio(server, beneficio);
+                            }
+                            response.setBeneficios(beneficios);
+                            break;
+                    }
+                    //agregarFiltros(beneficios, response);
+
+
+        } catch (Exception e) {
+            response.getValidacion().setCodigo("1");
+            response.getValidacion().setCodigoNegocio("1");
+            response.getValidacion().setMensaje("Error al obtener beneficios");
+            log.error("Exception getBeneficiosByIdCat,",e);
+        }
+        log.info("fin");
+        return response;
+    }
+
+
+
 
     @Override
     @Transactional
@@ -286,6 +357,11 @@ public class CategoriaServicesImpl implements CategoriaServices{
         try {
             Integer idCategoria = request.getIdCategoria();
             log.info("Cargando categoria: ->{}", idCategoria);
+            ParametroSistema pItemsPagina = parametroSistemaServices.getDatosParametroSistema(PAGINACION, ITEMS_POR_PAGINA);
+            if(pItemsPagina!=null && pItemsPagina.getValorA()!=null&&!pItemsPagina.getValorA().equals("")){
+                log.info("items por página ->{}",pItemsPagina.getValorA());
+                request.getPaginador().setCantidadPagina(Integer.parseInt(pItemsPagina.getValorA()));
+            }
             if (idCategoria == null){
                 log.error("Campo nombreCategoria esta vacio");
                 response.setValidacion(new Validacion(CodigoValidacion.ERROR_SERVICIO,"0","Campo nombreCategoria esta vacio"));
@@ -309,7 +385,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadre(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPadrePaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
-
+                            //categoria.setNombre(nombreCategoria.trim());
+                            request.getPaginador().setCategoria(categoria);
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
@@ -327,6 +404,8 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             //beneficios = beneficioMapper.obtenerBeneficiosPorCategoria(categoria.getIdCategoria());
                             beneficios = beneficioMapper.obtenerBeneficiosPorCategoriaPaginados(categoria.getIdCategoria(),request.getPaginador());
                             request.getPaginador().setTotal(total);
+                           // categoria.setNombre(nombreCategoria.trim());
+                            request.getPaginador().setCategoria(categoria);
                             response.setPaginador(request.getPaginador());
                             log.info("Información paginador->{}",request.getPaginador().toString());
                             for (Beneficio beneficio : beneficios){
@@ -336,7 +415,6 @@ public class CategoriaServicesImpl implements CategoriaServices{
                             response.setBeneficios(beneficios);
                             break;
                     }
-                    request.getPaginador().setCategoria(categoria);
                     agregarFiltros(beneficios, response);
 
                     response.setValidacion(new Validacion("0", "0", "Categorías OK"));

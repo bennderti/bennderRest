@@ -10,8 +10,6 @@ import cl.bennder.bennderservices.security.JwtTokenUtil;
 import cl.bennder.bennderservices.security.JwtUser;
 import cl.bennder.bennderservices.services.UsuarioServices;
 import cl.bennder.entitybennderwebrest.model.Validacion;
-import cl.bennder.entitybennderwebrest.request.JwtAuthenticationRequest;
-import cl.bennder.entitybennderwebrest.response.JwtAuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

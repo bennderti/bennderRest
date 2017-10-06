@@ -3,12 +3,13 @@
 /* Created on:     28-04-2017 0:28:00                           */
 /*==============================================================*/
 --TODO: CAMBIAR NOMBRE DE ESQUEMA A EMPRESA CORRESPONDIENTE
-CREATE SCHEMA BENNDER
-  AUTHORIZATION bennder;
+
+--CREATE SCHEMA BENNDER
+  --AUTHORIZATION bennder;
 
 --CAMBIANDO CONEXION A ESQUEMA DE EMPRESA;
 --TODO: CAMBIAR NOMBRE DE ESQUEMA A EMPRESA CORRESPONDIENTE
-SET SEARCH_PATH TO BENNDER;
+--ET SEARCH_PATH TO BENNDER;
 
 /*==============================================================*/
 /* DBMS name:      PGSQL9                                       */
