@@ -151,6 +151,7 @@ public class EmailServicesImpl implements EmailServices{
                     EmailTemplate datosEmailTemplate = new EmailTemplate();
                     datosEmailTemplate.setMailFrom(paramCorreo.getValorA());
                     String passMailFrom = paramCorreo.getValorB();
+                    String username = paramCorreo.getValorC();
                     //.- datos de plantilla
                     log.info("obteniendo datos de plantilla html...");
                     PlantillaCorreo plantillaCorreo = emailMapper.getDatosPlantillaCorreo(ID_TEMPLATE_NOTIFICA_CANJE_BENEFICIO);
@@ -172,7 +173,7 @@ public class EmailServicesImpl implements EmailServices{
                         log.info("obteniendo beans de email...");
                         ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
                         Mailer mailer = (Mailer) context.getBean("mailer");
-                        Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
+                        Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom,username); 
                         if(val!=null && "0".equals(val.getCodigo())&& "0".equals(val.getCodigoNegocio())){
                            val.setMensaje("Se ha enviado información de beneficio canjeado");
                            log.info("{} Se ha enviado información de beneficio canjeado a correo: {} ",mensajeLog,correoUsuario);
@@ -227,6 +228,7 @@ public class EmailServicesImpl implements EmailServices{
                     EmailTemplate datosEmailTemplate = new EmailTemplate();
                     datosEmailTemplate.setMailFrom(paramCorreo.getValorA());
                     String passMailFrom = paramCorreo.getValorB();
+                    String username = paramCorreo.getValorC();
                     //.- datos de plantilla
                     log.info("obteniendo datos de plantilla html...");
                     PlantillaCorreo plantillaCorreo = emailMapper.getDatosPlantillaCorreo(ID_TEMPLATE_ENVIO_LINK_CUPON);
@@ -248,7 +250,7 @@ public class EmailServicesImpl implements EmailServices{
                         log.info("obteniendo beans de email...");
                         ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
                         Mailer mailer = (Mailer) context.getBean("mailer");
-                        Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
+                        Validacion val = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom,username); 
                         if(val!=null && "0".equals(val.getCodigo())&& "0".equals(val.getCodigoNegocio())){
                            val.setMensaje("Se ha enviado información de beneficio obtenido a su correo: "+correoUsuario);
                            log.info("{} Se ha enviado información de beneficio obtenido a su correo: {} ",mensajeLog,correoUsuario);
@@ -367,6 +369,7 @@ public class EmailServicesImpl implements EmailServices{
                 EmailTemplate datosEmailTemplate = new EmailTemplate();
                 datosEmailTemplate.setMailFrom(paramCorreo.getValorA());
                 String passMailFrom = paramCorreo.getValorB();
+                String username = paramCorreo.getValorC();
                 //.- datos de plantilla
                 log.info("obteniendo datos de plantilla html...");
                 PlantillaCorreo plantillaCorreo = emailMapper.getDatosPlantillaCorreo(ID_TEMPLATE_RECUPERACION_CORREO);
@@ -390,7 +393,7 @@ public class EmailServicesImpl implements EmailServices{
                         log.info("obteniendo beans de email...");
                         ApplicationContext context = new ClassPathXmlApplicationContext(VELOCITY_BEANS_XML);
                         Mailer mailer = (Mailer) context.getBean("mailer");
-                        response = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom); 
+                        response = mailer.envioCorreoTemplate(datosEmailTemplate, passMailFrom,username); 
 //                    }
 //                    else{  
 //                        response.setCodigoNegocio("3");
