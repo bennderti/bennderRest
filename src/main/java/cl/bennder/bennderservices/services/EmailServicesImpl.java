@@ -374,6 +374,7 @@ public class EmailServicesImpl implements EmailServices{
                 log.info("obteniendo datos de plantilla html...");
                 PlantillaCorreo plantillaCorreo = emailMapper.getDatosPlantillaCorreo(ID_TEMPLATE_RECUPERACION_CORREO);
                 if(plantillaCorreo != null){
+                    
                     log.info("datos plantilla correo ->{}",plantillaCorreo.toString());
                     datosEmailTemplate.setMailSubject(plantillaCorreo.getAsunto());
                     datosEmailTemplate.setNombreTemplate(plantillaCorreo.getNombre());

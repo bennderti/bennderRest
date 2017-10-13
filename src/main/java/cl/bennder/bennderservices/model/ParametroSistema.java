@@ -78,6 +78,8 @@ public class ParametroSistema {
     public void setValorC(String valorC) {
         this.valorC = valorC;
     }
+
+    
     
     
 }
